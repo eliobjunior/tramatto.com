@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
   <nav>
@@ -69,9 +69,9 @@
       <div>
         <div class="footer-col-title">Ajuda</div>
         <ul class="footer-links">
-          <li><a href="#">Como comprar</a></li>
-          <li><a href="#">Frete e prazo</a></li>
-          <li><a href="#">Contato</a></li>
+          <li><a href="pages/about.html">Nossa marca</a></li>
+          <li><a href="pages/shipping.html">Frete e prazo</a></li>
+          <li><a href="pages/contact.html">Contato</a></li>
         </ul>
       </div>
       <div>
@@ -88,7 +88,17 @@
     </div>
   </footer>
 
+  <script src="js/config.js"></script>
+  <script src="js/domain-model.js"></script>
+  <script src="js/services.js"></script>
+  <script src="js/adapters.js"></script>
+  <script src="integrations/nuvemshop/client.js"></script>
+  <script src="integrations/nuvemshop/mapper.js"></script>
+  <script src="integrations/nuvemshop/catalog.js"></script>
+  <script src="integrations/nuvemshop/products.js"></script>
+  <script src="integrations/nuvemshop/cart.js"></script>
   <script src="catalog-data.js"></script>
   <script src="script.js"></script>
+  <script src="js/analytics.js"></script>
 </body>
 </html>
