@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tramatto — Coleção Premium</title>
+  <meta name="description" content="Explore a coleção de panos de prato turcos premium da Tramatto, pensada para cozinhas e mesas sofisticadas." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://tramatto.com/collection.html" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Coleção Premium Tramatto",
+    "url": "https://tramatto.com/collection.html",
+    "description": "Explore a coleção de panos de prato turcos premium da Tramatto, com peças selecionadas para cozinhas sofisticadas."
+  }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="nav-logo">Trama<span>tto</span></a>
+    <ul class="nav-links">
+      <li><a href="collection.html">Panos Avulsos</a></li>
+      <li><a href="collection.html">Kits</a></li>
+      <li><a href="collection.html">Coleções</a></li>
+      <li><a href="index.html#origem">A Marca</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="collection.html" class="nav-cart">Sacola (0)</a>
+    </div>
+    <button class="nav-hamburger" aria-label="Menu" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+  <div class="nav-mobile-menu" id="mobileMenu">
+    <a href="collection.html" onclick="toggleMenu()">Panos Avulsos</a>
+    <a href="collection.html" onclick="toggleMenu()">Kits</a>
+    <a href="collection.html" onclick="toggleMenu()">Coleções</a>
+    <a href="index.html#origem" onclick="toggleMenu()">A Marca</a>
+    <a href="collection.html" onclick="toggleMenu()" style="border-bottom:none;color:var(--terra);">Sacola (0)</a>
+  </div>
+
+  <main class="collection-page">
+    <section class="collection-hero">
+      <div class="section-tag">Coleção premium</div>
+      <h1>Panos de prato feitos para durar e decorar.</h1>
+      <p>Escolha peças de algodão egípcio, acabamento refinado e presença de marca para transformar qualquer cozinha em um espaço mais sofisticado.</p>
+    </section>
+
+    <section class="products-grid" id="collectionProducts"></section>
+  </main>
+
+  <footer>
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand-name">Trama<em>tto</em></div>
+        <p class="footer-tagline">Panos de prato turcos de qualidade premium. Da Anatólia para a sua cozinha.</p>
+        <div class="footer-socials">
+          <a href="#" class="footer-social">Instagram</a>
+          <a href="#" class="footer-social">Pinterest</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Loja</div>
+        <ul class="footer-links">
+          <li><a href="collection.html">Panos Avulsos</a></li>
+          <li><a href="collection.html">Kits</a></li>
+          <li><a href="collection.html">Coleções</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Ajuda</div>
+        <ul class="footer-links">
+          <li><a href="#">Como comprar</a></li>
+          <li><a href="#">Frete e prazo</a></li>
+          <li><a href="#">Contato</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">A marca</div>
+        <ul class="footer-links">
+          <li><a href="index.html#origem">Nossa história</a></li>
+          <li><a href="#">Sobre o tecido</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2025 Tramatto. Todos os direitos reservados.</div>
+      <div class="footer-origin">Da Anatólia com cuidado · Anatolia'dan sevgiyle</div>
+    </div>
+  </footer>
+
+  <script src="catalog-data.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
