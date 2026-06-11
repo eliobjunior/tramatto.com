@@ -557,13 +557,13 @@ footer {
   }
   .hero-right {
     order: 1;
-    aspect-ratio: 1065 / 1008;
+    aspect-ratio: 5 / 7;
     height: auto;
-    min-height: 360px;
-    max-height: 480px;
+    min-height: 380px;
+    max-height: 560px;
   }
   .hero-right img {
-    object-position: center 15%;
+    object-position: center top;
   }
   .hero-float-tag {
     position: static;
