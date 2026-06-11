@@ -6,6 +6,11 @@
   const Products = root.TramattoNuvemshopProducts || {};
   const CartUtil = root.TramattoNuvemshopCart || {};
 
+  function parsePrice(value) {
+    const normalized = String(value).replace(/[R$\s]/g, '').replace(/\./g, '').replace(',', '.');
+    return Number(normalized) || 0;
+  }
+
   class MockAdapter {
     constructor(data = root.catalogData || {}) {
       this.data = data;
@@ -14,12 +19,12 @@
     async getProducts() {
       return (this.data.products || []).map((item) => new Domain.Product({
         ...item,
-        price: Number(String(item.price).replace(/[R$.,]/g, '').trim()) || 0,
-        promotionalPrice: item.promotionalPrice ? Number(String(item.promotionalPrice).replace(/[R$.,]/g, '').trim()) : null,
+        price: parsePrice(item.price),
+        promotionalPrice: item.promotionalPrice ? parsePrice(item.promotionalPrice) : null,
         variants: Array.isArray(item.variants) ? item.variants.map((variant) => new Domain.Variant({
           ...variant,
-          price: Number(String(variant.price).replace(/[R$.,]/g, '').trim()) || 0,
-          promotionalPrice: variant.promotionalPrice ? Number(String(variant.promotionalPrice).replace(/[R$.,]/g, '').trim()) : null
+          price: parsePrice(variant.price),
+          promotionalPrice: variant.promotionalPrice ? parsePrice(variant.promotionalPrice) : null
         })) : []
       }));
     }

@@ -19,8 +19,7 @@ window.catalogData = {
     {
       title: 'Linho Anatoliano',
       variant: 'Branco natural · 45×70cm',
-      price: 'R$ 89,00',
-      promotionalPrice: 'R$ 79,00',
+      price: 'R$ 120,00',
       badge: 'Novo',
       label: 'Pano dobrado',
       small: 'Em suporte de bancada',
@@ -34,14 +33,14 @@ window.catalogData = {
       collectionId: 'essentials',
       gallery: ['assets/images/produto-linho-anatoliano.jpg'],
       variants: [
-        { id: 'linho-branco', name: 'Branco natural', color: 'Branco natural', size: '45×70cm', price: 'R$ 89,00', promotionalPrice: 'R$ 79,00', stock: 8, image: 'assets/images/produto-linho-anatoliano.jpg' },
-        { id: 'linho-areia', name: 'Areia', color: 'Areia', size: '45×70cm', price: 'R$ 94,00', stock: 6, image: 'assets/images/produto-linho-anatoliano.jpg' }
+        { id: 'linho-branco', name: 'Branco natural', color: 'Branco natural', size: '45×70cm', price: 'R$ 120,00', stock: 8, image: 'assets/images/produto-linho-anatoliano.jpg' },
+        { id: 'linho-areia', name: 'Areia', color: 'Areia', size: '45×70cm', price: 'R$ 120,00', stock: 6, image: 'assets/images/produto-linho-anatoliano.jpg' }
       ]
     },
     {
       title: 'Borda Dourada',
       variant: 'Areia com detalhe dourado · 45×70cm',
-      price: 'R$ 99,00',
+      price: 'R$ 120,00',
       badge: '',
       label: 'Pano em mesa',
       small: 'Mesa decorada, iluminação quente',
@@ -55,14 +54,13 @@ window.catalogData = {
       collectionId: 'signature',
       gallery: ['assets/images/produto-borda-dourada.jpg'],
       variants: [
-        { id: 'borda-areia', name: 'Areia', color: 'Areia', size: '45×70cm', price: 'R$ 99,00', stock: 5, image: 'assets/images/produto-borda-dourada.jpg' }
+        { id: 'borda-areia', name: 'Areia', color: 'Areia', size: '45×70cm', price: 'R$ 120,00', stock: 5, image: 'assets/images/produto-borda-dourada.jpg' }
       ]
     },
     {
       title: 'Listrado Clássico',
       variant: 'Branco e terracota · 45×70cm',
-      price: 'R$ 95,00',
-      promotionalPrice: 'R$ 85,00',
+      price: 'R$ 120,00',
       badge: 'Mais vendido',
       label: 'Pano pendurado',
       small: 'Em suporte de alto padrão',
@@ -76,14 +74,14 @@ window.catalogData = {
       collectionId: 'essentials',
       gallery: ['assets/images/produto-listrado-classico.jpg'],
       variants: [
-        { id: 'listrado-branco', name: 'Branco', color: 'Branco', size: '45×70cm', price: 'R$ 95,00', promotionalPrice: 'R$ 85,00', stock: 7, image: 'assets/images/produto-listrado-classico.jpg' },
-        { id: 'listrado-terracota', name: 'Terracota', color: 'Terracota', size: '45×70cm', price: 'R$ 97,00', stock: 4, image: 'assets/images/produto-listrado-classico.jpg' }
+        { id: 'listrado-branco', name: 'Branco', color: 'Branco', size: '45×70cm', price: 'R$ 120,00', stock: 7, image: 'assets/images/produto-listrado-classico.jpg' },
+        { id: 'listrado-terracota', name: 'Terracota', color: 'Terracota', size: '45×70cm', price: 'R$ 120,00', stock: 4, image: 'assets/images/produto-listrado-classico.jpg' }
       ]
     },
     {
       title: 'Jacquard Ottomano',
       variant: 'Creme com padrão geométrico · 45×70cm',
-      price: 'R$ 119,00',
+      price: 'R$ 120,00',
       badge: '',
       label: 'Detalhe do tecido',
       small: 'Close na textura e acabamento',
@@ -97,7 +95,7 @@ window.catalogData = {
       collectionId: 'signature',
       gallery: ['assets/images/produto-jacquard-ottomano.jpg'],
       variants: [
-        { id: 'jacquard-creme', name: 'Creme', color: 'Creme', size: '45×70cm', price: 'R$ 119,00', stock: 0, image: 'assets/images/produto-jacquard-ottomano.jpg' }
+        { id: 'jacquard-creme', name: 'Creme', color: 'Creme', size: '45×70cm', price: 'R$ 120,00', stock: 0, image: 'assets/images/produto-jacquard-ottomano.jpg' }
       ]
     }
   ],
@@ -105,7 +103,7 @@ window.catalogData = {
     {
       title: 'Cozinha Clássica',
       description: 'Três panos em tons neutros — branco natural, areia e linho — para combinar com qualquer cozinha.',
-      price: 'R$ 249,00',
+      price: 'R$ 230,00',
       tag: 'Kit · 3 peças',
       label: 'Kit empilhado',
       small: '3 panos dobrados sobre bancada',
@@ -114,7 +112,7 @@ window.catalogData = {
     {
       title: 'Presente Especial',
       description: 'Quatro peças selecionadas em embalagem presente com caixa e cartão personalizado.',
-      price: 'R$ 329,00',
+      price: 'R$ 230,00',
       tag: 'Kit · 4 peças + embalagem',
       label: 'Kit presenteado',
       small: 'Caixa com fita e papel de seda',
@@ -123,7 +121,7 @@ window.catalogData = {
     {
       title: 'Mesa de Brunch',
       description: 'Seis panos combinados — dois de cada cor — para uma mesa generosa e elegante.',
-      price: 'R$ 479,00',
+      price: 'R$ 230,00',
       tag: 'Kit · 6 peças',
       label: 'Kit mesa posta',
       small: 'Panos em mesa bem decorada',
@@ -132,7 +130,7 @@ window.catalogData = {
     {
       title: 'Cozinha Gourmet',
       description: 'Mix de padrões e texturas para quem enxerga os panos de prato como peça de decoração.',
-      price: 'R$ 419,00',
+      price: 'R$ 230,00',
       tag: 'Kit · 5 peças',
       label: 'Kit decorativo',
       small: 'Panos em suporte alto — cozinha aberta',
