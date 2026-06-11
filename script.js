@@ -150,12 +150,7 @@ function renderKits() {
   container.innerHTML = kits.map((kit) => `
     <div class="kit-card">
       <div class="kit-photo">
-        <div class="photo-placeholder">
-          <div class="photo-label" style="font-size:0.75rem;">
-            ${escapeHTML(kit.label)}
-            <small>${escapeHTML(kit.small)}</small>
-          </div>
-        </div>
+        <div class="photo-placeholder" style="background-image:url('${kit.image || buildPlaceholderImage(kit.title)}'); background-size:cover; background-position:center;"></div>
       </div>
       <div class="kit-content">
         <div class="kit-tag">${escapeHTML(kit.tag)}</div>

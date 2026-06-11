@@ -32,10 +32,10 @@ window.catalogData = {
       colors: ['Branco natural', 'Areia', 'Linho'],
       sizes: ['45×70cm', '60×90cm'],
       collectionId: 'essentials',
-      gallery: ['https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=800&q=80'],
+      gallery: ['assets/images/produto-linho-anatoliano.jpg'],
       variants: [
-        { id: 'linho-branco', name: 'Branco natural', color: 'Branco natural', size: '45×70cm', price: 'R$ 89,00', promotionalPrice: 'R$ 79,00', stock: 8, image: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=800&q=80' },
-        { id: 'linho-areia', name: 'Areia', color: 'Areia', size: '45×70cm', price: 'R$ 94,00', stock: 6, image: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80' }
+        { id: 'linho-branco', name: 'Branco natural', color: 'Branco natural', size: '45×70cm', price: 'R$ 89,00', promotionalPrice: 'R$ 79,00', stock: 8, image: 'assets/images/produto-linho-anatoliano.jpg' },
+        { id: 'linho-areia', name: 'Areia', color: 'Areia', size: '45×70cm', price: 'R$ 94,00', stock: 6, image: 'assets/images/produto-linho-anatoliano.jpg' }
       ]
     },
     {
@@ -53,9 +53,9 @@ window.catalogData = {
       colors: ['Areia'],
       sizes: ['45×70cm'],
       collectionId: 'signature',
-      gallery: ['https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=800&q=80'],
+      gallery: ['assets/images/produto-borda-dourada.jpg'],
       variants: [
-        { id: 'borda-areia', name: 'Areia', color: 'Areia', size: '45×70cm', price: 'R$ 99,00', stock: 5, image: 'https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=800&q=80' }
+        { id: 'borda-areia', name: 'Areia', color: 'Areia', size: '45×70cm', price: 'R$ 99,00', stock: 5, image: 'assets/images/produto-borda-dourada.jpg' }
       ]
     },
     {
@@ -74,10 +74,10 @@ window.catalogData = {
       colors: ['Branco', 'Terracota'],
       sizes: ['45×70cm', '60×90cm'],
       collectionId: 'essentials',
-      gallery: ['https://images.unsplash.com/photo-1460317442991-0ec209397118?auto=format&fit=crop&w=800&q=80'],
+      gallery: ['assets/images/produto-listrado-classico.jpg'],
       variants: [
-        { id: 'listrado-branco', name: 'Branco', color: 'Branco', size: '45×70cm', price: 'R$ 95,00', promotionalPrice: 'R$ 85,00', stock: 7, image: 'https://images.unsplash.com/photo-1460317442991-0ec209397118?auto=format&fit=crop&w=800&q=80' },
-        { id: 'listrado-terracota', name: 'Terracota', color: 'Terracota', size: '45×70cm', price: 'R$ 97,00', stock: 4, image: 'https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=800&q=80' }
+        { id: 'listrado-branco', name: 'Branco', color: 'Branco', size: '45×70cm', price: 'R$ 95,00', promotionalPrice: 'R$ 85,00', stock: 7, image: 'assets/images/produto-listrado-classico.jpg' },
+        { id: 'listrado-terracota', name: 'Terracota', color: 'Terracota', size: '45×70cm', price: 'R$ 97,00', stock: 4, image: 'assets/images/produto-listrado-classico.jpg' }
       ]
     },
     {
@@ -95,9 +95,9 @@ window.catalogData = {
       colors: ['Creme'],
       sizes: ['45×70cm'],
       collectionId: 'signature',
-      gallery: ['https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=800&q=80'],
+      gallery: ['assets/images/produto-jacquard-ottomano.jpg'],
       variants: [
-        { id: 'jacquard-creme', name: 'Creme', color: 'Creme', size: '45×70cm', price: 'R$ 119,00', stock: 0, image: 'https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=800&q=80' }
+        { id: 'jacquard-creme', name: 'Creme', color: 'Creme', size: '45×70cm', price: 'R$ 119,00', stock: 0, image: 'assets/images/produto-jacquard-ottomano.jpg' }
       ]
     }
   ],
@@ -108,7 +108,8 @@ window.catalogData = {
       price: 'R$ 249,00',
       tag: 'Kit · 3 peças',
       label: 'Kit empilhado',
-      small: '3 panos dobrados sobre bancada'
+      small: '3 panos dobrados sobre bancada',
+      image: 'assets/images/kit-cozinha-classica.jpg'
     },
     {
       title: 'Presente Especial',
@@ -116,7 +117,8 @@ window.catalogData = {
       price: 'R$ 329,00',
       tag: 'Kit · 4 peças + embalagem',
       label: 'Kit presenteado',
-      small: 'Caixa com fita e papel de seda'
+      small: 'Caixa com fita e papel de seda',
+      image: 'assets/images/kit-presente-especial.jpg'
     },
     {
       title: 'Mesa de Brunch',
@@ -124,7 +126,8 @@ window.catalogData = {
       price: 'R$ 479,00',
       tag: 'Kit · 6 peças',
       label: 'Kit mesa posta',
-      small: 'Panos em mesa bem decorada'
+      small: 'Panos em mesa bem decorada',
+      image: 'assets/images/kit-mesa-brunch.jpg'
     },
     {
       title: 'Cozinha Gourmet',
@@ -132,7 +135,8 @@ window.catalogData = {
       price: 'R$ 419,00',
       tag: 'Kit · 5 peças',
       label: 'Kit decorativo',
-      small: 'Panos em suporte alto — cozinha aberta'
+      small: 'Panos em suporte alto — cozinha aberta',
+      image: 'assets/images/kit-cozinha-gourmet.jpg'
     }
   ]
 };
