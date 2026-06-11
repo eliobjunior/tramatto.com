@@ -350,10 +350,10 @@ nav {
 .material-watermark {
   position: absolute; top: 50%; left: 50%;
   transform: translate(-50%, -50%);
-  width: clamp(550px, 55vw, 700px);
+  width: clamp(700px, 70vw, 1100px);
   height: auto;
-  border-radius: 50%;
-  opacity: 0.06;
+  opacity: 0.08;
+  mix-blend-mode: screen;
   pointer-events: none; user-select: none;
   z-index: 0;
 }
@@ -630,7 +630,7 @@ footer {
   .kit-content { padding: 1.5rem; }
 
   .material { padding: 4rem 1.5rem; }
-  .material-watermark { width: clamp(550px, 90vw, 700px); }
+  .material-watermark { width: clamp(320px, 80vw, 600px); }
   .material-pillars {
     grid-template-columns: 1fr;
     gap: 1.5rem;
