@@ -413,7 +413,7 @@ nav {
 }
 .newsletter-title {
   font-family: var(--serif); font-size: clamp(2rem, 3.5vw, 3rem);
-  font-weight: 300; margin-bottom: 1rem;
+  font-weight: 300; line-height: 1.2; margin-bottom: 1rem;
 }
 .newsletter-title em { font-style: italic; color: var(--terra); }
 .newsletter-text {
@@ -658,6 +658,7 @@ footer {
   font-family: var(--serif);
   font-size: clamp(2.2rem, 3.2vw, 3rem);
   font-weight: 300;
+  line-height: 1.2;
   margin-bottom: 1rem;
 }
 .collection-hero p {
@@ -692,6 +693,7 @@ footer {
   font-family: var(--serif);
   font-size: clamp(2rem, 3vw, 2.8rem);
   font-weight: 300;
+  line-height: 1.2;
   margin-bottom: 0.8rem;
 }
 .product-detail-price {
@@ -821,6 +823,8 @@ footer {
 .collection-card h3 {
   font-family: var(--serif);
   font-size: 1.15rem;
+  font-weight: 300;
+  line-height: 1.2;
   margin-bottom: 0.4rem;
 }
 .collection-card p {
@@ -869,6 +873,7 @@ footer {
   font-family: var(--serif);
   font-size: clamp(2.2rem, 3.2vw, 3rem);
   font-weight: 300;
+  line-height: 1.2;
   margin-bottom: 1rem;
 }
 .page-hero p {
@@ -890,6 +895,8 @@ footer {
 .content-card h2 {
   font-family: var(--serif);
   font-size: 1.35rem;
+  font-weight: 300;
+  line-height: 1.2;
   margin-bottom: 0.8rem;
 }
 .content-card p,

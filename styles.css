@@ -413,7 +413,7 @@ nav {
 }
 .newsletter-title {
   font-family: var(--serif); font-size: clamp(2rem, 3.5vw, 3rem);
-  font-weight: 300; margin-bottom: 1rem;
+  font-weight: 300; line-height: 1.2; margin-bottom: 1rem;
 }
 .newsletter-title em { font-style: italic; color: var(--terra); }
 .newsletter-text {
