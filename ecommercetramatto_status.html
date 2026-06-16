@@ -5,20 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tramatto — Status do Projeto</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 :root{
   --ink:#111110;--ink2:#3d3d3b;--ink3:#706f6c;--ink4:#a09f9b;
-  --paper:#f8f7f4;--white:#ffffff;--line:rgba(17,17,16,0.09);--line2:rgba(17,17,16,0.05);
+  --paper:#f8f7f4;--white:#fff;--line:rgba(17,17,16,0.09);--line2:rgba(17,17,16,0.05);
   --done:#2d5a1b;--done-bg:#e8f0e2;--wip:#1a3a5c;--wip-bg:#e2eaf4;
-  --pend-bg:#f2ede0;--pend:#5a4a1a;--warn-bg:#f2e0e0;--warn:#5a1a1a;
+  --aprov:#5a4a1a;--aprov-bg:#f2ede0;--geo:#3a1a5a;--geo-bg:#eee8f5;
+  --pend-bg:#f5f3ef;--warn:#5a1a1a;--warn-bg:#f2e0e0;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;font-size:14px;line-height:1.6}
-.page{max-width:1100px;margin:0 auto;padding:0 2.5rem 5rem}
+html,body{background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;font-size:14px;line-height:1.6;min-height:100vh}
+.page{max-width:1160px;margin:0 auto;padding:0 2.5rem 5rem}
 
+/* HERO */
 .hero{padding:3.5rem 0 2.5rem;display:grid;grid-template-columns:1fr auto;align-items:end;gap:2rem;border-bottom:1px solid var(--line);flex-wrap:wrap}
 .eyebrow{font-family:'Syne',sans-serif;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink4);margin-bottom:10px}
 .htitle{font-family:'Syne',sans-serif;font-size:52px;font-weight:600;letter-spacing:-1.5px;color:var(--ink);line-height:1}
@@ -27,266 +28,371 @@ html,body{background:var(--paper);color:var(--ink);font-family:'Inter',sans-seri
 .hpct{font-family:'Syne',sans-serif;font-size:72px;font-weight:600;color:var(--ink);letter-spacing:-3px;line-height:1;text-align:right}
 .hpct-lbl{font-size:11px;color:var(--ink4);letter-spacing:.08em;text-transform:uppercase;margin-top:4px;text-align:right}
 
-.strip{height:3px;display:flex;margin:2rem 0;overflow:hidden;border-radius:1px}
-.sd{background:var(--done);flex:19}
-.sw{background:var(--wip);flex:11}
-.sp{background:var(--line);flex:17}
+/* STRIP */
+.strip-wrap{margin:2rem 0 0}
+.strip{height:3px;display:flex;overflow:hidden;border-radius:1px}
+.strip-labels{display:flex;gap:16px;margin-top:8px}
+.sl{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink3);font-weight:300}
+.sl-d{width:8px;height:2px;flex-shrink:0}
 
-.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--line);border-radius:2px;overflow:hidden;margin-bottom:2.5rem}
-.met{padding:1.5rem 1.25rem;border-right:1px solid var(--line)}
+/* METRICS */
+.metrics{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border:1px solid var(--line);border-radius:2px;overflow:hidden;margin:1.5rem 0 2rem}
+.met{padding:1.25rem 1rem;border-right:1px solid var(--line)}
 .met:last-child{border-right:none}
-.ml{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink4);font-weight:500;margin-bottom:10px}
-.mv{font-family:'Syne',sans-serif;font-size:40px;font-weight:600;letter-spacing:-1px;line-height:1;color:var(--ink)}
-.mv.d{color:var(--done)}.mv.w{color:var(--wip)}
-.ms{font-size:11px;color:var(--ink4);margin-top:6px;font-weight:300}
-.mbar{height:2px;margin-top:14px;background:var(--line2);border-radius:1px;overflow:hidden}
-.mbf{height:100%;border-radius:1px;transition:width 1.4s cubic-bezier(.4,0,.2,1);width:0}
+.ml{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink4);font-weight:500;margin-bottom:8px}
+.mv{font-family:'Syne',sans-serif;font-size:34px;font-weight:600;letter-spacing:-1px;line-height:1;color:var(--ink)}
+.mv.done{color:var(--done)}.mv.wip{color:var(--wip)}.mv.geo{color:var(--geo)}.mv.aprov{color:var(--aprov)}
+.ms{font-size:11px;color:var(--ink4);margin-top:4px;font-weight:300}
+.mbar{height:2px;margin-top:12px;background:var(--line2);border-radius:1px;overflow:hidden}
+.mbf{height:100%;transition:width 1.4s cubic-bezier(.4,0,.2,1);width:0}
 
+/* GRIDS */
 .g2{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:1.5rem;margin-bottom:1.5rem}
-.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.5rem}
-.card{background:var(--white);border:1px solid var(--line);border-radius:2px}
-.ch{padding:13px 18px;border-bottom:1px solid var(--line2);display:flex;align-items:center;justify-content:space-between}
-.ct{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink4);font-weight:500}
-.cb2{font-size:11px;color:var(--ink3);background:var(--paper);padding:2px 9px;border-radius:1px;font-weight:300}
-.cb{padding:16px 18px}
-.cw{position:relative;width:100%;height:210px}
-.dw{position:relative;width:100%;height:130px}
+.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1.5rem;margin-bottom:1.5rem}
+.g2b{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1.5rem;margin-bottom:1.5rem}
 
-.lbars{display:flex;flex-direction:column;gap:11px}
-.lr{display:flex;align-items:center;gap:10px}
-.ln{font-size:11px;color:var(--ink3);width:110px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:300}
+/* CARD */
+.card{background:var(--white);border:1px solid var(--line);border-radius:2px}
+.ch{padding:12px 16px;border-bottom:1px solid var(--line2);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ct{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink4);font-weight:500}
+.cb2{font-size:11px;color:var(--ink3);background:var(--paper);padding:2px 8px;border-radius:1px;font-weight:300;white-space:nowrap}
+.cb{padding:14px 16px}
+
+/* CHARTS */
+.cw{position:relative;width:100%;height:200px}
+.dw{position:relative;width:100%;height:120px}
+
+/* LABEL BARS */
+.lbars{display:flex;flex-direction:column;gap:10px}
+.lr{display:flex;align-items:center;gap:8px}
+.ln{font-size:11px;color:var(--ink3);width:100px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:300}
 .lt{flex:1;height:3px;background:var(--paper);border-radius:1px;overflow:hidden}
 .lf{height:100%;border-radius:1px;transition:width 1.4s cubic-bezier(.4,0,.2,1);width:0}
-.lp{font-size:11px;font-weight:500;width:30px;text-align:right;color:var(--ink2)}
+.lp{font-size:11px;font-weight:500;width:28px;text-align:right;color:var(--ink2)}
 
-.leg{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:12px}
-.li{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink3);font-weight:300}
-.ld{width:8px;height:2px;flex-shrink:0}
-
-.div{height:1px;background:var(--line2);margin:14px 0}
-
+/* TASK LIST */
 .tlist{display:flex;flex-direction:column}
-.ti{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--line2)}
+.ti{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line2)}
 .ti:last-child{border-bottom:none}
-.tic{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:700}
-.sd2{background:var(--done-bg);color:var(--done)}
-.sw2{background:var(--wip-bg);color:var(--wip)}
-.sa{background:var(--pend-bg);color:var(--pend)}
-.sp2{background:var(--paper);color:var(--ink4);border:1px solid var(--line)}
-.tn{flex:1;font-size:12px;color:var(--ink2);font-weight:300}
+.tic{width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:8px;font-weight:700}
+.s-done{background:var(--done-bg);color:var(--done)}
+.s-wip{background:var(--wip-bg);color:var(--wip)}
+.s-aprov{background:var(--aprov-bg);color:var(--aprov)}
+.s-geo{background:var(--geo-bg);color:var(--geo)}
+.s-pend{background:var(--paper);color:var(--ink4);border:1px solid var(--line)}
+.tn{flex:1;font-size:12px;color:var(--ink2);font-weight:300;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tn.f{color:var(--ink4)}
-.tag{font-size:9px;font-weight:500;padding:2px 6px;border-radius:1px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
-.ts{background:var(--done-bg);color:var(--done)}
-.ta{background:var(--wip-bg);color:var(--wip)}
-.tn3{background:#e8e2f0;color:#3a1a5a}
-.tc{background:var(--pend-bg);color:var(--pend)}
-.td{background:var(--warn-bg);color:var(--warn)}
+.tag{font-size:9px;font-weight:500;padding:1px 5px;border-radius:1px;letter-spacing:.03em;text-transform:uppercase;white-space:nowrap;flex-shrink:0}
+.t-seo{background:var(--done-bg);color:var(--done)}
+.t-anal{background:var(--wip-bg);color:var(--wip)}
+.t-nuv{background:#e8e2f0;color:#3a1a5a}
+.t-cont{background:var(--aprov-bg);color:var(--aprov)}
+.t-dep{background:var(--warn-bg);color:var(--warn)}
+.t-geo{background:var(--geo-bg);color:var(--geo)}
 
+/* AVATAR */
+.av{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:600;flex-shrink:0;letter-spacing:0}
+.av-e{background:#1a3a5c;color:#fff}
+.av-s{background:#5a2d5a;color:#fff}
+.av-c{background:#3a1a5a;color:#fff}
+
+/* SECTION LABEL */
+.slabel{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink4);font-weight:500;margin:2rem 0 1rem;padding-bottom:8px;border-bottom:1px solid var(--line2)}
+
+/* DIV */
+.div{height:1px;background:var(--line2);margin:12px 0}
+
+/* FOOT */
 .foot{border-top:1px solid var(--line);margin-top:3rem;padding-top:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
 .foot p{font-size:11px;color:var(--ink4);font-weight:300}
-.foot a{font-size:11px;color:var(--ink3);text-decoration:none;letter-spacing:.04em}
+.foot a{font-size:11px;color:var(--ink3);text-decoration:none}
 .foot a:hover{color:var(--ink)}
 
+@keyframes spin{to{transform:rotate(360deg)}}
 @media(max-width:700px){
   .hero{grid-template-columns:1fr}.hpct,.hpct-lbl{text-align:left}
   .htitle{font-size:36px}.hpct{font-size:48px}
   .metrics{grid-template-columns:repeat(2,1fr)}.met{border-right:none;border-bottom:1px solid var(--line)}
-  .g2,.g3{grid-template-columns:1fr}.page{padding:0 1.25rem 3rem}
+  .g2,.g2b,.g4{grid-template-columns:1fr}.page{padding:0 1rem 3rem}
 }
 </style>
 </head>
 <body>
 <div class="page">
 
-  <div class="hero">
-    <div>
-      <div class="eyebrow">Status do projeto · e-commerce</div>
-      <div class="htitle">Tramatto<span>.</span></div>
-      <div class="hdesc">47 tarefas mapeadas · atualizado em jun/2026</div>
-    </div>
-    <div>
-      <div class="hpct">40%</div>
-      <div class="hpct-lbl">concluído</div>
+<div class="hero">
+  <div>
+    <div class="eyebrow">Status do projeto · e-commerce</div>
+    <div class="htitle">Tramatto<span>.</span></div>
+    <div class="hdesc">59 tarefas mapeadas em 5 fases · atualizado em jun/2026</div>
+  </div>
+  <div>
+    <div class="hpct">31%</div>
+    <div class="hpct-lbl">concluído</div>
+  </div>
+</div>
+
+<div class="strip-wrap">
+  <div class="strip">
+    <div style="background:var(--done);flex:18"></div>
+    <div style="background:var(--wip);flex:11"></div>
+    <div style="background:var(--aprov);flex:1"></div>
+    <div style="background:var(--geo);flex:13"></div>
+    <div style="background:var(--line);flex:17"></div>
+  </div>
+  <div class="strip-labels">
+    <span class="sl"><span class="sl-d" style="background:var(--done)"></span>Concluído 31%</span>
+    <span class="sl"><span class="sl-d" style="background:var(--wip)"></span>Em andamento 17%</span>
+    <span class="sl"><span class="sl-d" style="background:var(--aprov)"></span>Aprovação 2%</span>
+    <span class="sl"><span class="sl-d" style="background:var(--geo)"></span>GEO & Autoridade 22%</span>
+    <span class="sl"><span class="sl-d" style="background:var(--line)"></span>Backlog 29%</span>
+  </div>
+</div>
+
+<div class="metrics">
+  <div class="met">
+    <div class="ml">Concluídas</div>
+    <div class="mv done">18</div>
+    <div class="ms">entregues</div>
+    <div class="mbar"><div class="mbf" style="background:var(--done)" data-w="31"></div></div>
+  </div>
+  <div class="met">
+    <div class="ml">Em andamento</div>
+    <div class="mv wip">10</div>
+    <div class="ms">em execução</div>
+    <div class="mbar"><div class="mbf" style="background:var(--wip)" data-w="17"></div></div>
+  </div>
+  <div class="met">
+    <div class="ml">Aprovação</div>
+    <div class="mv aprov">1</div>
+    <div class="ms">aguardando</div>
+    <div class="mbar"><div class="mbf" style="background:var(--aprov)" data-w="2"></div></div>
+  </div>
+  <div class="met">
+    <div class="ml">GEO & Autoridade</div>
+    <div class="mv geo">13</div>
+    <div class="ms">fase 4 — nova</div>
+    <div class="mbar"><div class="mbf" style="background:var(--geo)" data-w="22"></div></div>
+  </div>
+  <div class="met">
+    <div class="ml">Backlog</div>
+    <div class="mv">17</div>
+    <div class="ms">não iniciados</div>
+    <div class="mbar"><div class="mbf" style="background:var(--ink4)" data-w="29"></div></div>
+  </div>
+</div>
+
+<div class="g2">
+  <div class="card">
+    <div class="ch"><span class="ct">Distribuição por fase</span></div>
+    <div class="cb">
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+        <span class="sl"><span class="sl-d" style="background:var(--done)"></span>Concluído</span>
+        <span class="sl"><span class="sl-d" style="background:var(--wip)"></span>Andamento</span>
+        <span class="sl"><span class="sl-d" style="background:var(--geo)"></span>GEO</span>
+        <span class="sl"><span class="sl-d" style="background:#c8c6c0"></span>Backlog</span>
+      </div>
+      <div class="cw"><canvas id="bc" role="img" aria-label="Distribuição de cards por fase">Backlog 17, Em andamento 10, Aprovação 1, GEO 13, Concluído 18.</canvas></div>
     </div>
   </div>
-
-  <div class="strip"></div>
-
-  <div class="metrics">
-    <div class="met">
-      <div class="ml">Concluídas</div>
-      <div class="mv d">19</div>
-      <div class="ms">cards entregues</div>
-      <div class="mbar"><div class="mbf" style="background:var(--done)" data-w="40"></div></div>
-    </div>
-    <div class="met">
-      <div class="ml">Em andamento</div>
-      <div class="mv w">11</div>
-      <div class="ms">10 execução · 1 aprovação</div>
-      <div class="mbar"><div class="mbf" style="background:var(--wip)" data-w="23"></div></div>
-    </div>
-    <div class="met">
-      <div class="ml">Backlog</div>
-      <div class="mv">17</div>
-      <div class="ms">não iniciados</div>
-      <div class="mbar"><div class="mbf" style="background:var(--ink4)" data-w="36"></div></div>
-    </div>
-    <div class="met">
-      <div class="ml">Total</div>
-      <div class="mv">47</div>
-      <div class="ms">tasks mapeadas</div>
-      <div class="mbar"><div class="mbf" style="background:var(--ink);width:100%!important"></div></div>
+  <div class="card">
+    <div class="ch"><span class="ct">Por área</span></div>
+    <div class="cb">
+      <div class="lbars">
+        <div class="lr"><span class="ln">SEO</span><div class="lt"><div class="lf" style="background:var(--done)" data-w="100"></div></div><span class="lp">100%</span></div>
+        <div class="lr"><span class="ln">Analytics</span><div class="lt"><div class="lf" style="background:var(--wip)" data-w="33"></div></div><span class="lp">33%</span></div>
+        <div class="lr"><span class="ln">Nuvemshop</span><div class="lt"><div class="lf" style="background:#3a1a5a" data-w="25"></div></div><span class="lp">25%</span></div>
+        <div class="lr"><span class="ln">Conteúdo</span><div class="lt"><div class="lf" style="background:var(--aprov)" data-w="15"></div></div><span class="lp">15%</span></div>
+        <div class="lr"><span class="ln">GEO</span><div class="lt"><div class="lf" style="background:var(--geo)" data-w="0"></div></div><span class="lp">0%</span></div>
+        <div class="lr"><span class="ln">Dep. externa</span><div class="lt"><div class="lf" style="background:var(--warn)" data-w="0"></div></div><span class="lp">0%</span></div>
+      </div>
+      <div class="div"></div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px;justify-content:center">
+        <span class="sl"><span class="sl-d" style="background:var(--done)"></span>31%</span>
+        <span class="sl"><span class="sl-d" style="background:var(--wip)"></span>17%</span>
+        <span class="sl"><span class="sl-d" style="background:var(--geo)"></span>22%</span>
+        <span class="sl"><span class="sl-d" style="background:#c8c6c0"></span>29%</span>
+      </div>
+      <div class="dw"><canvas id="dc" role="img" aria-label="Donut de distribuição">18 concluídos, 11 andamento, 13 geo, 17 backlog.</canvas></div>
     </div>
   </div>
+</div>
 
-  <div class="g2">
-    <div class="card">
-      <div class="ch"><span class="ct">Distribuição por lista</span></div>
-      <div class="cb">
-        <div class="leg">
-          <span class="li"><span class="ld" style="background:var(--done)"></span>Concluído</span>
-          <span class="li"><span class="ld" style="background:var(--wip)"></span>Em andamento</span>
-          <span class="li"><span class="ld" style="background:#c8c6c0"></span>Backlog</span>
-        </div>
-        <div class="cw"><canvas id="bc" role="img" aria-label="Cards por lista: Backlog 17, Em andamento 10, Aprovação 1, Concluído 19">Backlog 17, Em andamento 10, Aprovação 1, Concluído 19.</canvas></div>
-      </div>
+<!-- RESPONSÁVEIS -->
+<div class="slabel">Responsáveis</div>
+<div class="g2b" style="margin-bottom:2rem">
+  <div class="card">
+    <div class="ch">
+      <span class="ct">Elio</span>
+      <div style="display:flex;align-items:center;gap:6px"><span class="av av-e">EJ</span><span class="cb2">41 cards</span></div>
     </div>
-    <div class="card">
-      <div class="ch"><span class="ct">Por área</span></div>
-      <div class="cb">
-        <div class="lbars">
-          <div class="lr"><span class="ln">SEO</span><div class="lt"><div class="lf" style="background:var(--done)" data-w="100"></div></div><span class="lp">100%</span></div>
-          <div class="lr"><span class="ln">Analytics</span><div class="lt"><div class="lf" style="background:var(--wip)" data-w="33"></div></div><span class="lp">33%</span></div>
-          <div class="lr"><span class="ln">Nuvemshop</span><div class="lt"><div class="lf" style="background:#3a1a5a" data-w="25"></div></div><span class="lp">25%</span></div>
-          <div class="lr"><span class="ln">Conteúdo</span><div class="lt"><div class="lf" style="background:var(--pend)" data-w="20"></div></div><span class="lp">20%</span></div>
-          <div class="lr"><span class="ln">Dep. externa</span><div class="lt"><div class="lf" style="background:var(--warn)" data-w="0"></div></div><span class="lp">0%</span></div>
-        </div>
-        <div class="div"></div>
-        <div class="leg" style="justify-content:center">
-          <span class="li"><span class="ld" style="background:var(--done)"></span>Concluído 40%</span>
-          <span class="li"><span class="ld" style="background:var(--wip)"></span>Andamento 23%</span>
-          <span class="li"><span class="ld" style="background:#c8c6c0"></span>Backlog 36%</span>
-        </div>
-        <div class="dw"><canvas id="dc" role="img" aria-label="Distribuição: 19 concluídos, 11 andamento, 17 backlog">19 concluídos, 11 andamento, 17 backlog.</canvas></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="g3">
-    <div class="card">
-      <div class="ch"><span class="ct">Concluídas</span><span class="cb2">19</span></div>
-      <div class="cb">
-        <div class="tlist">
-          <div class="ti"><span class="tic sd2">✓</span><span class="tn f">Arquitetura</span><span class="tag tn3">Nuvemshop</span></div>
-          <div class="ti"><span class="tic sd2">✓</span><span class="tn f">SEO técnico</span><span class="tag ts">SEO</span></div>
-          <div class="ti"><span class="tic sd2">✓</span><span class="tn f">WhatsApp</span><span class="tag tn3">Nuvemshop</span></div>
-          <div class="ti"><span class="tic sd2">✓</span><span class="tn f">Sitemap</span><span class="tag ts">SEO</span></div>
-          <div class="ti"><span class="tic sd2">✓</span><span class="tn f">Kits</span><span class="tag tn3">Nuvemshop</span></div>
-          <div class="ti"><span class="tic sd2">✓</span><span class="tn f">Robots</span><span class="tag ts">SEO</span></div>
-          <div class="ti"><span class="tic sd2">✓</span><span class="tn f">Sobre</span><span class="tag tc">Conteúdo</span></div>
-          <div class="ti"><span class="tic sd2">✓</span><span class="tn f">Contato</span><span class="tag tc">Conteúdo</span></div>
-          <div class="ti"><span class="tic sd2">✓</span><span class="tn f">Privacidade</span><span class="tag tc">Conteúdo</span></div>
-          <div class="ti"><span class="tic sd2">✓</span><span class="tn f">Inserir imagens</span><span class="tag tc">Conteúdo</span></div>
-          <div class="ti"><span class="tic sd2">✓</span><span class="tn f">Favicon</span><span class="tag ts">SEO</span></div>
-          <div class="ti"><span class="tic sd2">✓</span><span class="tn f">Analytics</span><span class="tag ta">Analytics</span></div>
-          <div class="ti"><span class="tic sd2">✓</span><span class="tn f">404</span><span class="tag ts">SEO</span></div>
-          <div class="ti"><span class="tic sd2">✓</span><span class="tn f">Otimização WebP</span><span class="tag ts">SEO</span></div>
-          <div class="ti"><span class="tic sd2">✓</span><span class="tn f">Canonical URLs</span><span class="tag ts">SEO</span></div>
-          <div class="ti"><span class="tic sd2">✓</span><span class="tn f">Open Graph</span><span class="tag ts">SEO</span></div>
-          <div class="ti"><span class="tic sd2">✓</span><span class="tn f">JSON-LD</span><span class="tag ts">SEO</span></div>
-          <div class="ti"><span class="tic sd2">✓</span><span class="tn f">Product Schema</span><span class="tag ts">SEO</span></div>
-          <div class="ti"><span class="tic sd2">✓</span><span class="tn f">Robots.txt</span><span class="tag ts">SEO</span></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="ch"><span class="ct">Em andamento</span><span class="cb2">11</span></div>
-      <div class="cb">
-        <div class="tlist">
-          <div class="ti"><span class="tic sw2">●</span><span class="tn">Search Console</span><span class="tag td">Dep. ext.</span></div>
-          <div class="ti"><span class="tic sw2">●</span><span class="tn">Merchant Center</span><span class="tag td">Dep. ext.</span></div>
-          <div class="ti"><span class="tic sw2">●</span><span class="tn">Meta Pixel</span><span class="tag ta">Analytics</span></div>
-          <div class="ti"><span class="tic sw2">●</span><span class="tn">Ecommerce Tracking</span><span class="tag ta">Analytics</span></div>
-          <div class="ti"><span class="tic sw2">●</span><span class="tn">Catálogo</span><span class="tag tn3">Nuvemshop</span></div>
-          <div class="ti"><span class="tic sw2">●</span><span class="tn">Variantes</span><span class="tag tn3">Nuvemshop</span></div>
-          <div class="ti"><span class="tic sw2">●</span><span class="tn">Layout Nuvemshop</span><span class="tag tn3">Nuvemshop</span></div>
-          <div class="ti"><span class="tic sw2">●</span><span class="tn">Preços</span><span class="tag tn3">Nuvemshop</span></div>
-          <div class="ti"><span class="tic sw2">●</span><span class="tn">Estoque</span><span class="tag tn3">Nuvemshop</span></div>
-          <div class="ti"><span class="tic sw2">●</span><span class="tn">Sincronização</span><span class="tag tn3">Nuvemshop</span></div>
-          <div class="ti"><span class="tic sa">★</span><span class="tn">Google Ads Ready</span><span class="tag tc">Aprovação</span></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="ch"><span class="ct">Backlog</span><span class="cb2">17</span></div>
-      <div class="cb">
-        <div class="tlist">
-          <div class="ti"><span class="tic sp2">○</span><span class="tn f">Fotos dos produtos</span><span class="tag tc">Conteúdo</span></div>
-          <div class="ti"><span class="tic sp2">○</span><span class="tn f">Sessão lifestyle</span><span class="tag tc">Conteúdo</span></div>
-          <div class="ti"><span class="tic sp2">○</span><span class="tn f">Banco de imagens</span><span class="tag tc">Conteúdo</span></div>
-          <div class="ti"><span class="tic sp2">○</span><span class="tn f">Conteúdo Instagram (Schirlei)</span><span class="tag tc">Conteúdo</span></div>
-          <div class="ti"><span class="tic sp2">○</span><span class="tn f">Conteúdo Instagram (Elio)</span><span class="tag tc">Conteúdo</span></div>
-          <div class="ti"><span class="tic sp2">○</span><span class="tn f">Melhorar Produto</span><span class="tag tc">Conteúdo</span></div>
-          <div class="ti"><span class="tic sp2">○</span><span class="tn f">Melhorar Home</span><span class="tag tc">Conteúdo</span></div>
-          <div class="ti"><span class="tic sp2">○</span><span class="tn f">Prova Social</span><span class="tag tc">Conteúdo</span></div>
-          <div class="ti"><span class="tic sp2">○</span><span class="tn f">FAQ</span><span class="tag tc">Conteúdo</span></div>
-          <div class="ti"><span class="tic sp2">○</span><span class="tn f">Leads</span><span class="tag tc">Conteúdo</span></div>
-          <div class="ti"><span class="tic sp2">○</span><span class="tn f">Cupom</span><span class="tag tn3">Nuvemshop</span></div>
-          <div class="ti"><span class="tic sp2">○</span><span class="tn f">Selos de confiança</span><span class="tag tn3">Nuvemshop</span></div>
-          <div class="ti"><span class="tic sp2">○</span><span class="tn f">Performance Max</span><span class="tag td">Dep. ext.</span></div>
-          <div class="ti"><span class="tic sp2">○</span><span class="tn f">Otimização de Conversão</span><span class="tag tc">Conteúdo</span></div>
-          <div class="ti"><span class="tic sp2">○</span><span class="tn f">Testes Checkout</span><span class="tag tn3">Nuvemshop</span></div>
-          <div class="ti"><span class="tic sp2">○</span><span class="tn f">Trocas</span><span class="tag tn3">Nuvemshop</span></div>
-          <div class="ti"><span class="tic sp2">○</span><span class="tn f">Carrinho + Checkout WhatsApp</span><span class="tag tn3">Nuvemshop</span></div>
-        </div>
+    <div class="cb">
+      <div class="tlist">
+        <div class="ti"><span class="tic s-done">✓</span><span class="tn f">Arquitetura</span><span class="tag t-nuv">Nuvemshop</span></div>
+        <div class="ti"><span class="tic s-done">✓</span><span class="tn f">SEO técnico</span><span class="tag t-seo">SEO</span></div>
+        <div class="ti"><span class="tic s-done">✓</span><span class="tn f">WhatsApp</span><span class="tag t-nuv">Nuvemshop</span></div>
+        <div class="ti"><span class="tic s-done">✓</span><span class="tn f">Sitemap · Robots · Favicon · 404</span><span class="tag t-seo">SEO</span></div>
+        <div class="ti"><span class="tic s-done">✓</span><span class="tn f">Analytics · Open Graph · JSON-LD</span><span class="tag t-anal">Analytics</span></div>
+        <div class="ti"><span class="tic s-wip">●</span><span class="tn">Search Console</span><span class="tag t-seo">SEO</span></div>
+        <div class="ti"><span class="tic s-wip">●</span><span class="tn">Merchant Center</span><span class="tag t-dep">Dep. ext.</span></div>
+        <div class="ti"><span class="tic s-wip">●</span><span class="tn">Meta Pixel</span><span class="tag t-anal">Analytics</span></div>
+        <div class="ti"><span class="tic s-wip">●</span><span class="tn">Ecommerce Tracking</span><span class="tag t-anal">Analytics</span></div>
+        <div class="ti"><span class="tic s-aprov">★</span><span class="tn">Google Ads Ready</span><span class="tag t-dep">Aprovação</span></div>
+        <div class="ti"><span class="tic s-geo">◆</span><span class="tn">Google Business Profile</span><span class="tag t-geo">GEO</span></div>
+        <div class="ti"><span class="tic s-geo">◆</span><span class="tn">Artigos GEO (4)</span><span class="tag t-geo">GEO</span></div>
+        <div class="ti"><span class="tic s-pend">○</span><span class="tn f">Performance Max</span><span class="tag t-dep">Dep. ext.</span></div>
+        <div class="ti"><span class="tic s-pend">○</span><span class="tn f">Otimização de Conversão</span><span class="tag t-cont">Conteúdo</span></div>
       </div>
     </div>
   </div>
-
-  <div class="foot">
-    <p>Tramatto &mdash; Estrutura do Projeto &mdash; junho 2026</p>
-    <a href="https://trello.com/b/KyZQ97gf/tramatto-estrutura-do-projeto" target="_blank">Abrir board no Trello →</a>
+  <div class="card">
+    <div class="ch">
+      <span class="ct">Schirlei</span>
+      <div style="display:flex;align-items:center;gap:6px"><span class="av av-s">SK</span><span class="cb2">10 cards</span></div>
+    </div>
+    <div class="cb">
+      <div class="tlist">
+        <div class="ti"><span class="tic s-pend">○</span><span class="tn f">Fotos dos Produtos</span><span class="tag t-cont">Conteúdo</span></div>
+        <div class="ti"><span class="tic s-pend">○</span><span class="tn f">Sessão Lifestyle</span><span class="tag t-cont">Conteúdo</span></div>
+        <div class="ti"><span class="tic s-pend">○</span><span class="tn f">Banco de Imagens</span><span class="tag t-cont">Conteúdo</span></div>
+        <div class="ti"><span class="tic s-pend">○</span><span class="tn f">Conteúdo Instagram (Schirlei)</span><span class="tag t-cont">Conteúdo</span></div>
+        <div class="ti"><span class="tic s-pend">○</span><span class="tn f">Conteúdo Instagram (Elio)</span><span class="tag t-cont">Conteúdo</span></div>
+        <div class="ti"><span class="tic s-pend">○</span><span class="tn f">Melhorar Produto</span><span class="tag t-cont">Conteúdo</span></div>
+        <div class="ti"><span class="tic s-geo">◆</span><span class="tn">Google Business Profile</span><span class="tag t-geo">GEO</span></div>
+        <div class="ti"><span class="tic s-geo">◆</span><span class="tn">LinkedIn Empresa</span><span class="tag t-geo">GEO</span></div>
+        <div class="ti"><span class="tic s-geo">◆</span><span class="tn">Reclame Aqui</span><span class="tag t-geo">GEO</span></div>
+        <div class="ti"><span class="tic s-geo">◆</span><span class="tn">Pinterest Institucional</span><span class="tag t-geo">GEO</span></div>
+      </div>
+    </div>
   </div>
+</div>
+
+<!-- FASES -->
+<div class="slabel">Detalhamento por fase</div>
+<div class="g4">
+  <div class="card">
+    <div class="ch"><span class="ct">Concluídas</span><span class="cb2">18</span></div>
+    <div class="cb">
+      <div class="tlist">
+        <div class="ti"><span class="tic s-done">✓</span><span class="tn f">Arquitetura</span><span class="tag t-nuv">NVS</span></div>
+        <div class="ti"><span class="tic s-done">✓</span><span class="tn f">SEO técnico</span><span class="tag t-seo">SEO</span></div>
+        <div class="ti"><span class="tic s-done">✓</span><span class="tn f">WhatsApp</span><span class="tag t-nuv">NVS</span></div>
+        <div class="ti"><span class="tic s-done">✓</span><span class="tn f">Sitemap</span><span class="tag t-seo">SEO</span></div>
+        <div class="ti"><span class="tic s-done">✓</span><span class="tn f">Kits</span><span class="tag t-cont">CTD</span></div>
+        <div class="ti"><span class="tic s-done">✓</span><span class="tn f">Robots / Robots.txt</span><span class="tag t-seo">SEO</span></div>
+        <div class="ti"><span class="tic s-done">✓</span><span class="tn f">Sobre / Contato</span><span class="tag t-cont">CTD</span></div>
+        <div class="ti"><span class="tic s-done">✓</span><span class="tn f">Privacidade / Favicon</span><span class="tag t-cont">CTD</span></div>
+        <div class="ti"><span class="tic s-done">✓</span><span class="tn f">Analytics</span><span class="tag t-anal">ANL</span></div>
+        <div class="ti"><span class="tic s-done">✓</span><span class="tn f">404 / WebP</span><span class="tag t-seo">SEO</span></div>
+        <div class="ti"><span class="tic s-done">✓</span><span class="tn f">Canonical URLs</span><span class="tag t-seo">SEO</span></div>
+        <div class="ti"><span class="tic s-done">✓</span><span class="tn f">Open Graph</span><span class="tag t-seo">SEO</span></div>
+        <div class="ti"><span class="tic s-done">✓</span><span class="tn f">JSON-LD / Product Schema</span><span class="tag t-seo">SEO</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><span class="ct">Em andamento</span><span class="cb2">11</span></div>
+    <div class="cb">
+      <div class="tlist">
+        <div class="ti"><span class="tic s-wip">●</span><span class="tn">Search Console</span><span class="av av-e" style="width:14px;height:14px;font-size:7px">EJ</span></div>
+        <div class="ti"><span class="tic s-wip">●</span><span class="tn">Merchant Center</span><span class="av av-e" style="width:14px;height:14px;font-size:7px">EJ</span></div>
+        <div class="ti"><span class="tic s-wip">●</span><span class="tn">Meta Pixel</span><span class="av av-e" style="width:14px;height:14px;font-size:7px">EJ</span></div>
+        <div class="ti"><span class="tic s-wip">●</span><span class="tn">Ecommerce Tracking</span><span class="av av-e" style="width:14px;height:14px;font-size:7px">EJ</span></div>
+        <div class="ti"><span class="tic s-wip">●</span><span class="tn">Catálogo</span><span class="tag t-nuv">NVS</span></div>
+        <div class="ti"><span class="tic s-wip">●</span><span class="tn">Variantes</span><span class="tag t-nuv">NVS</span></div>
+        <div class="ti"><span class="tic s-wip">●</span><span class="tn">Layout Nuvemshop</span><span class="tag t-nuv">NVS</span></div>
+        <div class="ti"><span class="tic s-wip">●</span><span class="tn">Preços</span><span class="tag t-nuv">NVS</span></div>
+        <div class="ti"><span class="tic s-wip">●</span><span class="tn">Estoque</span><span class="tag t-nuv">NVS</span></div>
+        <div class="ti"><span class="tic s-wip">●</span><span class="tn">Sincronização</span><span class="tag t-nuv">NVS</span></div>
+        <div class="ti"><span class="tic s-aprov">★</span><span class="tn">Google Ads Ready</span><span class="av av-e" style="width:14px;height:14px;font-size:7px">EJ</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><span class="ct">GEO & Autoridade</span><span class="cb2">13</span></div>
+    <div class="cb">
+      <div class="tlist">
+        <div class="ti"><span class="tic s-geo">◆</span><span class="tn">🔍 Presença Mecanismos</span><span class="tag t-geo">ÉPICO</span></div>
+        <div class="ti"><span class="tic s-geo">◆</span><span class="tn">🏢 Knowledge Graph</span><span class="tag t-geo">ÉPICO</span></div>
+        <div class="ti"><span class="tic s-geo">◆</span><span class="tn">Google Business Profile</span><span class="av av-s" style="width:14px;height:14px;font-size:7px">SK</span></div>
+        <div class="ti"><span class="tic s-geo">◆</span><span class="tn">LinkedIn Empresa</span><span class="av av-s" style="width:14px;height:14px;font-size:7px">SK</span></div>
+        <div class="ti"><span class="tic s-geo">◆</span><span class="tn">Reclame Aqui</span><span class="av av-s" style="width:14px;height:14px;font-size:7px">SK</span></div>
+        <div class="ti"><span class="tic s-geo">◆</span><span class="tn">Pinterest Institucional</span><span class="av av-s" style="width:14px;height:14px;font-size:7px">SK</span></div>
+        <div class="ti"><span class="tic s-geo">◆</span><span class="tn">FAQ GEO Home</span><span class="av av-c" style="width:14px;height:14px;font-size:7px">CC</span></div>
+        <div class="ti"><span class="tic s-geo">◆</span><span class="tn">📝 Blog GEO</span><span class="tag t-geo">ÉPICO</span></div>
+        <div class="ti"><span class="tic s-geo">◆</span><span class="tn">Estrutura Blog GEO</span><span class="av av-c" style="width:14px;height:14px;font-size:7px">CC</span></div>
+        <div class="ti"><span class="tic s-geo">◆</span><span class="tn">Como lavar pano de prato</span><span class="av av-e" style="width:14px;height:14px;font-size:7px">EJ</span></div>
+        <div class="ti"><span class="tic s-geo">◆</span><span class="tn">Como tirar manchas</span><span class="av av-e" style="width:14px;height:14px;font-size:7px">EJ</span></div>
+        <div class="ti"><span class="tic s-geo">◆</span><span class="tn">Algodão vs Linho</span><span class="av av-e" style="width:14px;height:14px;font-size:7px">EJ</span></div>
+        <div class="ti"><span class="tic s-geo">◆</span><span class="tn">Presente p/ chá de cozinha</span><span class="av av-e" style="width:14px;height:14px;font-size:7px">EJ</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><span class="ct">Backlog</span><span class="cb2">17</span></div>
+    <div class="cb">
+      <div class="tlist">
+        <div class="ti"><span class="tic s-pend">○</span><span class="tn f">Fotos dos Produtos</span><span class="av av-s" style="width:14px;height:14px;font-size:7px">SK</span></div>
+        <div class="ti"><span class="tic s-pend">○</span><span class="tn f">Sessão Lifestyle</span><span class="av av-s" style="width:14px;height:14px;font-size:7px">SK</span></div>
+        <div class="ti"><span class="tic s-pend">○</span><span class="tn f">Banco de Imagens</span><span class="av av-s" style="width:14px;height:14px;font-size:7px">SK</span></div>
+        <div class="ti"><span class="tic s-pend">○</span><span class="tn f">Conteúdo Instagram (SK)</span><span class="av av-s" style="width:14px;height:14px;font-size:7px">SK</span></div>
+        <div class="ti"><span class="tic s-pend">○</span><span class="tn f">Conteúdo Instagram (EJ)</span><span class="av av-s" style="width:14px;height:14px;font-size:7px">SK</span></div>
+        <div class="ti"><span class="tic s-pend">○</span><span class="tn f">Melhorar Produto</span><span class="av av-s" style="width:14px;height:14px;font-size:7px">SK</span></div>
+        <div class="ti"><span class="tic s-pend">○</span><span class="tn f">Melhorar Home</span><span class="tag t-cont">CTD</span></div>
+        <div class="ti"><span class="tic s-pend">○</span><span class="tn f">Prova Social</span><span class="tag t-cont">CTD</span></div>
+        <div class="ti"><span class="tic s-pend">○</span><span class="tn f">FAQ Conversão</span><span class="tag t-cont">CTD</span></div>
+        <div class="ti"><span class="tic s-pend">○</span><span class="tn f">Leads</span><span class="tag t-cont">CTD</span></div>
+        <div class="ti"><span class="tic s-pend">○</span><span class="tn f">Cupom</span><span class="tag t-nuv">NVS</span></div>
+        <div class="ti"><span class="tic s-pend">○</span><span class="tn f">Selos de confiança</span><span class="tag t-cont">CTD</span></div>
+        <div class="ti"><span class="tic s-pend">○</span><span class="tn f">Performance Max</span><span class="av av-e" style="width:14px;height:14px;font-size:7px">EJ</span></div>
+        <div class="ti"><span class="tic s-pend">○</span><span class="tn f">Otimização de Conversão</span><span class="av av-e" style="width:14px;height:14px;font-size:7px">EJ</span></div>
+        <div class="ti"><span class="tic s-pend">○</span><span class="tn f">Testes Checkout</span><span class="tag t-nuv">NVS</span></div>
+        <div class="ti"><span class="tic s-pend">○</span><span class="tn f">Trocas</span><span class="tag t-nuv">NVS</span></div>
+        <div class="ti"><span class="tic s-pend">○</span><span class="tn f">Carrinho + Checkout WhatsApp</span><span class="tag t-nuv">NVS</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="foot">
+  <p>Tramatto &mdash; Estrutura do Projeto &mdash; junho 2026 &mdash; 59 tasks · 5 fases</p>
+  <a href="https://trello.com/b/KyZQ97gf/tramatto-estrutura-do-projeto" target="_blank">Abrir board no Trello →</a>
+</div>
 
 </div>
 
 <script>
-window.addEventListener('load', () => {
-  document.querySelectorAll('.mbf[data-w],.lf[data-w]').forEach(e => {
-    setTimeout(() => { e.style.width = e.dataset.w + '%'; }, 100);
+window.addEventListener('load',()=>{
+  document.querySelectorAll('.mbf[data-w],.lf[data-w]').forEach(e=>{
+    setTimeout(()=>{e.style.width=e.dataset.w+'%'},100);
   });
-
-  const gc = 'rgba(17,17,16,0.05)', tc = '#a09f9b';
-
-  new Chart(document.getElementById('bc'), {
-    type: 'bar',
-    data: {
-      labels: ['Backlog', 'Em andamento', 'Aprovação', 'Concluído'],
-      datasets: [
-        { label: 'Concluído',   data: [0, 0, 0, 19], backgroundColor: '#2d5a1b', borderRadius: 1, stack: 's' },
-        { label: 'Em andamento',data: [0, 10, 1, 0],  backgroundColor: '#1a3a5c', borderRadius: 1, stack: 's' },
-        { label: 'Backlog',     data: [17, 0, 0, 0],  backgroundColor: '#c8c6c0', borderRadius: 1, stack: 's' },
+  const gc='rgba(17,17,16,0.05)',tc='#a09f9b';
+  new Chart(document.getElementById('bc'),{
+    type:'bar',
+    data:{
+      labels:['Backlog','Em andamento','Aprovação','GEO & Auth.','Concluído'],
+      datasets:[
+        {label:'Concluído',data:[0,0,0,0,18],backgroundColor:'#2d5a1b',borderRadius:2,stack:'s'},
+        {label:'Andamento',data:[0,10,0,0,0],backgroundColor:'#1a3a5c',borderRadius:2,stack:'s'},
+        {label:'Aprovação',data:[0,0,1,0,0],backgroundColor:'#5a4a1a',borderRadius:2,stack:'s'},
+        {label:'GEO',data:[0,0,0,13,0],backgroundColor:'#3a1a5a',borderRadius:2,stack:'s'},
+        {label:'Backlog',data:[17,0,0,0,0],backgroundColor:'#c8c6c0',borderRadius:2,stack:'s'},
       ]
     },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { stacked: true, grid: { color: gc }, ticks: { color: tc, font: { size: 11, family: 'Inter' } } },
-        y: { stacked: true, grid: { color: gc }, ticks: { color: tc, font: { size: 11, family: 'Inter' }, stepSize: 5 }, beginAtZero: true }
-      }
-    }
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{stacked:true,grid:{color:gc},ticks:{color:tc,font:{size:11,family:'Inter'}}},
+              y:{stacked:true,grid:{color:gc},ticks:{color:tc,font:{size:11,family:'Inter'},stepSize:5},beginAtZero:true}}}
   });
-
-  new Chart(document.getElementById('dc'), {
-    type: 'doughnut',
-    data: {
-      labels: ['Concluído', 'Em andamento', 'Backlog'],
-      datasets: [{ data: [19, 11, 17], backgroundColor: ['#2d5a1b', '#1a3a5c', '#c8c6c0'], borderWidth: 0, hoverOffset: 3 }]
+  new Chart(document.getElementById('dc'),{
+    type:'doughnut',
+    data:{labels:['Concluído','Andamento','Aprovação','GEO','Backlog'],
+      datasets:[{data:[18,10,1,13,17],
+        backgroundColor:['#2d5a1b','#1a3a5c','#5a4a1a','#3a1a5a','#c8c6c0'],borderWidth:0,hoverOffset:3}]
     },
-    options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false } } }
+    options:{responsive:true,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{display:false}}}
   });
 });
 </script>
