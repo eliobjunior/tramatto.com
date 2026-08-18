@@ -7,13 +7,39 @@
   <meta name="description" content="Explore a coleção de panos de prato turcos premium da Tramatto, pensada para cozinhas e mesas sofisticadas." />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://tramatto.com/collection.html" />
+
+  <!-- Open Graph / WhatsApp / Facebook / LinkedIn -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://tramatto.com/collection.html">
+  <meta property="og:title" content="Tramatto — Coleção Premium de Panos de Prato">
+  <meta property="og:description" content="Explore a coleção de panos de prato turcos premium da Tramatto, com peças selecionadas para cozinhas sofisticadas.">
+  <meta property="og:image" content="https://tramatto.com/tramatto_og.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:site_name" content="Tramatto">
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Tramatto — Coleção Premium de Panos de Prato">
+  <meta name="twitter:description" content="Explore a coleção de panos de prato turcos premium da Tramatto, com peças selecionadas para cozinhas sofisticadas.">
+  <meta name="twitter:image" content="https://tramatto.com/tramatto_og.jpg">
+
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     "name": "Coleção Premium Tramatto",
     "url": "https://tramatto.com/collection.html",
-    "description": "Explore a coleção de panos de prato turcos premium da Tramatto, com peças selecionadas para cozinhas sofisticadas."
+    "description": "Explore a coleção de panos de prato turcos premium da Tramatto, com peças selecionadas para cozinhas sofisticadas.",
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://tramatto.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Coleção", "item": "https://tramatto.com/collection.html" }
+      ]
+    }
   }
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -41,6 +67,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <li><a href="collection.html">Kits</a></li>
       <li><a href="collection.html">Coleções</a></li>
       <li><a href="index.html#origem">A Marca</a></li>
+      <li><a href="blog/">Blog</a></li>
     </ul>
     <div class="nav-right">
       <a href="collection.html" class="nav-cart">Sacola (0)</a>
@@ -54,6 +81,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a href="collection.html" onclick="toggleMenu()">Kits</a>
     <a href="collection.html" onclick="toggleMenu()">Coleções</a>
     <a href="index.html#origem" onclick="toggleMenu()">A Marca</a>
+    <a href="blog/" onclick="toggleMenu()">Blog</a>
     <a href="collection.html" onclick="toggleMenu()" style="border-bottom:none;color:var(--terra);">Sacola (0)</a>
   </div>
 
@@ -62,6 +90,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="section-tag">Coleção premium</div>
       <h1>Panos de prato feitos para durar e decorar.</h1>
       <p>Escolha peças de algodão egípcio, acabamento refinado e presença de marca para transformar qualquer cozinha em um espaço mais sofisticado.</p>
+      <div class="collection-search">
+        <input type="search" id="collectionSearch" placeholder="Buscar por nome do produto..." aria-label="Buscar produtos">
+      </div>
     </section>
 
     <section class="products-grid" id="collectionProducts"></section>
@@ -73,8 +104,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="footer-brand-name">Trama<em>tto</em></div>
         <p class="footer-tagline">Panos de prato turcos de qualidade premium. Da Anatólia para a sua cozinha.</p>
         <div class="footer-socials">
-          <a href="#" class="footer-social">Instagram</a>
-          <a href="#" class="footer-social">Pinterest</a>
+          <a href="https://www.instagram.com/tramatto" class="footer-social" target="_blank" rel="noopener noreferrer">Instagram</a>
+          <a href="https://www.pinterest.com/tramatto" class="footer-social" target="_blank" rel="noopener noreferrer">Pinterest</a>
         </div>
       </div>
       <div>
@@ -116,6 +147,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <script src="integrations/nuvemshop/catalog.js"></script>
   <script src="integrations/nuvemshop/products.js"></script>
   <script src="integrations/nuvemshop/cart.js"></script>
+  <script src="nuvemshop-mirror-data.js"></script>
   <script src="catalog-data.js"></script>
   <script src="script.js"></script>
   <script src="js/analytics.js"></script>

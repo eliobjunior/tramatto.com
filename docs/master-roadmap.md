@@ -1,6 +1,6 @@
 # Master Roadmap — Tramatto Storefront
 
-**Data:** 2026-06-10
+**Data:** 2026-06-16 (atualizado — audit ecommerce tracking + Meta Pixel)
 **Fontes:** [docs/technical-audit.md](technical-audit.md) (auditoria técnica) + [docs/business-audit.md](business-audit.md) (auditoria de negócio)
 **Objetivo:** consolidar os achados das duas auditorias em um plano único, priorizado por ROI, com estimativas de esforço/impacto e horizontes de 30/90/360 dias.
 
@@ -35,7 +35,8 @@
 | 12 | **`aria-expanded`/`aria-controls` no menu mobile + `aria-live` no toast** | UX (Acessibilidade) | Baixo | Médio | ⭐⭐⭐ | AC2, AC5 |
 | 13 | **FAQ visível + `FAQPage` schema** (reaproveitar conteúdo de frete/trocas/origem) | SEO, GEO | Médio | Alto | ⭐⭐⭐⭐ | GEO1 |
 | 14 | **Conteúdo do catálogo no HTML inicial** (SSR/snapshot, não só pós-JS) | SEO, GEO | Alto | Alto | ⭐⭐⭐ | S2, GEO4 |
-| 15 | **`<title>`/canonical dinâmicos por produto + sitemap por slug** | SEO | Médio-Alto | Alto | ⭐⭐⭐ | S1, S3, SEO1 |
+| 15 | **`<title>`/canonical dinâmicos por produto + sitemap por slug** ✅ *concluído — canonical dinâmico, `<title>`/`<meta description>` dinâmicos e sincronizados, Product Schema (JSON-LD), Open Graph dinâmico e sitemap por slug (`sitemap-products.xml`) implementados (ver [merchant-center-phase1.md](merchant-center-phase1.md), [sitemap-products.md](sitemap-products.md) e [search-console.md](search-console.md) §4.2); SSR completo (item #14) permanece como melhoria futura* | SEO | Médio-Alto | Alto | ⭐⭐⭐ | S1, S3, SEO1 |
+| 15b | ~~**🔴 `<title>` dinâmico em `product.html`**~~ ✅ **concluído** — implementado via `updateProductMetaTags()` em `script.js`, sincronizado com canonical/description/OG/Schema (ver [search-console.md](search-console.md) §4.2) | SEO | Baixo | Alto | ⭐⭐⭐⭐⭐ | [search-console.md](search-console.md) §4.2, §10 |
 | 16 | **Sessão de fotos própria** (produto + lifestyle) | Conversão, UX, Posicionamento | Alto | Alto | ⭐⭐⭐ | seção 3 (audit. negócio) |
 | 17 | **`package.json` + CI básico (`node --test`)** | Débito Técnico | Baixo | Médio | ⭐⭐⭐⭐ | B3, D6 |
 | 18 | **Modelar Kits como entidade própria no domínio** | Débito Técnico, Conversão | Médio | Médio | ⭐⭐ | B6 |
@@ -51,6 +52,10 @@
 | 28 | **`role="radiogroup"`/`aria-pressed` em variantes** | UX (Acessibilidade) | Baixo | Baixo-Médio | ⭐⭐ | AC4 |
 | 29 | **Bundler/build (Vite/esbuild)** para resolver carregamento de scripts | Débito Técnico, Performance | Alto | Médio | ⭐⭐ | A2, SC2, SC4 |
 | 30 | **Internacionalização (i18n)** | Débito Técnico, Escalabilidade | Alto | Baixo (no momento) | ⭐ | SC5 |
+| 31a | **GA4 Ecommerce Tracking — Fase A** ✅ **concluído** — `select_item` + `add_to_cart` implementados; `view_item`/`view_item_list` enriquecidos com `item_brand`, `item_category`, `quantity`, `currency`, `item_list_id`. **Pendente:** criar 2 triggers + 2 tags no GTM (`CE - select_item`, `CE - add_to_cart`). Ver [docs/ecommerce-tracking-audit.md](ecommerce-tracking-audit.md) | Analytics | Baixo | Alto | ⭐⭐⭐⭐⭐ | audit. ecommerce-tracking |
+| 31b | **GA4 Ecommerce Tracking — Fase B** (`view_cart`, `remove_from_cart`, `begin_checkout`): depende do Roadmap #3 (carrinho drawer). Implementar imediatamente após #3. | Analytics | Baixo | Alto | ⭐⭐⭐⭐ | audit. ecommerce-tracking |
+| 31c | **GA4 Ecommerce Tracking — Fase C** (`purchase`): depende do Roadmap #21 (checkout real). | Analytics | Baixo | Alto | ⭐⭐⭐ | audit. ecommerce-tracking |
+| 32 | **Meta Pixel — Instalação via GTM** (8 tags, 0 triggers novos, 3 variáveis novas): sem dependências externas além da criação do Pixel ID no Meta Business Manager. Ver [docs/meta-pixel-implementation.md](meta-pixel-implementation.md) e [docs/meta-pixel-checklist.md](meta-pixel-checklist.md) | Analytics | Baixo | Alto | ⭐⭐⭐⭐⭐ | audit. meta-pixel |
 
 ---
 
@@ -68,6 +73,8 @@
 | 3 | #12 `aria-expanded`/`aria-controls`/`aria-live` | UX | Baixo | Médio |
 | 4 | #17 `package.json` + CI (`node --test`) | Débito Técnico | Baixo | Médio |
 | 4 | #8 Expor Kits na `collection.html` | Conversão, SEO | Médio | Alto |
+| 2-4 | **#31a GA4 Ecommerce Tracking — Fase A**: `select_item` (listener nos cards), `add_to_cart` (dispatcher em `addToCart()`), enriquecimento de `view_item`/`view_item_list` com `item_brand`, `item_category`, `quantity` | Analytics | Baixo | Alto |
+| 2-4 | **#32 Meta Pixel via GTM**: criar Pixel no Meta Business Manager + 8 tags GTM (reaproveitando os 7 triggers existentes) | Analytics | Baixo | Alto |
 
 **Critério de saída do mês 1:** o site consegue gerar uma venda de ponta a ponta (mesmo que via WhatsApp), os links principais funcionam, a home carrega rápido em mobile, e a base de governança (CI + CSS único) está pronta para suportar o crescimento dos meses seguintes.
 
@@ -82,10 +89,12 @@
 | 2 | #9 Seletor de quantidade + cross-sell de Kits | Conversão | Médio | Alto |
 | 2 | #13 FAQ visível + `FAQPage` schema | SEO, GEO | Médio | Alto |
 | 2 | #18 Modelar Kits como entidade própria | Débito Técnico, Conversão | Médio | Médio |
-| 2-3 | #15 `<title>`/canonical dinâmicos por produto + sitemap por slug | SEO | Médio-Alto | Alto |
+| 2-3 | #15 `<title>`/canonical dinâmicos por produto + sitemap por slug — ✅ **concluído** (canonical, `<title>`/description, Schema, OG e sitemap por slug) | SEO | Médio-Alto | Alto |
+| — | ~~#15b `<title>` dinâmico em `product.html`~~ — ✅ **concluído**, absorvido pelo #15 | SEO | Baixo | Alto |
 | 3 | #22 Programa de prova social (depoimentos/Instagram embed) | Conversão, GEO | Médio | Alto |
 | 3 | #27 Página "Sobre" com sinais E-E-A-T | GEO, Conversão | Médio | Médio |
 | 3 (início) | #19 Início do `client.js` real Nuvemshop (descoberta de API/credenciais) | Nuvemshop Integration | Alto (início) | Alto |
+| Após #3 | **#31b GA4 Ecommerce Tracking — Fase B**: `view_cart`, `remove_from_cart`, `begin_checkout` — implementar imediatamente após o drawer de carrinho (#3) estar funcional | Analytics | Baixo | Alto |
 
 **Critério de saída do mês 3:** páginas de produto convertem melhor (qty seletor, cross-sell, FAQ, prova social), produtos individuais começam a ser indexáveis, e a integração Nuvemshop real está em desenvolvimento ativo (não mais "stub").
 
@@ -118,8 +127,8 @@
 | Item | Esforço | Impacto | Janela |
 |---|---|---|---|
 | #13 FAQ + `FAQPage` schema | Médio | Alto | 90 dias |
-| #15 Title/canonical dinâmicos por produto + sitemap por slug | Médio-Alto | Alto | 90 dias |
-| #14 Catálogo no HTML inicial (SSR/snapshot) | Alto | Alto | 12 meses (Q2) |
+| #15 Title/canonical dinâmicos por produto + sitemap por slug — ✅ **concluído** (canonical, `<title>`/description sincronizados, Product Schema, Open Graph e sitemap por slug) | Médio-Alto | Alto | 90 dias |
+| #14 Catálogo no HTML inicial (SSR/snapshot) — melhoria futura para eliminar dependência de CSR no estado pré-JS (ver [search-console.md](search-console.md) §4.2/§10) | Alto | Alto | 12 meses (Q2) |
 | #23 Conteúdo educacional/blog | Alto | Alto | 12 meses (Q3) |
 | #24 Páginas de coleção temáticas | Médio-Alto | Médio | 12 meses (Q3) |
 | Limpeza de `<meta name="keywords">` (obsoleto) | Baixo | Baixo | Oportunista (junto com #6) |
@@ -189,7 +198,25 @@
 
 ---
 
-### 6.6 Débito Técnico
+### 6.6 Analytics
+
+| Item | Esforço | Impacto | Janela | Dependência |
+|---|---|---|---|---|
+| #31a GA4: `select_item` + `add_to_cart` + enriquecimento de `view_item`/`view_item_list` | Baixo | Alto | 30 dias | Nenhuma |
+| #32 Meta Pixel (8 tags GTM, reaproveitamento de triggers existentes) | Baixo | Alto | 30 dias | Criar Pixel ID no Meta Business Manager |
+| #31b GA4: `view_cart`, `remove_from_cart`, `begin_checkout` | Baixo | Alto | Após #3 | Roadmap #3 (carrinho drawer) |
+| #31c GA4: `purchase` | Baixo | Alto | 12 meses (Q2) | Roadmap #21 (checkout real) |
+
+**Referências:** [docs/ecommerce-tracking-audit.md](ecommerce-tracking-audit.md) · [docs/ecommerce-tracking-checklist.md](ecommerce-tracking-checklist.md) · [docs/meta-pixel-implementation.md](meta-pixel-implementation.md) · [docs/meta-pixel-checklist.md](meta-pixel-checklist.md)
+
+**Estado atual do funil GA4:**
+- ✅ `page_view` → ✅ `view_item_list` (parcial) → 🔴 `select_item` → ✅ `view_item` (parcial) → 🔴 `add_to_cart` → 🔴 `view_cart` → 🔴 `begin_checkout` → 🔴 `purchase`
+
+**Resumo:** a infraestrutura GTM está sólida (container instalado em 9 páginas, 7 triggers e 7 tags GA4 publicados, dataLayer com arquitetura desacoplada). Os dois eventos de maior valor que **podem ser feitos agora** sem nenhuma dependência são `select_item` e `add_to_cart` — juntos completam o rastreamento do topo e meio do funil que hoje está invisível no GA4. O fundo do funil (`purchase`) depende inteiramente do Roadmap #21.
+
+---
+
+### 6.7 Débito Técnico
 
 | Item | Esforço | Impacto | Janela |
 |---|---|---|---|

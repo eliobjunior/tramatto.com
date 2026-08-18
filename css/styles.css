@@ -661,6 +661,23 @@ footer {
   line-height: 1.2;
   margin-bottom: 1rem;
 }
+.collection-search {
+  margin-top: 1.5rem;
+  max-width: 360px;
+}
+.collection-search input {
+  width: 100%;
+  padding: 0.85rem 1.25rem;
+  border: 0.5px solid var(--sand);
+  background: var(--warm-white);
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  color: var(--text-main);
+  outline: none;
+}
+.collection-search input::placeholder { color: var(--text-light); }
+.collection-search input:focus { border-color: var(--terra); }
+
 .collection-hero p {
   font-size: 0.95rem;
   line-height: 1.8;

@@ -1,19 +1,37 @@
 (function (global) {
   const root = globalThis;
+  // NUVEMSHOP_STORE_URL: domínio público da loja Nuvemshop da Tramatto —
+  // não é segredo (é a própria URL da loja), usado só para montar o link
+  // de "comprar" (ver js/purchase.js). Validado manualmente antes desta
+  // configuração: https://tramatto.lojavirtualnuvem.com.br
+  const NUVEMSHOP_STORE_URL = 'https://tramatto.lojavirtualnuvem.com.br';
+
   const environments = {
     development: {
       adapter: 'mock',
       apiBaseUrl: '',
+      // Vazio de propósito: MockAdapter usa IDs fictícios que não existem
+      // na loja real — js/purchase.js trata storeUrl vazio como "compra
+      // indisponível neste ambiente" (ver Fase D do plano de integração).
+      storeUrl: '',
       debug: true
     },
     staging: {
-      adapter: 'nuvemshop',
-      apiBaseUrl: 'https://api.nuvemshop.example',
+      // Opção A aprovada: catálogo espelhado (nuvemshop-mirror-data.js),
+      // gerado por scripts/sync-nuvemshop-mirror.js a partir só de páginas
+      // públicas da loja — sem access_token, sem proxy, sem API privada.
+      adapter: 'mirror',
+      // apiBaseUrl do proxy (Fase 1) fica registrado, mas não é usado
+      // enquanto o adapter for 'mirror' — ver proxy/README.md se algum dia
+      // precisarmos reativar o NuvemshopAdapter.
+      apiBaseUrl: 'https://tramatto-nuvemshop-proxy-staging.example.workers.dev',
+      storeUrl: NUVEMSHOP_STORE_URL,
       debug: true
     },
     production: {
-      adapter: 'nuvemshop',
-      apiBaseUrl: 'https://api.nuvemshop.example',
+      adapter: 'mirror',
+      apiBaseUrl: 'https://tramatto-nuvemshop-proxy.example.workers.dev',
+      storeUrl: NUVEMSHOP_STORE_URL,
       debug: false
     }
   };
@@ -22,10 +40,29 @@
     return environments[environmentName] || environments.development;
   }
 
+  // Sites estáticos sem build não têm variável de ambiente em runtime —
+  // detectamos o ambiente pelo hostname. Qualquer host que não seja o
+  // domínio de produção (localhost, previews, file://, etc.) continua no
+  // MockAdapter, então dev/testes nunca dependem do proxy/Nuvemshop real.
+  function detectEnvironment() {
+    if (typeof window === 'undefined' || !window.location) {
+      return 'development';
+    }
+    const host = window.location.hostname;
+    if (host === 'tramatto.com' || host === 'www.tramatto.com') {
+      return 'production';
+    }
+    return 'development';
+  }
+
   function createAdapter(environmentName = 'development') {
     const environment = resolveEnvironment(environmentName);
     if (!root.TramattoAdapters) {
       throw new Error('Tramatto adapters were not loaded yet.');
+    }
+
+    if (environment.adapter === 'mirror') {
+      return new root.TramattoAdapters.MirrorAdapter();
     }
 
     if (environment.adapter === 'nuvemshop') {
@@ -49,7 +86,8 @@
 
   root.TramattoConfig = {
     environments,
-    environment: 'development',
+    environment: detectEnvironment(),
+    detectEnvironment,
     resolveEnvironment,
     createAdapter,
     createServices

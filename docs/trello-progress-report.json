@@ -1,0 +1,539 @@
+{
+  "tarefas": [
+    {
+      "id": "SEO-001",
+      "titulo": "Schema.org dinâmico e sitemap por produto",
+      "fase": "Fase 1 (30 dias)",
+      "categoria": "SEO",
+      "status": "Concluído",
+      "prioridade": "Alta",
+      "responsavel": "Claude Code",
+      "percentual": 100,
+      "resumo": "Implementação de canonical dinâmico, <title>/<meta description> dinâmicos sincronizados, Product Schema (JSON-LD), Open Graph dinâmico e sitemap-products.xml com slugs.",
+      "checklist_concluido": [
+        "Canonical dinâmico por slug em product.html",
+        "<title> dinâmico via updateProductMetaTags() em script.js",
+        "Meta description dinâmica",
+        "Product Schema (JSON-LD) com preço, disponibilidade, imagens",
+        "Open Graph dinâmico (og:title, og:description, og:image)",
+        "sitemap-products.xml com 4 produtos",
+        "BreadcrumbList schema dinâmico por produto"
+      ],
+      "checklist_pendente": []
+    },
+    {
+      "id": "BLOG-001",
+      "titulo": "Blog operacional com 4 artigos",
+      "fase": "Fase 1 (30 dias)",
+      "categoria": "Conteúdo / SEO",
+      "status": "Concluído",
+      "prioridade": "Alta",
+      "responsavel": "Claude Code",
+      "percentual": 100,
+      "resumo": "Criação de 4 artigos de blog com conteúdo educacional (cuidados, materiais, presentes), schema FAQ, schema Article, sitemap-blog.xml, e integração na navegação global.",
+      "checklist_concluido": [
+        "Artigo 1: Como lavar pano de prato (1.700+ palavras, 5 FAQs)",
+        "Artigo 2: Como tirar manchas de pano de prato (1.600+ palavras, 5 FAQs)",
+        "Artigo 3: Algodão vs linho vs microfibra (1.900+ palavras, tabela comparativa)",
+        "Artigo 4: Presente para chá de cozinha (1.700+ palavras, 5 FAQs)",
+        "Schema Article com author, datePublished, dateModified",
+        "Schema FAQPage implementado em todos os artigos",
+        "sitemap-blog.xml criado e adicionado a robots.txt",
+        "Links de blog adicionados em navegação global (index, collection, pages)"
+      ],
+      "checklist_pendente": []
+    },
+    {
+      "id": "ARCH-001",
+      "titulo": "Unificação de CSS e limpeza de débito técnico",
+      "fase": "Fase 1 (30 dias)",
+      "categoria": "Débito Técnico / UX",
+      "status": "Pendente",
+      "prioridade": "Alta",
+      "responsavel": "Claude Code",
+      "percentual": 0,
+      "resumo": "Consolidar styles.css e css/styles.css em um único arquivo; remover 666 linhas de CSS comentado; corrigir skip-link ausente em index.html.",
+      "checklist_concluido": [],
+      "checklist_pendente": [
+        "Mesclar styles.css (raiz) e css/styles.css",
+        "Adicionar .skip-link ao stylesheet único",
+        "Adicionar skip-link HTML ao index.html",
+        "Remover CSS comentado de index.html (~40% do arquivo)",
+        "Validar UI consistency entre todas as páginas"
+      ]
+    },
+    {
+      "id": "PERF-001",
+      "titulo": "Otimizações de performance críticas",
+      "fase": "Fase 1 (30 dias)",
+      "categoria": "Performance",
+      "status": "Pendente",
+      "prioridade": "Alta",
+      "responsavel": "Claude Code",
+      "percentual": 0,
+      "resumo": "Substituir hero base64 (~225KB) por arquivo otimizado; adicionar defer em todos os <script>; otimizar carregamento de imagens.",
+      "checklist_concluido": [],
+      "checklist_pendente": [
+        "Remover hero <img> base64 de index.html",
+        "Criar asset de imagem otimizado (PNG/WebP)",
+        "Adicionar defer em 9 tags <script>",
+        "Implementar lazy load em product gallery",
+        "Validar LCP e FID em PageSpeed Insights"
+      ]
+    },
+    {
+      "id": "CRO-001",
+      "titulo": "Resgatar WhatsApp real e corrigir links",
+      "fase": "Fase 1 (30 dias)",
+      "categoria": "Conversão / UX",
+      "status": "Pendente",
+      "prioridade": "Alta",
+      "responsavel": "Claude Code",
+      "percentual": 0,
+      "resumo": "Substituir placeholder de WhatsApp por número real; corrigir todos os links # que apontam para rotas inexistentes (footer, redes sociais, CTAs).",
+      "checklist_concluido": [],
+      "checklist_pendente": [
+        "Obter número de WhatsApp reais",
+        "Atualizar todos os links href='#' para URLs corretas ou âncoras válidas",
+        "Atualizar links de redes sociais (Instagram, Pinterest)",
+        "Adicionar links navegáveis em newsletter footer",
+        "Testar todos os CTAs em mobile"
+      ]
+    },
+    {
+      "id": "CRO-002",
+      "titulo": "Dados de empresa visíveis (CNPJ, razão social, endereço)",
+      "fase": "Fase 1 (30 dias)",
+      "categoria": "Conversão / Trust",
+      "status": "Pendente",
+      "prioridade": "Alta",
+      "responsavel": "Claude Code",
+      "percentual": 0,
+      "resumo": "Adicionar CNPJ, razão social, endereço físico, contato e informações legais no rodapé e/ou políticas para elevar confiança e conformidade.",
+      "checklist_concluido": [],
+      "checklist_pendente": [
+        "Obter dados legais da empresa (CNPJ, razão social)",
+        "Adicionar endereço físico no rodapé",
+        "Adicionar informações de contato",
+        "Atualizar schema Organization com legalName, address",
+        "Validar com Merchant Center"
+      ]
+    },
+    {
+      "id": "ANALYTICS-GA4-001",
+      "titulo": "GA4 Ecommerce Tracking — Fase A (select_item, add_to_cart)",
+      "fase": "Fase 1 (30 dias)",
+      "categoria": "Analytics / GA4",
+      "status": "Pendente",
+      "prioridade": "Alta",
+      "responsavel": "Claude Code",
+      "percentual": 50,
+      "resumo": "Implementação de tracking de seleção de item e adição ao carrinho; enriquecimento de view_item/view_item_list com item_brand, item_category, quantity. Criar 2 triggers e 2 tags no GTM.",
+      "checklist_concluido": [
+        "select_item listener implementado em script.js",
+        "add_to_cart dispatcher em addToCart()",
+        "view_item enriquecido com item_brand, item_category, quantity",
+        "view_item_list enriquecido com item_list_id"
+      ],
+      "checklist_pendente": [
+        "Criar trigger CE - select_item no GTM",
+        "Criar trigger CE - add_to_cart no GTM",
+        "Criar tag GA4 Event - select_item no GTM",
+        "Criar tag GA4 Event - add_to_cart no GTM",
+        "Validar em GA4 DebugView",
+        "Documentar em ecommerce-tracking-checklist.md"
+      ]
+    },
+    {
+      "id": "ANALYTICS-META-001",
+      "titulo": "Meta Pixel instalação via GTM",
+      "fase": "Fase 1 (30 dias)",
+      "categoria": "Analytics / Meta",
+      "status": "Pendente",
+      "prioridade": "Alta",
+      "responsavel": "Claude Code",
+      "percentual": 0,
+      "resumo": "Instalação de Meta Pixel através de GTM com 8 tags mapeadas para eventos existentes (sem novos triggers). Reusa triggers CE já existentes.",
+      "checklist_concluido": [],
+      "checklist_pendente": [
+        "Obter Pixel ID do Meta Business Manager",
+        "Criar tag Meta Pixel Base Code (All Pages)",
+        "Criar tag Meta Pixel — ViewContent (CE - view_product)",
+        "Criar tag Meta Pixel — Search (CE - search)",
+        "Criar tag Meta Pixel — Contact (CE - click_whatsapp)",
+        "Criar tag Meta Pixel — ViewContent List (CE - view_collection)",
+        "Adicionar DLV: content_ids, content_type, content_category",
+        "Validar em Meta Events Manager"
+      ]
+    },
+    {
+      "id": "CHECKOUT-001",
+      "titulo": "Carrinho visível + bridge WhatsApp",
+      "fase": "Fase 1 (30 dias)",
+      "categoria": "Conversão / Nuvemshop Integration",
+      "status": "Em andamento",
+      "prioridade": "Alta",
+      "responsavel": "Claude Code",
+      "percentual": 30,
+      "resumo": "Implementar drawer de carrinho visível e bridge de checkout via WhatsApp (provisório até integração real Nuvemshop). Bloqueador crítico para qualquer conversão real.",
+      "checklist_concluido": [
+        "CartService funcional com add/remove/persist em localStorage"
+      ],
+      "checklist_pendente": [
+        "Criar UI de drawer de carrinho responsivo",
+        "Implementar toggle do drawer (botão, animação)",
+        "Criar botão 'Finalizar pelo WhatsApp' no drawer",
+        "Serializar carrinho e enviar via link WhatsApp",
+        "Testar UX em mobile",
+        "Adicionar GA4 view_cart event após drawer abrir",
+        "Documentar fluxo em integration-flow.md"
+      ]
+    },
+    {
+      "id": "SEO-002",
+      "titulo": "FAQ visível + FAQPage schema",
+      "fase": "Fase 2 (90 dias)",
+      "categoria": "SEO / GEO",
+      "status": "Pendente",
+      "prioridade": "Alta",
+      "responsavel": "Claude Code",
+      "percentual": 0,
+      "resumo": "Expor FAQs relacionadas a frete, devolução, origem no HTML (home/about/shipping); implementar schema FAQPage; reaproveitar FAQ do blog.",
+      "checklist_concluido": [],
+      "checklist_pendente": [
+        "Compilar FAQs de frete, devolução, cuidado, origem",
+        "Adicionar seção FAQ visível em about.html",
+        "Adicionar seção FAQ em shipping.html",
+        "Implementar schema FAQPage em index.html",
+        "Validar com Rich Results Test",
+        "Manter FAQ schema sincronizado entre HTML e JSON-LD"
+      ]
+    },
+    {
+      "id": "CRO-003",
+      "titulo": "Seletor de quantidade + cross-sell de Kits",
+      "fase": "Fase 2 (90 dias)",
+      "categoria": "Conversão",
+      "status": "Pendente",
+      "prioridade": "Alta",
+      "responsavel": "Claude Code",
+      "percentual": 0,
+      "resumo": "Adicionar seletor de quantidade antes de add-to-cart; implementar recomendação de Kits relacionados na PDP; incrementar valor do carrinho.",
+      "checklist_concluido": [],
+      "checklist_pendente": [
+        "Criar UI de seletor de quantidade (1-999 ou ajustado)",
+        "Atualizar CartService para suportar quantity > 1",
+        "Implementar algoritmo de cross-sell (Kit se produto base selecionado)",
+        "Renderizar Kit cards na PDP",
+        "Atualizar add_to_cart event para incluir quantity",
+        "Testar mobile UX"
+      ]
+    },
+    {
+      "id": "GEO-001",
+      "titulo": "Página Sobre com sinais E-E-A-T",
+      "fase": "Fase 2 (90 dias)",
+      "categoria": "GEO / Conversão",
+      "status": "Pendente",
+      "prioridade": "Média",
+      "responsavel": "Claude Code",
+      "percentual": 50,
+      "resumo": "Expandir about.html com histórico da marca, fundadores (nomes/fotos), processo de produção, certificações, fatos verificáveis sobre tecidos e origem.",
+      "checklist_concluido": [
+        "Estrutura inicial de about.html com 4 seções"
+      ],
+      "checklist_pendente": [
+        "Adicionar nomes e fotos dos fundadores",
+        "Descrever processo de produção de forma verificável",
+        "Adicionar certificações/parcerias",
+        "Implementar Author schema (Person) se nomeado",
+        "Adicionar FAQ sobre origem e processo",
+        "Atualizar schema Organization com foundingDate, employees"
+      ]
+    },
+    {
+      "id": "COLEÇOES-001",
+      "titulo": "Expor Kits na collection.html",
+      "fase": "Fase 2 (90 dias)",
+      "categoria": "Conversão / SEO",
+      "status": "Pendente",
+      "prioridade": "Média",
+      "responsavel": "Claude Code",
+      "percentual": 0,
+      "resumo": "Criar seção dedicada a Kits e Presentes em collection.html com cards, preço, CTA; ou criar rota /colecoes/presentes/ com collection temática.",
+      "checklist_concluido": [],
+      "checklist_pendente": [
+        "Decidir: adicionar seção Kits em collection.html OU criar página /colecoes/presentes/",
+        "Implementar renderização de Kits com preço/descrição",
+        "Adicionar CollectionPage schema com item_list_name",
+        "Testar mobile UX",
+        "Atualizar sitemap"
+      ]
+    },
+    {
+      "id": "GEO-002",
+      "titulo": "Programa de prova social (reviews, depoimentos, social proof)",
+      "fase": "Fase 2 (90 dias)",
+      "categoria": "GEO / Conversão",
+      "status": "Pendente",
+      "prioridade": "Média",
+      "responsavel": "Claude Code",
+      "percentual": 0,
+      "resumo": "Implementar seção de depoimentos, embed de Instagram, e futura integração de sistema de reviews para alimentar sinais de confiança em LLMs.",
+      "checklist_concluido": [],
+      "checklist_pendente": [
+        "Definir estrutura de depoimentos (HTML estático ou embed)",
+        "Criar seção de Social Proof na home",
+        "Implementar Instagram Embed API (se realizado)",
+        "Adicionar AggregateRating schema (quando houver reviews reais)",
+        "Integrar com plataforma de reviews (Yotpo, Trustpilot, etc.)"
+      ]
+    },
+    {
+      "id": "NUVEM-001",
+      "titulo": "Integração Nuvemshop Fase 1 (discover API, design contract)",
+      "fase": "Fase 2 (90 dias)",
+      "categoria": "Nuvemshop Integration",
+      "status": "Em andamento",
+      "prioridade": "Alta",
+      "responsavel": "Claude Code",
+      "percentual": 20,
+      "resumo": "Início da integração real Nuvemshop: descoberta de endpoints, autenticação, contrato de dados, e estrutura de client.js com chamadas HTTP reais (mesmo que atrás de feature flag).",
+      "checklist_concluido": [],
+      "checklist_pendente": [
+        "Obter credenciais Nuvemshop (store ID, token)",
+        "Documentar endpoints de catálogo, produtos, carrinho, checkout",
+        "Definir contrato de dados (request/response)",
+        "Implementar client.js com fetch real (fase 2 - beta)",
+        "Adicionar autenticação (headers, bearer token)",
+        "Implementar paginação e cache de catálogo",
+        "Definir error handling e retry logic"
+      ]
+    },
+    {
+      "id": "ANALYTICS-GA4-002",
+      "titulo": "GA4 Ecommerce Tracking — Fase B (carrinho e checkout)",
+      "fase": "Fase 2 (90 dias)",
+      "categoria": "Analytics / GA4",
+      "status": "Pendente",
+      "prioridade": "Alta",
+      "responsavel": "Claude Code",
+      "percentual": 0,
+      "resumo": "Implementar tracking de view_cart, remove_from_cart, begin_checkout após drawer de carrinho estar funcional (Roadmap #3). Depende de Fase 1.",
+      "checklist_concluido": [],
+      "checklist_pendente": [
+        "Implementar view_cart event no drawer open",
+        "Implementar remove_from_cart listener",
+        "Implementar begin_checkout no botão WhatsApp",
+        "Criar triggers CE no GTM para os 3 eventos",
+        "Criar tags GA4 Event correspondentes",
+        "Validar em GA4 DebugView"
+      ]
+    },
+    {
+      "id": "MC-001",
+      "titulo": "Google Merchant Center — GTIN e identificadores",
+      "fase": "Fase 2-3 (90-360 dias)",
+      "categoria": "Ecommerce / Google",
+      "status": "Pendente",
+      "prioridade": "Média",
+      "responsavel": "Claude Code",
+      "percentual": 20,
+      "resumo": "Adicionar GTIN (após registro GS1 Brasil) ou manter identifier_exists=no com MPN clara; aumentar score de Merchant Center de 83→100.",
+      "checklist_concluido": [
+        "Merchant Center score pós-Fase 1: 83/100"
+      ],
+      "checklist_pendente": [
+        "Cenário A (curto prazo): manter identifier_exists=no",
+        "Cenário B (médio prazo): registrar GS1 Brasil, gerar GTINs",
+        "Adicionar imagens adicionais (−9 pontos no score)",
+        "Adicionar dados da empresa: CNPJ, endereço (−2 pontos)",
+        "Validar com Rich Results Test"
+      ]
+    },
+    {
+      "id": "CONTEUDO-001",
+      "titulo": "Conteúdo educacional/blog expandido",
+      "fase": "Fase 3 (12 meses - Q3)",
+      "categoria": "Conteúdo / SEO",
+      "status": "Pendente",
+      "prioridade": "Alta",
+      "responsavel": "Claude Code",
+      "percentual": 25,
+      "resumo": "Expandir blog com 6-10 artigos adicionais cobrindo guias de presente, comparativos, cuidados sazonais, e conteúdo educacional para gerar tráfego orgânico recorrente.",
+      "checklist_concluido": [
+        "4 artigos de blog base já implementados"
+      ],
+      "checklist_pendente": [
+        "Definir editorial calendar para 6-10 artigos",
+        "Artigos sugeridos: guias por estação, comparativos regionais, cuidados especiais",
+        "Implementar comment/feedback system (opcional)",
+        "Monitorar ranking de keywords primárias",
+        "Documentar performance em GAS"
+      ]
+    },
+    {
+      "id": "FOTO-001",
+      "titulo": "Sessão de fotos própria (produto + lifestyle)",
+      "fase": "Fase 3 (12 meses - Q2-Q3)",
+      "categoria": "Conversão / UX",
+      "status": "Pendente",
+      "prioridade": "Alta",
+      "responsavel": "Claude Code",
+      "percentual": 0,
+      "resumo": "Substituir imagens Unsplash por fotografia própria de produtos e lifestyle; implementar galeria multi-ângulo, zoom, variantess de cor.",
+      "checklist_concluido": [],
+      "checklist_pendente": [
+        "Contratar fotógrafo ou produtor interno",
+        "Fotografar 4 produtos em múltiplos ângulos (mín. 4-6 por produto)",
+        "Fotografar lifestyle (uso, contexto de cozinha)",
+        "Criar variantes de cor (se aplicável)",
+        "Comprimir e otimizar imagens (WebP, srcset)",
+        "Integrar ao product.html com lazy load",
+        "Implementar zoom em mobile"
+      ]
+    },
+    {
+      "id": "NUVEM-002",
+      "titulo": "Integração Nuvemshop Fase 2-3 (client.js real + mapper.js)",
+      "fase": "Fase 3 (12 meses - Q2)",
+      "categoria": "Nuvemshop Integration",
+      "status": "Pendente",
+      "prioridade": "Alta",
+      "responsavel": "Claude Code",
+      "percentual": 0,
+      "resumo": "Implementação real de client.js com chamadas fetch autenticadas, mapper.js conforme schema Nuvemshop, paginação, cache e tratamento de erros.",
+      "checklist_concluido": [],
+      "checklist_pendente": [
+        "Implementar getCatalog() com paginação real",
+        "Implementar getCollections() com dados da API",
+        "Implementar getProduct(id) com detalhes completos",
+        "Implementar addToCart() e removeFromCart()",
+        "Implementar checkout workflow (Nuvemshop hospedado vs. próprio)",
+        "Adicionar retry logic e circuit breaker",
+        "Cache de catálogo com TTL",
+        "Monitorar latência de API"
+      ]
+    },
+    {
+      "id": "NUVEM-003",
+      "titulo": "Catálogo no HTML inicial (SSR/snapshot para SEO)",
+      "fase": "Fase 3 (12 meses - Q2)",
+      "categoria": "SEO / Nuvemshop Integration",
+      "status": "Pendente",
+      "prioridade": "Alta",
+      "responsavel": "Claude Code",
+      "percentual": 0,
+      "resumo": "Renderizar conteúdo de catálogo no HTML inicial (não apenas pós-JS) para melhorar indexabilidade em buscadores que não executam JS completo. Depende de #19-20.",
+      "checklist_concluido": [],
+      "checklist_pendente": [
+        "Implementar SSR ou snapshot de catálogo (node.js ou static generation)",
+        "Gerar HTML estático com produtos renderizados",
+        "Coordenar com integração Nuvemshop real",
+        "Validar em Lighthouse SEO audit",
+        "Medir melhoria em indexabilidade via GSC"
+      ]
+    },
+    {
+      "id": "OTIM-001",
+      "titulo": "Otimização de imagens (CDN, responsive, lazy load)",
+      "fase": "Fase 3 (12 meses - Q3)",
+      "categoria": "Performance / SEO",
+      "status": "Pendente",
+      "prioridade": "Média",
+      "responsavel": "Claude Code",
+      "percentual": 0,
+      "resumo": "Implementar CDN para servir imagens otimizadas, srcset responsivo, lazy load, e WebP com fallback; depende de sessão de fotos própria (#16).",
+      "checklist_concluido": [],
+      "checklist_pendente": [
+        "Escolher provedor CDN (Cloudflare, AWS CloudFront, Imgix)",
+        "Configurar otimização automática (WebP, resize)",
+        "Implementar srcset em product.html",
+        "Implementar sizes attribute",
+        "Adicionar lazy load com loading='lazy'",
+        "Monitorar métricas de performance (LCP, CLS)"
+      ]
+    },
+    {
+      "id": "ARCH-002",
+      "titulo": "Package.json + CI básico (node --test)",
+      "fase": "Fase 1 (30 dias)",
+      "categoria": "Débito Técnico",
+      "status": "Pendente",
+      "prioridade": "Média",
+      "responsavel": "Claude Code",
+      "percentual": 0,
+      "resumo": "Adicionar package.json, script de test com node --test, e CI pipeline (.github/workflows) para rodar testes automaticamente.",
+      "checklist_concluido": [],
+      "checklist_pendente": [
+        "Criar package.json com scripts (test, lint)",
+        "Documentar como rodar testes localmente",
+        "Criar .github/workflows/test.yml para CI",
+        "Validar testes em architecture.test.js",
+        "Adicionar .gitignore para artifacts"
+      ]
+    },
+    {
+      "id": "ACESSIB-001",
+      "titulo": "Acessibilidade — ARIA labels e roles",
+      "fase": "Fase 1 (30 dias)",
+      "categoria": "UX / Acessibilidade",
+      "status": "Pendente",
+      "prioridade": "Média",
+      "responsavel": "Claude Code",
+      "percentual": 0,
+      "resumo": "Adicionar aria-expanded/aria-controls no menu mobile, aria-live no toast, aria-pressed em variantes, role='radiogroup' em seletores.",
+      "checklist_concluido": [],
+      "checklist_pendente": [
+        "Adicionar aria-expanded ao botão hamburger",
+        "Adicionar aria-controls apontando para #mobileMenu",
+        "Adicionar aria-live='assertive' ao #cartToast",
+        "Adicionar aria-pressed aos botões de variantes",
+        "Adicionar role='radiogroup' ao seletor de variantes",
+        "Validar com axe DevTools"
+      ]
+    },
+    {
+      "id": "SECURITY-001",
+      "titulo": "CSP + SRI headers",
+      "fase": "Fase 3 (12 meses - Q4)",
+      "categoria": "Segurança",
+      "status": "Pendente",
+      "prioridade": "Baixa",
+      "responsavel": "Claude Code",
+      "percentual": 0,
+      "resumo": "Implementar Content-Security-Policy meta tag/header e Subresource Integrity (SRI) em recursos externos (Google Fonts, Google Fonts).",
+      "checklist_concluido": [],
+      "checklist_pendente": [
+        "Definir CSP policy (script-src, style-src, img-src)",
+        "Adicionar CSP meta tag",
+        "Gerar SRI hashes para Google Fonts",
+        "Testar com browser DevTools"
+      ]
+    }
+  ],
+  "resumo_projeto": {
+    "tarefas_concluidas": 3,
+    "tarefas_em_andamento": 2,
+    "tarefas_pendentes": 21,
+    "percentual_geral": 18,
+    "principais_entregas": [
+      "Blog operacional com 4 artigos (cuidados, materiais, presentes) — conteúdo educacional como ativo de SEO/GEO",
+      "Schema.org dinâmico por produto + sitemap-products.xml — base técnica de indexabilidade e merchant center",
+      "Documentação completa: roadmap, auditorias técnica/negócio, readiness checks (SEO, GEO, AI, Merchant Center)",
+      "GTM container com 7 triggers + dataLayer preparado para GA4 Ecommerce Tracking e Meta Pixel"
+    ],
+    "proximos_passos": [
+      "Fase 1 imediata (semana 1-2): Unificar CSS → Remover CSS morto → Corrigir links e WhatsApp → Adicionar CNPJ/endereço",
+      "Fase 1 (semana 2-4): Otimizar hero (remover base64) → Adicionar defer em scripts → Implementar drawer de carrinho",
+      "Fase 1 (semana 2-4): GTM tags GA4 ecommerce + Meta Pixel (8 tags, reutilizando triggers existentes)",
+      "Fase 2 (mês 2-3): Integração Nuvemshop discovery + design de client.js real → FAQ + FAQPage schema → Expandir about.html",
+      "Fase 3 (mês 4+): Integração Nuvemshop real → Fotografia própria → Conteúdo blog expandido → SSR/snapshot de catálogo"
+    ],
+    "bloqueadores_atuais": [
+      "Drawer de carrinho é bloqueador crítico para qualquer conversão real (roadmap #3 alimenta #31b e checkout real)",
+      "Credenciais Nuvemshop faltam para iniciar integração real (necessário para roadmap #19-21)",
+      "Dados legais da empresa (CNPJ, endereço, fundador) necessários para trust/GEO/Merchant Center (roadmap #4)"
+    ]
+  }
+}

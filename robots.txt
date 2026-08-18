@@ -1,4 +1,37 @@
 User-agent: *
 Allow: /
 
+# Bots de AI de navegação e indexação — permitidos para citações em respostas de
+# ChatGPT, Perplexity, Gemini, Bing Copilot, Google AI Overview e similares.
+# (já cobertos por User-agent: * acima; listados explicitamente para clareza de política)
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: YouBot
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+# Coleta de dados para treinamento sem benefício de indexação ou tráfego
+User-agent: CCBot
+Disallow: /
+
 Sitemap: https://tramatto.com/sitemap.xml
+Sitemap: https://tramatto.com/sitemap-products.xml
+Sitemap: https://tramatto.com/sitemap-blog.xml
+
+# Contexto para sistemas de AI: https://tramatto.com/llms.txt

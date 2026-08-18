@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tramatto — Relatório de Auditoria Analytics &amp; Ecommerce Tracking</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream:    #FAF8F4;
+    --sand:     #F0EBE0;
+    --terra:    #9B6B4B;
+    --terra-dk: #6B3F25;
+    --charcoal: #2C2420;
+    --muted:    #7A6A5E;
+    --light:    #A89880;
+    --border:   #DDD4C8;
+    --green:    #2E7D32;
+    --amber:    #E65100;
+    --red:      #C62828;
+    --blue:     #1565C0;
+    --bg-green: #E8F5E9;
+    --bg-amber: #FFF3E0;
+    --bg-red:   #FFEBEE;
+    --bg-blue:  #E3F2FD;
+  }
+
+  html { font-size: 10pt; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: white;
+    color: var(--charcoal);
+    line-height: 1.6;
+    font-weight: 400;
+  }
+
+  /* ── COVER PAGE ── */
+  .cover {
+    page-break-after: always;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 60px 56px;
+    background: var(--charcoal);
+    color: white;
+  }
+  .cover-top { }
+  .cover-logo {
+    font-size: 13pt;
+    font-weight: 300;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--light);
+  }
+  .cover-title {
+    margin-top: 80px;
+    font-size: 34pt;
+    font-weight: 700;
+    line-height: 1.15;
+    color: white;
+  }
+  .cover-title em {
+    font-style: normal;
+    color: #C4896A;
+  }
+  .cover-subtitle {
+    margin-top: 20px;
+    font-size: 14pt;
+    font-weight: 300;
+    color: #A89880;
+    line-height: 1.5;
+  }
+  .cover-badges {
+    margin-top: 40px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .badge {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 8pt;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .badge-terra  { background: var(--terra); color: white; }
+  .badge-muted  { background: rgba(255,255,255,0.12); color: #ccc; border: 1px solid rgba(255,255,255,0.2); }
+  .cover-meta {
+    border-top: 1px solid rgba(255,255,255,0.15);
+    padding-top: 24px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .cover-meta-item label {
+    display: block;
+    font-size: 7pt;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--light);
+    margin-bottom: 4px;
+  }
+  .cover-meta-item span {
+    font-size: 9.5pt;
+    color: white;
+    font-weight: 400;
+  }
+
+  /* ── TOC ── */
+  .toc-page {
+    page-break-after: always;
+    padding: 56px;
+  }
+  .toc-title {
+    font-size: 20pt;
+    font-weight: 700;
+    color: var(--charcoal);
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 2.5px solid var(--terra);
+  }
+  .toc-section { margin-bottom: 8px; }
+  .toc-section a {
+    display: flex;
+    justify-content: space-between;
+    text-decoration: none;
+    color: var(--charcoal);
+    padding: 8px 0;
+    border-bottom: 1px dotted var(--border);
+    font-size: 10pt;
+  }
+  .toc-section a:hover { color: var(--terra); }
+  .toc-section.sub a {
+    padding-left: 20px;
+    font-size: 9pt;
+    color: var(--muted);
+  }
+  .toc-num { color: var(--terra); font-weight: 600; margin-right: 10px; }
+
+  /* ── CONTENT PAGES ── */
+  .section {
+    padding: 48px 56px;
+    page-break-inside: avoid;
+  }
+  .section + .section {
+    border-top: 1px solid var(--border);
+  }
+  .page-break { page-break-before: always; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 2.5px solid var(--terra);
+  }
+  .section-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: var(--terra);
+    color: white;
+    font-size: 12pt;
+    font-weight: 700;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+  .section-title {
+    font-size: 18pt;
+    font-weight: 700;
+    color: var(--charcoal);
+  }
+
+  h3 {
+    font-size: 12pt;
+    font-weight: 600;
+    color: var(--charcoal);
+    margin: 24px 0 12px;
+    padding-left: 12px;
+    border-left: 3px solid var(--terra);
+  }
+  h4 {
+    font-size: 10.5pt;
+    font-weight: 600;
+    color: var(--terra-dk);
+    margin: 18px 0 8px;
+  }
+
+  p { margin-bottom: 12px; color: var(--charcoal); font-size: 9.5pt; }
+
+  /* ── STATUS PILLS ── */
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 8pt;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+  .status-ok     { background: var(--bg-green); color: var(--green); }
+  .status-partial { background: var(--bg-amber); color: var(--amber); }
+  .status-missing { background: var(--bg-red);   color: var(--red); }
+  .status-blocked { background: var(--bg-blue);  color: var(--blue); }
+
+  /* ── TABLES ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8.5pt;
+    margin: 16px 0 24px;
+  }
+  thead tr { background: var(--charcoal); color: white; }
+  thead th {
+    text-align: left;
+    padding: 9px 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    font-size: 7.5pt;
+    text-transform: uppercase;
+  }
+  tbody tr:nth-child(even) { background: var(--sand); }
+  tbody tr:hover { background: #EDE6D6; }
+  tbody td { padding: 8px 12px; vertical-align: top; line-height: 1.5; }
+  tbody td:first-child { font-weight: 500; }
+
+  /* ── FUNNEL DIAGRAM ── */
+  .funnel {
+    display: flex;
+    gap: 0;
+    align-items: stretch;
+    margin: 20px 0 28px;
+    font-size: 7.5pt;
+  }
+  .funnel-step {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 14px 8px;
+    border-right: 1px solid var(--border);
+    gap: 8px;
+  }
+  .funnel-step:last-child { border-right: none; }
+  .funnel-step-icon { font-size: 18pt; }
+  .funnel-step-name { font-weight: 600; text-align: center; color: var(--charcoal); }
+  .funnel-step-status { text-align: center; }
+  .funnel-step.ok    { background: var(--bg-green); }
+  .funnel-step.partial { background: var(--bg-amber); }
+  .funnel-step.missing { background: var(--bg-red); }
+
+  /* ── EVENT CARDS ── */
+  .event-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 24px;
+    overflow: hidden;
+    page-break-inside: avoid;
+  }
+  .event-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    background: var(--sand);
+    border-bottom: 1px solid var(--border);
+  }
+  .event-name {
+    font-family: 'Fira Mono', monospace;
+    font-size: 10pt;
+    font-weight: 500;
+    color: var(--charcoal);
+  }
+  .event-body { padding: 16px 18px; }
+  .event-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .event-meta-item label {
+    display: block;
+    font-size: 7pt;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 3px;
+    font-weight: 600;
+  }
+  .event-meta-item span {
+    font-size: 8.5pt;
+    color: var(--charcoal);
+  }
+  .event-meta-item.full { grid-column: 1 / -1; }
+
+  /* ── CODE BLOCKS ── */
+  pre {
+    background: #1E1E1E;
+    color: #D4D4D4;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-family: 'Fira Mono', monospace;
+    font-size: 7.5pt;
+    line-height: 1.7;
+    overflow: hidden;
+    margin: 10px 0 14px;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .kw  { color: #569CD6; } /* keyword */
+  .str { color: #CE9178; } /* string */
+  .num { color: #B5CEA8; } /* number */
+  .cmt { color: #6A9955; } /* comment */
+  .key { color: #9CDCFE; } /* key */
+
+  /* ── GAP LIST ── */
+  .gaps { margin: 10px 0 16px; }
+  .gap-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--sand);
+    font-size: 8.5pt;
+  }
+  .gap-item:last-child { border-bottom: none; }
+  .gap-icon { flex-shrink: 0; font-size: 10pt; }
+
+  /* ── CHECKLIST ── */
+  .checklist { margin: 12px 0 20px; }
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--sand);
+    font-size: 8.5pt;
+  }
+  .check-item:last-child { border-bottom: none; }
+  .check-box {
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .check-phase {
+    display: inline-block;
+    padding: 2px 8px;
+    background: var(--sand);
+    border-radius: 4px;
+    font-size: 7pt;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    margin-right: 6px;
+  }
+
+  /* ── CALLOUT BOXES ── */
+  .callout {
+    border-left: 4px solid;
+    padding: 14px 16px;
+    border-radius: 0 8px 8px 0;
+    margin: 16px 0;
+    font-size: 8.5pt;
+  }
+  .callout.info    { border-color: var(--blue);  background: var(--bg-blue);  color: var(--blue); }
+  .callout.warning { border-color: var(--amber); background: var(--bg-amber); color: #5D3E00; }
+  .callout.success { border-color: var(--green); background: var(--bg-green); color: var(--green); }
+  .callout.danger  { border-color: var(--red);   background: var(--bg-red);   color: var(--red); }
+  .callout strong  { display: block; margin-bottom: 4px; font-size: 8pt; text-transform: uppercase; letter-spacing: 0.08em; }
+
+  /* ── PHASE GRID ── */
+  .phase-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 20px 0;
+  }
+  .phase-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .phase-card-header {
+    padding: 12px 16px;
+    font-weight: 700;
+    font-size: 9pt;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .phase-card-header.a { background: var(--green); color: white; }
+  .phase-card-header.b { background: var(--blue); color: white; }
+  .phase-card-header.c { background: var(--amber); color: white; }
+  .phase-card-header.d { background: var(--red); color: white; }
+  .phase-card-body { padding: 12px 16px; }
+  .phase-card-body ul { margin: 0; padding-left: 16px; }
+  .phase-card-body li { font-size: 8.5pt; margin-bottom: 4px; }
+
+  /* ── GTM ARCH ── */
+  .arch-box {
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    background: var(--cream);
+    margin: 16px 0 24px;
+    font-size: 8pt;
+  }
+  .arch-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .arch-node {
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-family: 'Fira Mono', monospace;
+    font-size: 7.5pt;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .arch-node.gtm    { background: var(--charcoal); color: white; }
+  .arch-node.ga4    { background: var(--blue); color: white; }
+  .arch-node.meta   { background: #1877F2; color: white; }
+  .arch-node.code   { background: var(--terra); color: white; }
+  .arch-node.datalayer { background: var(--sand); border: 1px solid var(--border); color: var(--charcoal); }
+  .arch-arrow { color: var(--muted); font-size: 12pt; }
+
+  /* ── RISK BOXES ── */
+  .risks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 16px 0; }
+  .risk-card { border: 1px solid; border-radius: 8px; padding: 14px; }
+  .risk-card.high   { border-color: var(--red); background: var(--bg-red); }
+  .risk-card.medium { border-color: var(--amber); background: var(--bg-amber); }
+  .risk-card.low    { border-color: var(--green); background: var(--bg-green); }
+  .risk-level { font-size: 7pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+  .risk-card.high   .risk-level { color: var(--red); }
+  .risk-card.medium .risk-level { color: var(--amber); }
+  .risk-card.low    .risk-level { color: var(--green); }
+  .risk-title { font-size: 9pt; font-weight: 600; margin-bottom: 6px; }
+  .risk-desc  { font-size: 8pt; color: var(--muted); line-height: 1.5; }
+
+  /* ── PAGE FOOTER ── */
+  @page {
+    margin: 0;
+    size: A4;
+  }
+
+  .footer-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0; right: 0;
+    height: 36px;
+    background: var(--charcoal);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 48px;
+    font-size: 7pt;
+    color: var(--light);
+    letter-spacing: 0.05em;
+  }
+
+  /* Print-specific overrides */
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .cover { min-height: 100vh; }
+    .section { padding: 36px 48px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════ COVER ══════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-top">
+    <div class="cover-logo">Tramatto — Relatório Técnico</div>
+    <div class="cover-title">Auditoria de<br><em>Analytics &amp;<br>Ecommerce Tracking</em></div>
+    <div class="cover-subtitle">
+      Diagnóstico completo da infraestrutura GTM, dataLayer, GA4<br>
+      e plano de implementação Meta Pixel
+    </div>
+    <div class="cover-badges">
+      <span class="badge badge-terra">GTM-W7NZMTL7</span>
+      <span class="badge badge-muted">GA4 · G-13KSN16JDG</span>
+      <span class="badge badge-muted">Meta Pixel</span>
+      <span class="badge badge-muted">Ecommerce Funnel</span>
+    </div>
+  </div>
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <label>Data</label>
+      <span>16 de junho de 2026</span>
+    </div>
+    <div class="cover-meta-item">
+      <label>Projeto</label>
+      <span>tramatto.com</span>
+    </div>
+    <div class="cover-meta-item">
+      <label>Responsável</label>
+      <span>Engenharia de Analytics</span>
+    </div>
+    <div class="cover-meta-item">
+      <label>Arquivos auditados</label>
+      <span>analytics.js · script.js · domain-model.js · catalog-data.js · adapters.js · services.js · gtm-config.json</span>
+    </div>
+    <div class="cover-meta-item">
+      <label>Documentos gerados</label>
+      <span>ecommerce-tracking-audit.md · ecommerce-tracking-checklist.md · meta-pixel-implementation.md · meta-pixel-checklist.md</span>
+    </div>
+    <div class="cover-meta-item">
+      <label>Escopo</label>
+      <span>Auditoria e planejamento — nenhuma alteração de código realizada</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ TOC ══════════════════════════════════════════ -->
+<div class="toc-page">
+  <div class="toc-title">Índice</div>
+  <div class="toc-section">
+    <a href="#s1"><span><span class="toc-num">1</span>Infraestrutura GTM — Diagnóstico</span><span>3</span></a>
+  </div>
+  <div class="toc-section sub">
+    <a href="#s1a"><span>1.1 · Instalação do Container</span><span>3</span></a>
+  </div>
+  <div class="toc-section sub">
+    <a href="#s1b"><span>1.2 · Variáveis, Triggers e Tags existentes</span><span>3</span></a>
+  </div>
+  <div class="toc-section sub">
+    <a href="#s1c"><span>1.3 · Descoberta crítica — preços numéricos</span><span>4</span></a>
+  </div>
+  <div class="toc-section">
+    <a href="#s2"><span><span class="toc-num">2</span>Ecommerce Tracking — Status por Evento</span><span>5</span></a>
+  </div>
+  <div class="toc-section sub">
+    <a href="#s2a"><span>2.1 · Funil GA4 atual vs. completo</span><span>5</span></a>
+  </div>
+  <div class="toc-section sub">
+    <a href="#s2b"><span>2.2 · Auditoria detalhada — evento a evento</span><span>5</span></a>
+  </div>
+  <div class="toc-section">
+    <a href="#s3"><span><span class="toc-num">3</span>Plano de Implementação — Fases</span><span>9</span></a>
+  </div>
+  <div class="toc-section sub">
+    <a href="#s3a"><span>3.1 · Fase A — Implementável agora (sem dependências)</span><span>9</span></a>
+  </div>
+  <div class="toc-section sub">
+    <a href="#s3b"><span>3.2 · Fases B, C, D — Dependentes de outras entregas</span><span>10</span></a>
+  </div>
+  <div class="toc-section">
+    <a href="#s4"><span><span class="toc-num">4</span>Meta Pixel — Arquitetura e Mapeamento</span><span>11</span></a>
+  </div>
+  <div class="toc-section sub">
+    <a href="#s4a"><span>4.1 · Arquitetura recomendada</span><span>11</span></a>
+  </div>
+  <div class="toc-section sub">
+    <a href="#s4b"><span>4.2 · Mapeamento GA4 → Meta Pixel</span><span>11</span></a>
+  </div>
+  <div class="toc-section sub">
+    <a href="#s4c"><span>4.3 · Tags GTM necessárias</span><span>12</span></a>
+  </div>
+  <div class="toc-section sub">
+    <a href="#s4d"><span>4.4 · Riscos identificados</span><span>12</span></a>
+  </div>
+  <div class="toc-section">
+    <a href="#s5"><span><span class="toc-num">5</span>Checklist Operacional — Meta Pixel</span><span>13</span></a>
+  </div>
+  <div class="toc-section">
+    <a href="#s6"><span><span class="toc-num">6</span>Roadmap e Próximos Passos</span><span>14</span></a>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ SECTION 1 ══════════════════════════════════════════ -->
+<div class="section page-break" id="s1">
+  <div class="section-header">
+    <div class="section-num">1</div>
+    <div class="section-title">Infraestrutura GTM — Diagnóstico</div>
+  </div>
+
+  <h3 id="s1a">1.1 Instalação do Container</h3>
+  <p>O container <strong>GTM-W7NZMTL7</strong> está instalado corretamente em todas as páginas do site, com o snippet no <code>&lt;head&gt;</code> e o fallback <code>&lt;noscript&gt;</code> imediatamente após o <code>&lt;body&gt;</code>.</p>
+
+  <table>
+    <thead>
+      <tr><th>Página</th><th>Snippet no &lt;head&gt;</th><th>&lt;noscript&gt; pós-&lt;body&gt;</th><th>Posição (linha)</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>index.html</td><td><span class="status status-partial">⚠ Verificar</span></td><td><span class="status status-ok">✓ OK</span></td><td>723 — confirmar posição</td></tr>
+      <tr><td>collection.html</td><td><span class="status status-ok">✓ OK</span></td><td><span class="status status-ok">✓ OK</span></td><td>24</td></tr>
+      <tr><td>product.html</td><td><span class="status status-ok">✓ OK</span></td><td><span class="status status-ok">✓ OK</span></td><td>47</td></tr>
+      <tr><td>404.html</td><td><span class="status status-ok">✓ OK</span></td><td><span class="status status-ok">✓ OK</span></td><td>12</td></tr>
+      <tr><td>pages/about.html</td><td><span class="status status-ok">✓ OK</span></td><td><span class="status status-ok">✓ OK</span></td><td>13</td></tr>
+      <tr><td>pages/contact.html</td><td><span class="status status-ok">✓ OK</span></td><td><span class="status status-ok">✓ OK</span></td><td>13</td></tr>
+      <tr><td>pages/privacy.html</td><td><span class="status status-ok">✓ OK</span></td><td><span class="status status-ok">✓ OK</span></td><td>13</td></tr>
+      <tr><td>pages/shipping.html</td><td><span class="status status-ok">✓ OK</span></td><td><span class="status status-ok">✓ OK</span></td><td>13</td></tr>
+      <tr><td>pages/terms.html</td><td><span class="status status-ok">✓ OK</span></td><td><span class="status status-ok">✓ OK</span></td><td>13</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout warning">
+    <strong>Atenção — index.html</strong>
+    O snippet GTM em <code>index.html</code> está na linha 723, muito mais tarde do que nos demais arquivos (~24). Confirmar no código-fonte que ele está dentro do <code>&lt;head&gt;</code>. Se estiver no <code>&lt;body&gt;</code>, o Pixel e os eventos podem disparar fora do timing esperado.
+  </div>
+
+  <h3 id="s1b">1.2 Variáveis, Triggers e Tags existentes</h3>
+
+  <h4>Variáveis Data Layer (DLV) — 10 configuradas</h4>
+  <table>
+    <thead><tr><th>Nome</th><th>Caminho no dataLayer</th></tr></thead>
+    <tbody>
+      <tr><td>DLV - link_url</td><td>link_url</td></tr>
+      <tr><td>DLV - link_text</td><td>link_text</td></tr>
+      <tr><td>DLV - page_location</td><td>page_location</td></tr>
+      <tr><td>DLV - page_path</td><td>page_path</td></tr>
+      <tr><td>DLV - page_title</td><td>page_title</td></tr>
+      <tr><td>DLV - percent_scrolled</td><td>percent_scrolled</td></tr>
+      <tr><td>DLV - search_term</td><td>search_term</td></tr>
+      <tr><td>DLV - results_count</td><td>results_count</td></tr>
+      <tr><td>DLV - ecommerce</td><td>ecommerce</td></tr>
+      <tr><td>CONST - GA4 Measurement ID</td><td>G-13KSN16JDG (constante)</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Triggers Custom Event — 7 configurados</h4>
+  <table>
+    <thead><tr><th>Nome</th><th>Evento</th><th>Reutilizável para Meta Pixel</th></tr></thead>
+    <tbody>
+      <tr><td>CE - click_whatsapp</td><td>click_whatsapp</td><td><span class="status status-ok">Sim</span></td></tr>
+      <tr><td>CE - click_instagram</td><td>click_instagram</td><td><span class="status status-ok">Sim</span></td></tr>
+      <tr><td>CE - click_ver_colecao</td><td>click_ver_colecao</td><td><span class="status status-ok">Sim</span></td></tr>
+      <tr><td>CE - scroll_90</td><td>scroll_90</td><td><span class="status status-ok">Sim</span></td></tr>
+      <tr><td>CE - view_collection</td><td>view_collection</td><td><span class="status status-ok">Sim</span></td></tr>
+      <tr><td>CE - view_product</td><td>view_product</td><td><span class="status status-ok">Sim</span></td></tr>
+      <tr><td>CE - search</td><td>search</td><td><span class="status status-ok">Sim</span></td></tr>
+    </tbody>
+  </table>
+
+  <h4>Tags GA4 — 8 configuradas</h4>
+  <table>
+    <thead><tr><th>Nome</th><th>Evento GA4</th><th>Trigger</th></tr></thead>
+    <tbody>
+      <tr><td>GA4 - Configuration</td><td>—</td><td>All Pages</td></tr>
+      <tr><td>GA4 Event - click_whatsapp</td><td>click_whatsapp</td><td>CE - click_whatsapp</td></tr>
+      <tr><td>GA4 Event - click_instagram</td><td>click_instagram</td><td>CE - click_instagram</td></tr>
+      <tr><td>GA4 Event - click_ver_colecao</td><td>click_ver_colecao</td><td>CE - click_ver_colecao</td></tr>
+      <tr><td>GA4 Event - scroll_90</td><td>scroll_90</td><td>CE - scroll_90</td></tr>
+      <tr><td>GA4 Event - view_item_list</td><td>view_item_list</td><td>CE - view_collection</td></tr>
+      <tr><td>GA4 Event - view_item</td><td>view_item</td><td>CE - view_product</td></tr>
+      <tr><td>GA4 Event - search</td><td>search</td><td>CE - search</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="s1c">1.3 Descoberta Crítica — Preços Chegam Como Número</h3>
+  <p>O arquivo <code>catalog-data.js</code> armazena preços como strings formatadas (<code>"R$ 120,00"</code>). Porém, o <code>MockAdapter</code> em <code>adapters.js</code> aplica <code>parsePrice()</code> antes de instanciar os objetos de domínio, convertendo para <code>number</code>:</p>
+
+  <pre><span class="cmt">// adapters.js:9–12</span>
+<span class="kw">function</span> parsePrice(<span class="key">value</span>) {
+  <span class="kw">const</span> normalized = String(value)
+    .replace(<span class="str">/[R$\s]/g</span>, <span class="str">''</span>)
+    .replace(<span class="str">/\./g</span>, <span class="str">''</span>)
+    .replace(<span class="str">','</span>, <span class="str">'.'</span>);
+  <span class="kw">return</span> Number(normalized) || <span class="num">0</span>; <span class="cmt">// "R$ 120,00" → 120</span>
+}</pre>
+
+  <div class="callout success">
+    <strong>Conclusão</strong>
+    Todos os preços chegam como <code>number</code> ao dataLayer. Nenhum risco de string em parâmetros numéricos do GA4 ou do Meta Pixel.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ SECTION 2 ══════════════════════════════════════════ -->
+<div class="section page-break" id="s2">
+  <div class="section-header">
+    <div class="section-num">2</div>
+    <div class="section-title">Ecommerce Tracking — Status por Evento</div>
+  </div>
+
+  <h3 id="s2a">2.1 Funil GA4 Atual vs. Completo</h3>
+
+  <div class="funnel">
+    <div class="funnel-step ok">
+      <div class="funnel-step-icon">👁</div>
+      <div class="funnel-step-name">view_item_list</div>
+      <div class="funnel-step-status"><span class="status status-partial">Parcial</span></div>
+    </div>
+    <div class="funnel-step missing">
+      <div class="funnel-step-icon">🖱</div>
+      <div class="funnel-step-name">select_item</div>
+      <div class="funnel-step-status"><span class="status status-missing">Ausente</span></div>
+    </div>
+    <div class="funnel-step ok">
+      <div class="funnel-step-icon">📄</div>
+      <div class="funnel-step-name">view_item</div>
+      <div class="funnel-step-status"><span class="status status-partial">Parcial</span></div>
+    </div>
+    <div class="funnel-step missing">
+      <div class="funnel-step-icon">🛒</div>
+      <div class="funnel-step-name">add_to_cart</div>
+      <div class="funnel-step-status"><span class="status status-missing">Ausente</span></div>
+    </div>
+    <div class="funnel-step missing">
+      <div class="funnel-step-icon">🧾</div>
+      <div class="funnel-step-name">view_cart</div>
+      <div class="funnel-step-status"><span class="status status-blocked">Bloqueado</span></div>
+    </div>
+    <div class="funnel-step missing">
+      <div class="funnel-step-icon">💳</div>
+      <div class="funnel-step-name">begin_checkout</div>
+      <div class="funnel-step-status"><span class="status status-blocked">Bloqueado</span></div>
+    </div>
+    <div class="funnel-step missing">
+      <div class="funnel-step-icon">✅</div>
+      <div class="funnel-step-name">purchase</div>
+      <div class="funnel-step-status"><span class="status status-blocked">Bloqueado</span></div>
+    </div>
+  </div>
+
+  <table>
+    <thead><tr><th>Evento GA4</th><th>Status</th><th>Origem no código</th><th>Trigger GTM</th><th>Dependência</th></tr></thead>
+    <tbody>
+      <tr><td>page_view</td><td><span class="status status-ok">✓ Completo</span></td><td>analytics.js</td><td>All Pages (automático)</td><td>—</td></tr>
+      <tr><td>view_item_list</td><td><span class="status status-partial">⚠ Parcial</span></td><td>script.js → analytics.js</td><td>CE - view_collection ✓</td><td>Nenhuma (melhorias)</td></tr>
+      <tr><td>view_item</td><td><span class="status status-partial">⚠ Parcial</span></td><td>script.js → analytics.js</td><td>CE - view_product ✓</td><td>Nenhuma (melhorias)</td></tr>
+      <tr><td>select_item</td><td><span class="status status-missing">✗ Ausente</span></td><td>—</td><td>Não existe</td><td>Nenhuma</td></tr>
+      <tr><td>add_to_cart</td><td><span class="status status-missing">✗ Ausente</span></td><td>addToCart() existe sem analytics</td><td>Não existe</td><td>Nenhuma</td></tr>
+      <tr><td>remove_from_cart</td><td><span class="status status-missing">✗ Ausente</span></td><td>—</td><td>Não existe</td><td>Roadmap #3</td></tr>
+      <tr><td>view_cart</td><td><span class="status status-missing">✗ Ausente</span></td><td>—</td><td>Não existe</td><td>Roadmap #3</td></tr>
+      <tr><td>begin_checkout</td><td><span class="status status-missing">✗ Ausente</span></td><td>—</td><td>Não existe</td><td>Roadmap #3 / #21</td></tr>
+      <tr><td>purchase</td><td><span class="status status-missing">✗ Ausente</span></td><td>—</td><td>Não existe</td><td>Roadmap #21</td></tr>
+      <tr><td>search</td><td><span class="status status-ok">✓ Completo</span></td><td>script.js → analytics.js</td><td>CE - search ✓</td><td>—</td></tr>
+      <tr><td>click_whatsapp</td><td><span class="status status-ok">✓ Completo</span></td><td>analytics.js</td><td>CE - click_whatsapp ✓</td><td>—</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="s2b">2.2 Auditoria Detalhada — Evento a Evento</h3>
+
+  <!-- view_item_list -->
+  <div class="event-card">
+    <div class="event-header">
+      <div class="event-name">view_item_list <span style="color:var(--muted);font-size:8pt;font-family:sans-serif">→ mapeado de view_collection</span></div>
+      <span class="status status-partial">⚠ Parcial</span>
+    </div>
+    <div class="event-body">
+      <div class="event-meta">
+        <div class="event-meta-item">
+          <label>Arquivo origem</label>
+          <span>script.js → dispatchViewCollection()</span>
+        </div>
+        <div class="event-meta-item">
+          <label>Mecanismo</label>
+          <span>CustomEvent 'tramatto:view_collection' → analytics.js</span>
+        </div>
+        <div class="event-meta-item">
+          <label>GTM Trigger</label>
+          <span>CE - view_collection ✓ (existente)</span>
+        </div>
+        <div class="event-meta-item">
+          <label>GTM Tag</label>
+          <span>GA4 Event - view_item_list ✓ (sendEcommerceData: true)</span>
+        </div>
+        <div class="event-meta-item full">
+          <label>dataLayer payload atual</label>
+        </div>
+      </div>
+      <pre>{ <span class="key">ecommerce</span>: <span class="kw">null</span> }   <span class="cmt">// limpeza</span>
+{
+  <span class="key">event</span>:               <span class="str">'view_collection'</span>,
+  <span class="key">ecommerce</span>: {
+    <span class="key">item_list_name</span>:  <span class="str">'Coleção Premium'</span>,
+    <span class="key">items</span>: [{
+      <span class="key">item_id</span>:       <span class="str">'linho-anatoliano'</span>,  <span class="cmt">// ✓ slug</span>
+      <span class="key">item_name</span>:     <span class="str">'Linho Anatoliano'</span>,
+      <span class="key">price</span>:         <span class="num">120</span>,                   <span class="cmt">// ✓ number</span>
+      <span class="key">index</span>:         <span class="num">0</span>
+      <span class="cmt">// ✗ item_brand ausente</span>
+      <span class="cmt">// ✗ item_category ausente</span>
+      <span class="cmt">// ✗ quantity ausente</span>
+    }]
+    <span class="cmt">// ✗ currency ausente (nível ecommerce)</span>
+  },
+  <span class="key">page_location</span>, <span class="key">page_path</span>, <span class="key">page_title</span>
+}</pre>
+      <div class="gaps">
+        <div class="gap-item"><span class="gap-icon">❌</span><span><strong>item_list_id</strong> — ausente; disponível via <code>product.collectionId</code></span></div>
+        <div class="gap-item"><span class="gap-icon">❌</span><span><strong>currency</strong> — ausente no objeto ecommerce; valor: <code>'BRL'</code></span></div>
+        <div class="gap-item"><span class="gap-icon">❌</span><span><strong>item_brand</strong> — ausente nos itens; disponível via <code>product.brand = 'Tramatto'</code></span></div>
+        <div class="gap-item"><span class="gap-icon">❌</span><span><strong>item_category</strong> — ausente; disponível via <code>product.googleProductCategory</code></span></div>
+        <div class="gap-item"><span class="gap-icon">❌</span><span><strong>quantity</strong> — ausente; default <code>1</code></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- view_item -->
+  <div class="event-card">
+    <div class="event-header">
+      <div class="event-name">view_item <span style="color:var(--muted);font-size:8pt;font-family:sans-serif">→ mapeado de view_product</span></div>
+      <span class="status status-partial">⚠ Parcial</span>
+    </div>
+    <div class="event-body">
+      <div class="event-meta">
+        <div class="event-meta-item">
+          <label>Arquivo origem</label>
+          <span>script.js → dispatchViewProduct()</span>
+        </div>
+        <div class="event-meta-item">
+          <label>Mecanismo</label>
+          <span>CustomEvent 'tramatto:view_product' → analytics.js</span>
+        </div>
+        <div class="event-meta-item">
+          <label>GTM Trigger</label>
+          <span>CE - view_product ✓</span>
+        </div>
+        <div class="event-meta-item">
+          <label>GTM Tag</label>
+          <span>GA4 Event - view_item ✓ (sendEcommerceData: true)</span>
+        </div>
+        <div class="event-meta-item full"><label>dataLayer payload atual</label></div>
+      </div>
+      <pre>{ <span class="key">ecommerce</span>: <span class="kw">null</span> }
+{
+  <span class="key">event</span>:     <span class="str">'view_product'</span>,
+  <span class="key">ecommerce</span>: {
+    <span class="key">currency</span>:  <span class="str">'BRL'</span>,         <span class="cmt">// ✓</span>
+    <span class="key">value</span>:     <span class="num">120</span>,           <span class="cmt">// ✓ number</span>
+    <span class="key">items</span>: [{
+      <span class="key">item_id</span>:      <span class="str">'linho-anatoliano'</span>,
+      <span class="key">item_name</span>:    <span class="str">'Linho Anatoliano'</span>,
+      <span class="key">item_variant</span>: <span class="str">'Branco natural'</span>,
+      <span class="key">price</span>:        <span class="num">120</span>
+      <span class="cmt">// ✗ item_brand ausente</span>
+      <span class="cmt">// ✗ item_category ausente</span>
+      <span class="cmt">// ✗ quantity ausente</span>
+    }]
+  },
+  <span class="key">page_location</span>, <span class="key">page_path</span>, <span class="key">page_title</span>
+}</pre>
+      <div class="gaps">
+        <div class="gap-item"><span class="gap-icon">❌</span><span><strong>item_brand</strong> — ausente; <code>product.brand = 'Tramatto'</code> disponível</span></div>
+        <div class="gap-item"><span class="gap-icon">❌</span><span><strong>item_category</strong> — ausente; <code>product.googleProductCategory</code> disponível</span></div>
+        <div class="gap-item"><span class="gap-icon">❌</span><span><strong>quantity</strong> — ausente; default <code>1</code></span></div>
+        <div class="gap-item"><span class="gap-icon">⚠️</span><span>Re-dispara ao trocar variante — correto, mas gera múltiplos <code>view_item</code> sem deduplicação</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- select_item -->
+  <div class="event-card">
+    <div class="event-header">
+      <div class="event-name">select_item</div>
+      <span class="status status-missing">✗ Ausente</span>
+    </div>
+    <div class="event-body">
+      <div class="event-meta">
+        <div class="event-meta-item">
+          <label>Onde deveria disparar</label>
+          <span>Clique no link do card de produto (.product-card-link)</span>
+        </div>
+        <div class="event-meta-item">
+          <label>GTM Trigger</label>
+          <span>Não existe (listado em plannedFutureEvents)</span>
+        </div>
+        <div class="event-meta-item full">
+          <label>Situação atual em script.js:renderProducts()</label>
+        </div>
+      </div>
+      <pre><span class="cmt">// Sem listener de analytics — apenas navegação:</span>
+container.innerHTML = items.map((product) => `
+  &lt;article class="product-card"&gt;
+    &lt;a href="product.html?slug=${product.slug}" class="product-card-link"&gt;
+    <span class="cmt">&lt;!-- ← nenhum evento analytics aqui --&gt;</span></pre>
+      <div class="callout info">
+        <strong>Impacto</strong>
+        Sem <code>select_item</code>, o funil <code>view_item_list → select_item → view_item</code> fica quebrado no GA4. Impossível medir qual produto o usuário escolheu clicar a partir da grade.
+      </div>
+    </div>
+  </div>
+
+  <!-- add_to_cart -->
+  <div class="event-card">
+    <div class="event-header">
+      <div class="event-name">add_to_cart</div>
+      <span class="status status-missing">✗ Ausente</span>
+    </div>
+    <div class="event-body">
+      <div class="event-meta">
+        <div class="event-meta-item">
+          <label>Função de negócio</label>
+          <span>addToCart() em script.js:98 — EXISTS, mas sem analytics</span>
+        </div>
+        <div class="event-meta-item">
+          <label>Pontos de entrada</label>
+          <span>Card da grade (coleção + home) · Kits · Botão na PDP</span>
+        </div>
+      </div>
+      <pre><span class="cmt">// script.js:98–103 — função existe mas não emite analytics:</span>
+<span class="kw">async function</span> addToCart(product, variant = <span class="kw">null</span>) {
+  <span class="kw">const</span> app = getAppState();
+  <span class="kw">await</span> app.services.cartService.addToCart(product, variant, <span class="num">1</span>);
+  updateCartBadge();
+  showToast(`${product.title} adicionado à sacola`);
+  <span class="cmt">// ← zero analytics. Sem dispatchAddToCart().</span>
+}</pre>
+      <div class="callout danger">
+        <strong>Este é o gap mais crítico do funil</strong>
+        Sem <code>add_to_cart</code>, é impossível medir a taxa de conversão produto→carrinho, criar audiências de remarketing no GA4 e no Meta Pixel (<code>AddToCart</code>), ou calcular o valor médio de itens adicionados.
+      </div>
+    </div>
+  </div>
+
+  <!-- view_cart / begin_checkout / purchase blocked -->
+  <div class="event-card">
+    <div class="event-header">
+      <div class="event-name">view_cart · begin_checkout · purchase</div>
+      <span class="status status-blocked">⊘ Bloqueados</span>
+    </div>
+    <div class="event-body">
+      <p>Estes três eventos dependem de infraestrutura de UI e checkout que ainda não existe no projeto:</p>
+      <table>
+        <thead><tr><th>Evento</th><th>O que falta</th><th>Roadmap</th></tr></thead>
+        <tbody>
+          <tr><td>view_cart</td><td>Drawer/página de carrinho (UI inexistente)</td><td>#3</td></tr>
+          <tr><td>remove_from_cart</td><td>Botão de remover item no carrinho</td><td>#3</td></tr>
+          <tr><td>begin_checkout</td><td>Botão "Finalizar pelo WhatsApp" ou checkout real</td><td>#3 / #21</td></tr>
+          <tr><td>purchase</td><td>Página de confirmação de pedido + integração Nuvemshop</td><td>#21</td></tr>
+        </tbody>
+      </table>
+      <p>O <code>CartService</code> em <code>services.js</code> já persiste o carrinho em <code>localStorage</code> e tem os métodos <code>removeFromCart()</code> e <code>updateQuantity()</code> prontos. A implementação de analytics será imediata após a UI estar disponível.</p>
+    </div>
+  </div>
+
+  <!-- search -->
+  <div class="event-card">
+    <div class="event-header">
+      <div class="event-name">search</div>
+      <span class="status status-ok">✓ Completo</span>
+    </div>
+    <div class="event-body">
+      <div class="event-meta">
+        <div class="event-meta-item">
+          <label>Origem</label>
+          <span>script.js:initCollectionSearch() → tramatto:search → analytics.js</span>
+        </div>
+        <div class="event-meta-item">
+          <label>GTM</label>
+          <span>CE - search → GA4 Event - search ✓</span>
+        </div>
+      </div>
+      <pre>{ <span class="key">event</span>: <span class="str">'search'</span>, <span class="key">search_term</span>: <span class="str">'linho'</span>, <span class="key">results_count</span>: <span class="num">2</span>,
+  <span class="key">page_location</span>, <span class="key">page_path</span>, <span class="key">page_title</span> }</pre>
+      <p>Evento recomendado GA4 com parâmetro <code>search_term</code> padrão — ativa automaticamente o relatório "Termos de pesquisa". <code>results_count: 0</code> funciona para capturar buscas sem resultado.</p>
+    </div>
+  </div>
+
+  <!-- click_whatsapp -->
+  <div class="event-card">
+    <div class="event-header">
+      <div class="event-name">click_whatsapp</div>
+      <span class="status status-ok">✓ Completo</span>
+    </div>
+    <div class="event-body">
+      <div class="event-meta">
+        <div class="event-meta-item">
+          <label>Origem</label>
+          <span>analytics.js:initWhatsappTracking() — listener em document</span>
+        </div>
+        <div class="event-meta-item">
+          <label>GTM</label>
+          <span>CE - click_whatsapp → GA4 Event - click_whatsapp ✓</span>
+        </div>
+      </div>
+      <pre>{ <span class="key">event</span>: <span class="str">'click_whatsapp'</span>, <span class="key">link_url</span>: <span class="str">'https://wa.me/...'</span>,
+  <span class="key">link_text</span>: <span class="str">'WhatsApp'</span>, <span class="key">page_location</span>, <span class="key">page_path</span>, <span class="key">page_title</span> }</pre>
+      <p>Cobertura: botão flutuante, links <code>wa.me/</code>, links <code>api.whatsapp.com</code>. O evento capturará o número real assim que o Roadmap #1 (número WhatsApp real) for concluído — sem necessidade de alterar analytics.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ SECTION 3 ══════════════════════════════════════════ -->
+<div class="section page-break" id="s3">
+  <div class="section-header">
+    <div class="section-num">3</div>
+    <div class="section-title">Plano de Implementação — Fases</div>
+  </div>
+
+  <div class="phase-grid">
+    <div class="phase-card">
+      <div class="phase-card-header a">FASE A — Sem Dependências <span style="font-weight:300;font-size:8pt">Implementável agora</span></div>
+      <div class="phase-card-body">
+        <ul>
+          <li>Enriquecer <code>view_item</code>: adicionar <code>item_brand</code>, <code>item_category</code>, <code>quantity</code> em <code>dispatchViewProduct()</code></li>
+          <li>Enriquecer <code>view_item_list</code>: adicionar <code>currency</code>, <code>item_brand</code>, <code>item_category</code>, <code>quantity</code> em <code>dispatchViewCollection()</code></li>
+          <li>Implementar <code>select_item</code>: listener em <code>.product-card-link</code> + <code>dispatchSelectItem()</code> + <code>initSelectItemTracking()</code></li>
+          <li>Implementar <code>add_to_cart</code>: <code>dispatchAddToCart()</code> em <code>addToCart()</code> + <code>initAddToCartTracking()</code></li>
+          <li>2 novos triggers GTM, 2 novas tags GA4</li>
+        </ul>
+      </div>
+    </div>
+    <div class="phase-card">
+      <div class="phase-card-header b">FASE B — Depende do Roadmap #3 <span style="font-weight:300;font-size:8pt">Carrinho drawer</span></div>
+      <div class="phase-card-body">
+        <ul>
+          <li>Implementar <code>view_cart</code> quando o drawer/modal de carrinho existir</li>
+          <li>Implementar <code>remove_from_cart</code> no botão de remover item</li>
+          <li><code>CartService.removeFromCart()</code> já existe em <code>services.js</code> — apenas adicionar dispatcher</li>
+          <li>2 novos triggers GTM, 2 novas tags GA4</li>
+        </ul>
+      </div>
+    </div>
+    <div class="phase-card">
+      <div class="phase-card-header c">FASE C — Depende do Roadmap #3 / #21 <span style="font-weight:300;font-size:8pt">Checkout</span></div>
+      <div class="phase-card-body">
+        <ul>
+          <li>Implementar <code>begin_checkout</code> no clique em "Finalizar pelo WhatsApp" (mínimo Roadmap #3)</li>
+          <li>Evoluir para checkout Nuvemshop quando Roadmap #21 estiver pronto</li>
+          <li>1 novo trigger GTM, 1 nova tag GA4</li>
+        </ul>
+      </div>
+    </div>
+    <div class="phase-card">
+      <div class="phase-card-header d">FASE D — Depende do Roadmap #21 <span style="font-weight:300;font-size:8pt">Checkout real</span></div>
+      <div class="phase-card-body">
+        <ul>
+          <li>Implementar <code>purchase</code> na página de confirmação de pedido (Nuvemshop ou custom)</li>
+          <li>Parâmetros necessários: <code>transaction_id</code>, <code>value</code>, <code>tax</code>, <code>shipping</code>, <code>items</code></li>
+          <li>1 novo trigger GTM, 1 nova tag GA4</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <h3 id="s3a">3.1 Código de Referência — Fase A</h3>
+
+  <h4>select_item — dispatcher (script.js)</h4>
+  <pre><span class="kw">function</span> dispatchSelectItem(product, index, listName = <span class="str">'Coleção Premium'</span>) {
+  document.dispatchEvent(<span class="kw">new</span> CustomEvent(<span class="str">'tramatto:select_item'</span>, {
+    detail: {
+      list_name: listName,
+      item: {
+        item_id:       product.slug,
+        item_name:     product.title,
+        item_brand:    product.brand,
+        item_category: product.googleProductCategory || product.productType || <span class="str">''</span>,
+        price:         product.getPrimaryPrice?.() || product.price || <span class="num">0</span>,
+        index
+      }
+    }
+  }));
+}</pre>
+
+  <h4>add_to_cart — dispatcher (script.js)</h4>
+  <pre><span class="kw">function</span> dispatchAddToCart(product, variant, quantity = <span class="num">1</span>) {
+  <span class="kw">const</span> price = Number(
+    variant?.getPrimaryPrice?.() || variant?.price ||
+    product.getPrimaryPrice?.() || product.price || <span class="num">0</span>
+  );
+  document.dispatchEvent(<span class="kw">new</span> CustomEvent(<span class="str">'tramatto:add_to_cart'</span>, {
+    detail: {
+      currency: <span class="str">'BRL'</span>, value: price * quantity,
+      item: {
+        item_id:       product.slug,      item_name:     product.title,
+        item_brand:    product.brand,     item_variant:  variant?.name || <span class="kw">null</span>,
+        item_category: product.googleProductCategory || <span class="str">''</span>,
+        price, quantity
+      }
+    }
+  }));
+}</pre>
+
+  <h3 id="s3b">3.2 Contagem de Work Items por Fase</h3>
+  <table>
+    <thead><tr><th>Fase</th><th>Eventos</th><th>Arquivo(s)</th><th>Triggers GTM</th><th>Tags GTM</th><th>Dependência</th></tr></thead>
+    <tbody>
+      <tr><td>A1</td><td>view_item (melhorias)</td><td>script.js</td><td>0</td><td>0</td><td>Nenhuma</td></tr>
+      <tr><td>A2</td><td>view_item_list (melhorias)</td><td>script.js</td><td>0</td><td>0</td><td>Nenhuma</td></tr>
+      <tr><td>A3</td><td>select_item (novo)</td><td>script.js + analytics.js</td><td>1</td><td>1</td><td>Nenhuma</td></tr>
+      <tr><td>A4</td><td>add_to_cart (novo)</td><td>script.js + analytics.js</td><td>1</td><td>1</td><td>Nenhuma</td></tr>
+      <tr><td>B</td><td>view_cart + remove_from_cart</td><td>script.js + analytics.js</td><td>2</td><td>2</td><td>Roadmap #3</td></tr>
+      <tr><td>C</td><td>begin_checkout</td><td>script.js + analytics.js</td><td>1</td><td>1</td><td>Roadmap #3 / #21</td></tr>
+      <tr><td>D</td><td>purchase</td><td>TBD (confirmation page)</td><td>1</td><td>1</td><td>Roadmap #21</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ══════════════════════════════════════════ SECTION 4 ══════════════════════════════════════════ -->
+<div class="section page-break" id="s4">
+  <div class="section-header">
+    <div class="section-num">4</div>
+    <div class="section-title">Meta Pixel — Arquitetura e Mapeamento</div>
+  </div>
+
+  <h3 id="s4a">4.1 Arquitetura Recomendada</h3>
+  <p>O Meta Pixel será instalado inteiramente via GTM, reutilizando os triggers existentes. Nenhuma alteração no código HTML ou JS do site é necessária.</p>
+
+  <div class="arch-box">
+    <div class="arch-row">
+      <div class="arch-node code">analytics.js</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node datalayer">window.dataLayer</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node gtm">GTM-W7NZMTL7</div>
+    </div>
+    <div style="margin: 10px 0 10px 60px; color: var(--muted); font-size: 7.5pt;">GTM roteia para ambas as plataformas com os mesmos triggers</div>
+    <div class="arch-row" style="margin-left: 60px;">
+      <div style="display:flex; flex-direction:column; gap:8px; flex:1;">
+        <div class="arch-row">
+          <div class="arch-arrow">↘</div>
+          <div class="arch-node ga4">GA4 (G-13KSN16JDG)</div>
+          <div style="margin-left:8px; font-size:7.5pt; color:var(--muted)">Tags existentes</div>
+        </div>
+        <div class="arch-row">
+          <div class="arch-arrow">↗</div>
+          <div class="arch-node meta">Meta Pixel (ID a criar)</div>
+          <div style="margin-left:8px; font-size:7.5pt; color:var(--muted)">8 tags novas · 0 triggers novos</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3 id="s4b">4.2 Mapeamento GA4 → Meta Pixel</h3>
+  <table>
+    <thead><tr><th>Evento Tramatto (dataLayer)</th><th>Evento GA4</th><th>Evento Meta Pixel</th><th>Tipo Meta</th><th>Trigger GTM</th></tr></thead>
+    <tbody>
+      <tr><td>page_view</td><td>page_view</td><td>PageView</td><td>Padrão</td><td>All Pages</td></tr>
+      <tr><td>view_product</td><td>view_item</td><td>ViewContent (product)</td><td>Padrão</td><td>CE - view_product ✓</td></tr>
+      <tr><td>view_collection</td><td>view_item_list</td><td>ViewContent (product_group)</td><td>Padrão</td><td>CE - view_collection ✓</td></tr>
+      <tr><td>click_ver_colecao</td><td>click_ver_colecao</td><td>ViewContent (product_group)</td><td>Padrão</td><td>CE - click_ver_colecao ✓</td></tr>
+      <tr><td>search</td><td>search</td><td>Search</td><td>Padrão</td><td>CE - search ✓</td></tr>
+      <tr><td>click_whatsapp</td><td>click_whatsapp</td><td>Contact</td><td>Padrão</td><td>CE - click_whatsapp ✓</td></tr>
+      <tr><td>scroll_90</td><td>scroll_90</td><td>CustomEvent: scroll_90</td><td>Personalizado</td><td>CE - scroll_90 ✓</td></tr>
+      <tr><td>click_instagram</td><td>click_instagram</td><td>CustomEvent: click_instagram</td><td>Personalizado</td><td>CE - click_instagram ✓</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="s4c">4.3 Tags GTM Necessárias</h3>
+  <table>
+    <thead><tr><th>Nome da Tag</th><th>Tipo</th><th>Trigger</th><th>Parâmetros-chave</th></tr></thead>
+    <tbody>
+      <tr><td>Meta Pixel — Base Code</td><td>Custom HTML</td><td>All Pages</td><td>fbq('init', PIXEL_ID) + fbq('track', 'PageView')</td></tr>
+      <tr><td>Meta Pixel — ViewContent (Produto)</td><td>Custom HTML</td><td>CE - view_product</td><td>content_ids, content_type:'product', value, currency:'BRL'</td></tr>
+      <tr><td>Meta Pixel — ViewContent (Coleção)</td><td>Custom HTML</td><td>CE - view_collection</td><td>content_ids (array), content_type:'product_group'</td></tr>
+      <tr><td>Meta Pixel — ViewContent (CTA Hero)</td><td>Custom HTML</td><td>CE - click_ver_colecao</td><td>content_type:'product_group', content_name:'Coleção Tramatto'</td></tr>
+      <tr><td>Meta Pixel — Search</td><td>Custom HTML</td><td>CE - search</td><td>search_string: search_term</td></tr>
+      <tr><td>Meta Pixel — Contact (WhatsApp)</td><td>Custom HTML</td><td>CE - click_whatsapp</td><td>(sem parâmetros obrigatórios)</td></tr>
+      <tr><td>Meta Pixel — Custom scroll_90</td><td>Custom HTML</td><td>CE - scroll_90</td><td>percent_scrolled, page_path</td></tr>
+      <tr><td>Meta Pixel — Custom click_instagram</td><td>Custom HTML</td><td>CE - click_instagram</td><td>link_url</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="s4d">4.4 Riscos Identificados</h3>
+  <div class="risks">
+    <div class="risk-card medium">
+      <div class="risk-level">⚠ Médio</div>
+      <div class="risk-title">Posição GTM em index.html</div>
+      <div class="risk-desc">Snippet GTM na linha 723 do arquivo. Verificar se está dentro do &lt;head&gt; antes da instalação. Se no &lt;body&gt;, o Pixel pode disparar fora do timing correto.</div>
+    </div>
+    <div class="risk-card medium">
+      <div class="risk-level">⚠ Médio</div>
+      <div class="risk-title">content_ids e IDs do Catálogo</div>
+      <div class="risk-desc">Os <code>content_ids</code> no Pixel (slugs como "linho-anatoliano") devem coincidir com os IDs no Catálogo de Produtos do Meta quando criado. Planejar nomenclatura com antecedência.</div>
+    </div>
+    <div class="risk-card low">
+      <div class="risk-level">✓ Resolvido</div>
+      <div class="risk-title">Preços como string</div>
+      <div class="risk-desc">Inicialmente identificado como risco, mas <code>parsePrice()</code> em <code>adapters.js</code> garante que todos os preços chegam como <code>number</code> ao dataLayer.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ SECTION 5 ══════════════════════════════════════════ -->
+<div class="section page-break" id="s5">
+  <div class="section-header">
+    <div class="section-num">5</div>
+    <div class="section-title">Checklist Operacional — Meta Pixel</div>
+  </div>
+
+  <h3>Fase 1 — Criação do Pixel no Meta Business Manager</h3>
+  <div class="checklist">
+    <div class="check-item"><div class="check-box"></div><span>Acessar Meta Business Manager com a conta da Tramatto</span></div>
+    <div class="check-item"><div class="check-box"></div><span>Navegar para Gerenciador de Eventos → Conectar fontes de dados → Web → Meta Pixel</span></div>
+    <div class="check-item"><div class="check-box"></div><span>Nomear o Pixel: <strong>Tramatto Web</strong></span></div>
+    <div class="check-item"><div class="check-box"></div><span>Informar URL: https://tramatto.com</span></div>
+    <div class="check-item"><div class="check-box"></div><span>Copiar e salvar o <strong>Pixel ID</strong> (15–16 dígitos)</span></div>
+  </div>
+
+  <h3>Fase 2 — Pré-verificação GTM</h3>
+  <div class="checklist">
+    <div class="check-item"><div class="check-box"></div><span>Confirmar que os 7 triggers Custom Event estão publicados no container</span></div>
+    <div class="check-item"><div class="check-box"></div><span>Verificar posição do GTM em <code>index.html</code> (deve estar no &lt;head&gt;)</span></div>
+    <div class="check-item"><div class="check-box"></div><span>Ativar GTM Preview Mode e confirmar eventos GA4 chegando antes de adicionar Pixel</span></div>
+  </div>
+
+  <h3>Fase 3 — Instalação via GTM (8 tags)</h3>
+  <div class="checklist">
+    <div class="check-item"><div class="check-box"></div><span><span class="check-phase">Variáveis</span> Criar <code>CONST - Meta Pixel ID</code> (Constante) com o Pixel ID</span></div>
+    <div class="check-item"><div class="check-box"></div><span><span class="check-phase">Variáveis</span> Criar <code>DLV - ecommerce.items</code> (Data Layer Variable → ecommerce.items)</span></div>
+    <div class="check-item"><div class="check-box"></div><span><span class="check-phase">Variáveis</span> Criar <code>DLV - ecommerce.value</code> (Data Layer Variable → ecommerce.value)</span></div>
+    <div class="check-item"><div class="check-box"></div><span><span class="check-phase">Tag 1</span> Meta Pixel — Base Code (All Pages) com fbq('init') + fbq('track', 'PageView')</span></div>
+    <div class="check-item"><div class="check-box"></div><span><span class="check-phase">Tag 2</span> Meta Pixel — ViewContent (Produto) → CE - view_product</span></div>
+    <div class="check-item"><div class="check-box"></div><span><span class="check-phase">Tag 3</span> Meta Pixel — ViewContent (Coleção) → CE - view_collection</span></div>
+    <div class="check-item"><div class="check-box"></div><span><span class="check-phase">Tag 4</span> Meta Pixel — ViewContent (CTA Hero) → CE - click_ver_colecao</span></div>
+    <div class="check-item"><div class="check-box"></div><span><span class="check-phase">Tag 5</span> Meta Pixel — Search → CE - search</span></div>
+    <div class="check-item"><div class="check-box"></div><span><span class="check-phase">Tag 6</span> Meta Pixel — Contact (WhatsApp) → CE - click_whatsapp</span></div>
+    <div class="check-item"><div class="check-box"></div><span><span class="check-phase">Tag 7</span> Meta Pixel — Custom scroll_90 → CE - scroll_90</span></div>
+    <div class="check-item"><div class="check-box"></div><span><span class="check-phase">Tag 8</span> Meta Pixel — Custom click_instagram → CE - click_instagram</span></div>
+  </div>
+
+  <h3>Fase 4 — Validação no GTM Preview Mode</h3>
+  <div class="checklist">
+    <div class="check-item"><div class="check-box"></div><span>Instalar extensão <strong>Meta Pixel Helper</strong> no Chrome</span></div>
+    <div class="check-item"><div class="check-box"></div><span>Confirmar PageView na home, coleção e produto</span></div>
+    <div class="check-item"><div class="check-box"></div><span>Confirmar ViewContent na coleção (grade carregada) e na PDP (produto)</span></div>
+    <div class="check-item"><div class="check-box"></div><span>Confirmar Search ao digitar no campo de busca</span></div>
+    <div class="check-item"><div class="check-box"></div><span>Confirmar Contact ao clicar no botão WhatsApp flutuante</span></div>
+    <div class="check-item"><div class="check-box"></div><span>Confirmar ViewContent (CTA) ao clicar em "Ver a coleção" no hero</span></div>
+    <div class="check-item"><div class="check-box"></div><span>Confirmar scroll_90 ao rolar página até o fim</span></div>
+    <div class="check-item"><div class="check-box"></div><span>Verificar que ViewContent (Produto) tem <code>value</code> numérico e <code>content_ids</code> preenchido</span></div>
+  </div>
+
+  <h3>Fase 5 — Validação no Meta Events Manager</h3>
+  <div class="checklist">
+    <div class="check-item"><div class="check-box"></div><span>Usar a aba "Testar Eventos" e navegar pelo site</span></div>
+    <div class="check-item"><div class="check-box"></div><span>Confirmar todos os eventos padrão sem erro de validação (ícone vermelho)</span></div>
+    <div class="check-item"><div class="check-box"></div><span>Confirmar ausência de alertas "Sinal de baixa qualidade de correspondência"</span></div>
+  </div>
+
+  <h3>Fase 6 — Publicação</h3>
+  <div class="checklist">
+    <div class="check-item"><div class="check-box"></div><span>Criar versão GTM: <code>vN — Meta Pixel inicial</code></span></div>
+    <div class="check-item"><div class="check-box"></div><span>Publicar a versão</span></div>
+    <div class="check-item"><div class="check-box"></div><span>Após 24h: confirmar status "Ativo" no Gerenciador de Eventos</span></div>
+    <div class="check-item"><div class="check-box"></div><span>Documentar Pixel ID no <code>docs/gtm-config.json</code> com a chave <code>"metaPixelId"</code></span></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ SECTION 6 ══════════════════════════════════════════ -->
+<div class="section page-break" id="s6">
+  <div class="section-header">
+    <div class="section-num">6</div>
+    <div class="section-title">Roadmap e Próximos Passos</div>
+  </div>
+
+  <h3>Itens adicionados ao Master Roadmap</h3>
+  <table>
+    <thead><tr><th>#</th><th>Item</th><th>Esforço</th><th>Impacto</th><th>Janela</th><th>Dependência</th></tr></thead>
+    <tbody>
+      <tr><td>31a</td><td>GA4 Ecommerce — Fase A: select_item + add_to_cart + enriquecimento</td><td>Baixo</td><td>Alto</td><td>30 dias</td><td>Nenhuma</td></tr>
+      <tr><td>31b</td><td>GA4 Ecommerce — Fase B: view_cart + remove_from_cart + begin_checkout</td><td>Baixo</td><td>Alto</td><td>Após #3</td><td>Roadmap #3</td></tr>
+      <tr><td>31c</td><td>GA4 Ecommerce — Fase C: purchase</td><td>Baixo</td><td>Alto</td><td>Q2</td><td>Roadmap #21</td></tr>
+      <tr><td>32</td><td>Meta Pixel via GTM (8 tags, 0 triggers novos)</td><td>Baixo</td><td>Alto</td><td>30 dias</td><td>Criar Pixel ID</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Prioridade recomendada — Analytics (sem dependências externas)</h3>
+  <table>
+    <thead><tr><th>Ordem</th><th>Ação</th><th>Motivo</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Criar Meta Pixel no Meta Business Manager e obter Pixel ID</td><td>Desbloqueia o card "Meta Pixel" e habilita remarketing imediato</td></tr>
+      <tr><td>2</td><td>Instalar as 8 tags Meta Pixel via GTM (Fase 3 do checklist)</td><td>Zero alteração de código. Reaproveitamento total dos triggers existentes.</td></tr>
+      <tr><td>3</td><td>Implementar add_to_cart (script.js + analytics.js + 1 trigger + 1 tag)</td><td>Gap mais crítico do funil GA4. Habilita audiências de remarketing de carrinho abandonado.</td></tr>
+      <tr><td>4</td><td>Implementar select_item (script.js + analytics.js + 1 trigger + 1 tag)</td><td>Completa o funil view_item_list → select_item → view_item no GA4.</td></tr>
+      <tr><td>5</td><td>Enriquecer view_item e view_item_list (item_brand, item_category, quantity)</td><td>Melhora qualidade dos dados de ecommerce no GA4 sem criar novos eventos.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Documentação gerada nesta auditoria</h3>
+  <table>
+    <thead><tr><th>Arquivo</th><th>Conteúdo</th></tr></thead>
+    <tbody>
+      <tr><td>docs/ecommerce-tracking-audit.md</td><td>Diagnóstico completo de cada evento: fluxo, payload, trigger GTM, lacunas por campo</td></tr>
+      <tr><td>docs/ecommerce-tracking-checklist.md</td><td>Checklist operacional em 4 fases com código de referência para cada evento</td></tr>
+      <tr><td>docs/meta-pixel-implementation.md</td><td>Arquitetura, mapeamento GA4→Meta Pixel, parâmetros por evento, riscos</td></tr>
+      <tr><td>docs/meta-pixel-checklist.md</td><td>Checklist com 6 fases e código HTML de cada tag GTM</td></tr>
+      <tr><td>docs/master-roadmap.md</td><td>Atualizado com itens #31a/b/c, #32 e seção 6.6 Analytics</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout success" style="margin-top:28px;">
+    <strong>Estado da infraestrutura</strong>
+    A base técnica está sólida: GTM instalado em 9 páginas, arquitetura desacoplada via Custom DOM Events, preços numéricos garantidos pelo adapter, 7 triggers reutilizáveis para Meta Pixel. O trabalho restante sem dependências externas se resume a 2 funções novas em script.js, 2 listeners em analytics.js, 2 triggers e 2 tags no GTM — estima-se 4–6 horas de desenvolvimento para a Fase A completa.
+  </div>
+</div>
+
+<div class="footer-bar">
+  <span>Tramatto — Auditoria Analytics &amp; Ecommerce Tracking</span>
+  <span>16 de junho de 2026 · Confidencial</span>
+</div>
+
+</body>
+</html>

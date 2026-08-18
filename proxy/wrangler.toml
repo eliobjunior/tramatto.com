@@ -1,0 +1,17 @@
+name = "tramatto-nuvemshop-proxy"
+main = "src/index.js"
+compatibility_date = "2026-08-01"
+
+# Variáveis não-sensíveis. NUVEMSHOP_STORE_ID pode ficar aqui para
+# desenvolvimento, mas em produção prefira configurá-lo pelo painel
+# Cloudflare (Worker > Settings > Variables) para não versionar o ID
+# real da loja no repositório público.
+[vars]
+NUVEMSHOP_STORE_ID = ""
+NUVEMSHOP_USER_AGENT = "Tramatto Storefront Proxy (contato@tramatto.com)"
+ALLOWED_ORIGINS = "https://tramatto.com,https://www.tramatto.com,http://localhost:8080,http://127.0.0.1:8080"
+
+# NUVEMSHOP_ACCESS_TOKEN NÃO fica neste arquivo (nem em nenhum arquivo
+# versionado). Configure como secret:
+#   wrangler secret put NUVEMSHOP_ACCESS_TOKEN
+# Veja README.md nesta pasta para o passo a passo completo.

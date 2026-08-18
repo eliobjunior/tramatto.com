@@ -3,10 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tramatto — Produto</title>
-  <meta name="description" content="Conheça os panos de prato premium da Tramatto, com acabamento artesanal e materiais selecionados." />
+  <title id="pageTitle">Tramatto — Produto</title>
+  <meta name="description" content="Conheça os panos de prato premium da Tramatto, com acabamento artesanal e materiais selecionados." id="pageDescription" />
   <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://tramatto.com/product.html" />
+  <link rel="canonical" href="https://tramatto.com/product.html" id="canonicalLink" />
+
+  <!-- Open Graph / WhatsApp / Facebook / LinkedIn (valores padrão; atualizados por produto via script.js) -->
+  <meta property="og:type" content="product" id="ogType">
+  <meta property="og:url" content="https://tramatto.com/product.html" id="ogUrl">
+  <meta property="og:title" content="Tramatto — Produto" id="ogTitle">
+  <meta property="og:description" content="Conheça os panos de prato premium da Tramatto, com acabamento artesanal e materiais selecionados." id="ogDescription">
+  <meta property="og:image" content="https://tramatto.com/tramatto_og.jpg" id="ogImage">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:site_name" content="Tramatto">
+  <meta property="product:brand" content="Tramatto" id="ogBrand">
+  <meta property="product:availability" content="in stock" id="ogAvailability">
+  <meta property="product:condition" content="new" id="ogCondition">
+  <meta property="product:price:amount" content="0.00" id="ogPriceAmount">
+  <meta property="product:price:currency" content="BRL">
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Tramatto — Produto" id="twitterTitle">
+  <meta name="twitter:description" content="Conheça os panos de prato premium da Tramatto, com acabamento artesanal e materiais selecionados." id="twitterDescription">
+  <meta name="twitter:image" content="https://tramatto.com/tramatto_og.jpg" id="twitterImage">
+
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -66,8 +90,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="footer-brand-name">Trama<em>tto</em></div>
         <p class="footer-tagline">Panos de prato turcos de qualidade premium. Da Anatólia para a sua cozinha.</p>
         <div class="footer-socials">
-          <a href="#" class="footer-social">Instagram</a>
-          <a href="#" class="footer-social">Pinterest</a>
+          <a href="https://www.instagram.com/tramatto" class="footer-social" target="_blank" rel="noopener noreferrer">Instagram</a>
+          <a href="https://www.pinterest.com/tramatto" class="footer-social" target="_blank" rel="noopener noreferrer">Pinterest</a>
         </div>
       </div>
       <div>
@@ -101,6 +125,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </footer>
 
   <script src="js/config.js"></script>
+  <script src="js/purchase.js"></script>
   <script src="js/domain-model.js"></script>
   <script src="js/services.js"></script>
   <script src="js/adapters.js"></script>
@@ -109,6 +134,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <script src="integrations/nuvemshop/catalog.js"></script>
   <script src="integrations/nuvemshop/products.js"></script>
   <script src="integrations/nuvemshop/cart.js"></script>
+  <script src="nuvemshop-mirror-data.js"></script>
   <script src="catalog-data.js"></script>
   <script src="script.js"></script>
   <script src="js/analytics.js"></script>

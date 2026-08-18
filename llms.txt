@@ -1,0 +1,79 @@
+# Tramatto
+
+> Tramatto é uma marca brasileira de panos de prato premium, importados diretamente das tecelagens artesanais da Anatólia, Turquia. Cada peça é produzida com algodão egípcio de fibra longa (38mm) em teares jacquard artesanais, com acabamento à mão e revisão individual antes do envio.
+
+## Sobre a marca
+
+A Tramatto nasceu para transformar panos de prato de item utilitário em peça de presença, valor e refinamento para cozinhas contemporâneas. A marca importa diretamente das tecelagens da Anatólia — uma região com mais de 500 anos de tradição têxtil — sem intermediários e sem concessões de qualidade.
+
+Os produtos Tramatto usam algodão egípcio de fibra longa (fibras de até 38mm), o mesmo padrão de matéria-prima adotado pelas grandes redes hoteleiras europeias. Os padrões são tecidos diretamente na estrutura jacquard (não estampados), o que garante que a cor não desbote e o desenho não descasque com lavagens repetidas. Bordas costuradas com linha reforçada para uso diário por anos.
+
+Atributos-chave: 2× mais durável que panos convencionais · sem amaciantes artificiais · origem turca auditada · entrega para todo o Brasil.
+
+## Produtos disponíveis
+
+- [Linho Anatoliano](https://tramatto.com/product.html?slug=linho-anatoliano): Pano de prato em algodão egípcio, acabamento natural. Coleção Essentials. Tamanhos: 45×70cm e 60×90cm. Cores: Branco natural, Areia, Linho. Preço: R$ 120.
+- [Borda Dourada](https://tramatto.com/product.html?slug=borda-dourada): Pano de prato em algodão com detalhe dourado. Coleção Signature. Tamanho: 45×70cm. Cor: Areia. Preço: R$ 120.
+- [Listrado Clássico](https://tramatto.com/product.html?slug=listrado-classico): Pano de prato listrado clássico branco e terracota. Coleção Essentials. Tamanhos: 45×70cm e 60×90cm. Cores: Branco, Terracota. Preço: R$ 120.
+- [Jacquard Ottomano](https://tramatto.com/product.html?slug=jacquard-ottomano): Pano de prato com padrão geométrico jacquard, creme. Coleção Signature. Tamanho: 45×70cm. Momentaneamente sem estoque.
+
+## Kits curados
+
+- Kit Cozinha Clássica: 3 panos em tons neutros (branco natural, areia e linho). R$ 230.
+- Kit Presente Especial: 4 panos em embalagem presente com caixa e cartão. R$ 230.
+- Kit Mesa de Brunch: 6 panos combinados em duas cores. R$ 230.
+- Kit Cozinha Gourmet: 5 panos com mix de padrões e texturas. R$ 230.
+
+## Coleções
+
+- **Essentials**: peças clássicas para cozinhas contemporâneas (Linho Anatoliano, Listrado Clássico).
+- **Signature**: coleção premium com maior presença visual (Borda Dourada, Jacquard Ottomano).
+
+## Políticas e atendimento
+
+- Frete grátis para pedidos acima de R$ 199. Prazo médio: 3 a 7 dias úteis. Entrega em todo o Brasil.
+- Trocas e devoluções aceitas em até 30 dias após a entrega, com embalagem original.
+- Atendimento via WhatsApp: +55 47 99117-6648.
+
+## Páginas do site
+
+- [Início](https://tramatto.com/): home com destaques de produtos, materiais e origem da marca.
+- [Coleção](https://tramatto.com/collection.html): catálogo completo — panos avulsos, kits e coleções.
+- [Sobre a Tramatto](https://tramatto.com/pages/about.html): história, valores e processo da marca.
+- [Frete e entregas](https://tramatto.com/pages/shipping.html): prazo, frete grátis, trocas e devoluções.
+- [Contato](https://tramatto.com/pages/contact.html): canal de atendimento.
+
+## Blog — Guias e Conteúdo
+
+O blog da Tramatto publica guias práticos sobre cuidados com panos de prato, comparativos de materiais têxteis, inspiração de mesa posta e presentes para chá de cozinha.
+
+- [Como lavar pano de prato do jeito certo](https://tramatto.com/blog/como-lavar-pano-de-prato.html): Guia completo de lavagem, temperatura ideal (30-40°C), por que nunca usar amaciante, secagem correta e cuidados especiais com algodão egípcio jacquard.
+- [Como tirar manchas de pano de prato](https://tramatto.com/blog/como-tirar-manchas-pano-de-prato.html): Técnicas para remover manchas de óleo, café, frutas, molho de tomate e amarelamento. Regra de ouro: agir imediatamente com água fria antes do calor.
+- [Algodão vs. linho vs. microfibra: qual o melhor pano de prato?](https://tramatto.com/blog/algodao-vs-linho-vs-microfibra.html): Comparativo técnico de materiais — absorção, durabilidade, cuidado e custo por uso. Tabela comparativa incluída.
+- [Presente para chá de cozinha: guia completo](https://tramatto.com/blog/presente-cha-de-cozinha.html): Como escolher o presente certo por faixa de preço (até R$100, R$100-200, acima de R$200), como montar kits e o que evitar.
+
+## Dados estruturados disponíveis
+
+O site da Tramatto expõe os seguintes schemas schema.org:
+- `Organization` com logo, areaServed (Brasil), knowsAbout e contactPoint.
+- `WebSite` com SearchAction.
+- `Product` por PDP (injetado via JavaScript): name, description, image, sku, mpn, brand, category, itemCondition, offers (price, priceCurrency, availability, url).
+- `BreadcrumbList` por PDP, página institucional e artigo de blog (4 níveis: Início → Blog → Cluster → Artigo).
+- `FAQPage` em /pages/shipping.html, /pages/about.html e em cada artigo de blog (5 Q&As por artigo).
+- `Article` em cada artigo de blog com author (Organization @id), datePublished, keywords e articleSection.
+- `AboutPage` em /pages/about.html.
+- `CollectionPage` em /collection.html e /blog/.
+
+## Sitemaps
+
+- https://tramatto.com/sitemap.xml — páginas institucionais e coleção (7 URLs).
+- https://tramatto.com/sitemap-products.xml — PDPs por slug (4 URLs).
+- https://tramatto.com/sitemap-blog.xml — índice do blog e artigos publicados (5+ URLs).
+
+## Contato e redes
+
+- Site: https://tramatto.com
+- Instagram: https://www.instagram.com/tramatto
+- WhatsApp: https://wa.me/5547991176648
+- País de operação: Brasil
+- Idioma: Português (pt-BR)

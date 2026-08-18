@@ -1,0 +1,146 @@
+{
+  "_comment": "Especificação estruturada da configuração GTM para o container GTM-W7NZMTL7. Não é um export literal de containerVersion do GTM — serve como referência para criação manual, scripting via GTM API, ou importação assistida. Ver docs/gtm-setup.md para o passo a passo.",
+  "container": "GTM-W7NZMTL7",
+  "ga4MeasurementId": "G-13KSN16JDG",
+  "variables": [
+    { "name": "DLV - link_url", "type": "Data Layer Variable", "dataLayerVariableName": "link_url", "version": 2 },
+    { "name": "DLV - link_text", "type": "Data Layer Variable", "dataLayerVariableName": "link_text", "version": 2 },
+    { "name": "DLV - page_location", "type": "Data Layer Variable", "dataLayerVariableName": "page_location", "version": 2 },
+    { "name": "DLV - page_path", "type": "Data Layer Variable", "dataLayerVariableName": "page_path", "version": 2 },
+    { "name": "DLV - page_title", "type": "Data Layer Variable", "dataLayerVariableName": "page_title", "version": 2 },
+    { "name": "DLV - percent_scrolled", "type": "Data Layer Variable", "dataLayerVariableName": "percent_scrolled", "version": 2 },
+    { "name": "DLV - search_term", "type": "Data Layer Variable", "dataLayerVariableName": "search_term", "version": 2 },
+    { "name": "DLV - results_count", "type": "Data Layer Variable", "dataLayerVariableName": "results_count", "version": 2 },
+    { "name": "DLV - ecommerce", "type": "Data Layer Variable", "dataLayerVariableName": "ecommerce", "version": 2 },
+    { "name": "CONST - GA4 Measurement ID", "type": "Constant", "value": "G-13KSN16JDG" }
+  ],
+  "triggers": [
+    { "name": "CE - click_whatsapp", "type": "Custom Event", "customEventName": "click_whatsapp" },
+    { "name": "CE - click_instagram", "type": "Custom Event", "customEventName": "click_instagram" },
+    { "name": "CE - click_ver_colecao", "type": "Custom Event", "customEventName": "click_ver_colecao" },
+    { "name": "CE - scroll_90", "type": "Custom Event", "customEventName": "scroll_90" },
+    { "name": "CE - view_collection", "type": "Custom Event", "customEventName": "view_collection" },
+    { "name": "CE - view_product", "type": "Custom Event", "customEventName": "view_product" },
+    { "name": "CE - search", "type": "Custom Event", "customEventName": "search" }
+  ],
+  "tags": [
+    {
+      "name": "GA4 - Configuration",
+      "type": "GA4 Configuration",
+      "measurementId": "{{CONST - GA4 Measurement ID}}",
+      "trigger": "All Pages"
+    },
+    {
+      "name": "GA4 Event - click_whatsapp",
+      "type": "GA4 Event",
+      "configurationTag": "GA4 - Configuration",
+      "trigger": "CE - click_whatsapp",
+      "ga4EventName": "click_whatsapp",
+      "eventParameters": {
+        "link_url": "{{DLV - link_url}}",
+        "link_text": "{{DLV - link_text}}",
+        "page_location": "{{DLV - page_location}}",
+        "page_path": "{{DLV - page_path}}",
+        "page_title": "{{DLV - page_title}}"
+      },
+      "businessObjective": "Medir intenção de contato/lead via WhatsApp (sugerido como evento de conversão)"
+    },
+    {
+      "name": "GA4 Event - click_instagram",
+      "type": "GA4 Event",
+      "configurationTag": "GA4 - Configuration",
+      "trigger": "CE - click_instagram",
+      "ga4EventName": "click_instagram",
+      "eventParameters": {
+        "link_url": "{{DLV - link_url}}",
+        "link_text": "{{DLV - link_text}}",
+        "page_location": "{{DLV - page_location}}",
+        "page_path": "{{DLV - page_path}}",
+        "page_title": "{{DLV - page_title}}"
+      },
+      "businessObjective": "Medir engajamento social e cliques de saída para Instagram"
+    },
+    {
+      "name": "GA4 Event - click_ver_colecao",
+      "type": "GA4 Event",
+      "configurationTag": "GA4 - Configuration",
+      "trigger": "CE - click_ver_colecao",
+      "ga4EventName": "click_ver_colecao",
+      "eventParameters": {
+        "link_url": "{{DLV - link_url}}",
+        "link_text": "{{DLV - link_text}}",
+        "page_location": "{{DLV - page_location}}",
+        "page_path": "{{DLV - page_path}}",
+        "page_title": "{{DLV - page_title}}"
+      },
+      "businessObjective": "Medir eficácia do CTA principal do hero (home -> coleção)"
+    },
+    {
+      "name": "GA4 Event - scroll_90",
+      "type": "GA4 Event",
+      "configurationTag": "GA4 - Configuration",
+      "trigger": "CE - scroll_90",
+      "ga4EventName": "scroll_90",
+      "eventParameters": {
+        "percent_scrolled": "{{DLV - percent_scrolled}}",
+        "page_location": "{{DLV - page_location}}",
+        "page_path": "{{DLV - page_path}}",
+        "page_title": "{{DLV - page_title}}"
+      },
+      "businessObjective": "Medir profundidade de engajamento/leitura por página"
+    },
+    {
+      "name": "GA4 Event - view_item_list",
+      "type": "GA4 Event",
+      "configurationTag": "GA4 - Configuration",
+      "trigger": "CE - view_collection",
+      "ga4EventName": "view_item_list",
+      "sendEcommerceData": true,
+      "ecommerceSource": "{{DLV - ecommerce}}",
+      "eventParameters": {
+        "page_location": "{{DLV - page_location}}",
+        "page_path": "{{DLV - page_path}}",
+        "page_title": "{{DLV - page_title}}"
+      },
+      "businessObjective": "Medir exposição de produtos na grade da coleção; alimenta funil de ecommerce e remarketing"
+    },
+    {
+      "name": "GA4 Event - view_item",
+      "type": "GA4 Event",
+      "configurationTag": "GA4 - Configuration",
+      "trigger": "CE - view_product",
+      "ga4EventName": "view_item",
+      "sendEcommerceData": true,
+      "ecommerceSource": "{{DLV - ecommerce}}",
+      "eventParameters": {
+        "page_location": "{{DLV - page_location}}",
+        "page_path": "{{DLV - page_path}}",
+        "page_title": "{{DLV - page_title}}"
+      },
+      "businessObjective": "Medir visualizações de produto (PDP); base do funil view->cart->purchase e remarketing dinâmico"
+    },
+    {
+      "name": "GA4 Event - search",
+      "type": "GA4 Event",
+      "configurationTag": "GA4 - Configuration",
+      "trigger": "CE - search",
+      "ga4EventName": "search",
+      "eventParameters": {
+        "search_term": "{{DLV - search_term}}",
+        "results_count": "{{DLV - results_count}}",
+        "page_location": "{{DLV - page_location}}",
+        "page_path": "{{DLV - page_path}}",
+        "page_title": "{{DLV - page_title}}"
+      },
+      "businessObjective": "Entender demanda dos usuários e identificar buscas sem resultado"
+    }
+  ],
+  "plannedFutureEvents": [
+    "select_item",
+    "add_to_cart",
+    "remove_from_cart",
+    "view_cart",
+    "begin_checkout",
+    "purchase"
+  ]
+}

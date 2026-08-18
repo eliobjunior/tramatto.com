@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Sitemap dedicado às páginas de produto (PDPs) da Tramatto.
+  Gerado a partir de catalog-data.js (4 produtos ativos).
+  Cada <loc> corresponde à URL canônica gerada dinamicamente por
+  updateCanonicalUrl() em script.js (ver docs/merchant-center-phase1.md).
+  Atualize este arquivo sempre que um produto for adicionado, removido
+  ou renomeado (slug) em catalog-data.js.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://tramatto.com/product.html?slug=linho-anatoliano</loc>
+    <lastmod>2026-06-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tramatto.com/product.html?slug=borda-dourada</loc>
+    <lastmod>2026-06-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tramatto.com/product.html?slug=listrado-classico</loc>
+    <lastmod>2026-06-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tramatto.com/product.html?slug=jacquard-ottomano</loc>
+    <lastmod>2026-06-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>

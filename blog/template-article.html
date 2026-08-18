@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<!--
+  TRAMATTO BLOG — TEMPLATE DE ARTIGO
+  ════════════════════════════════════════════════════════════════════
+  Como usar este template:
+    1. Copie este arquivo e renomeie para o slug do artigo.
+       Ex.: como-lavar-pano-de-prato.html
+    2. Substitua todos os campos marcados com <!--FIELD:nome--> abaixo.
+    3. Preencha o conteúdo do artigo na seção .article-body.
+    4. Ajuste o FAQPage schema (perguntas + respostas).
+    5. Atualize o BreadcrumbList com o cluster/categoria correto.
+    6. Atualize llms.txt na raiz com a URL do novo artigo.
+    7. Adicione a URL ao sitemap-blog.xml.
+
+  Schemas implementados:
+    - Article          (Google, Bing, Perplexity, Claude)
+    - FAQPage          (Google AI Overview, Perplexity)
+    - BreadcrumbList   (Google, Bing)
+    - Author           (Organization — trocar por Person quando fundador tiver nome)
+    - Organization     (referenciado via @id — definido em index.html)
+  ════════════════════════════════════════════════════════════════════
+-->
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!--
+    ── SEO META ──────────────────────────────────────────────────────
+    FIELD:meta-title      Max 60 chars. Keyword primária no início.
+    FIELD:meta-description Max 160 chars. Resposta direta à intenção.
+    FIELD:canonical       URL canônica do artigo (sem trailing slash ou com, seja consistente).
+    FIELD:slug            Usado no @id e nas URLs dos schemas.
+  -->
+  <title>Como lavar pano de prato do jeito certo: guia completo de lavagem e conservação | Tramatto</title>
+  <meta name="description" content="Aprenda como lavar pano de prato para durar anos: temperatura ideal, uso de amaciante (não use), secagem correta e cuidados especiais para algodão egípcio e jacquard." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://tramatto.com/blog/como-lavar-pano-de-prato.html" />
+
+  <!-- Open Graph -->
+  <!--
+    FIELD:og-title        Pode ser igual ao meta-title ou ligeiramente diferente para social.
+    FIELD:og-description  Pode ser igual ao meta-description.
+    FIELD:og-image        1200×630. Criar em: /blog/assets/como-lavar-pano-de-prato-og.jpg
+  -->
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://tramatto.com/blog/como-lavar-pano-de-prato.html" />
+  <meta property="og:title" content="Como lavar pano de prato do jeito certo para durar anos" />
+  <meta property="og:description" content="Temperatura, ciclo, amaciante e secagem — o guia completo para conservar panos de algodão egípcio e jacquard." />
+  <meta property="og:image" content="https://tramatto.com/tramatto_og.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:locale" content="pt_BR" />
+  <meta property="og:site_name" content="Tramatto" />
+  <meta property="article:published_time" content="2026-06-16" />
+  <meta property="article:modified_time" content="2026-06-16" />
+  <meta property="article:section" content="Cuidados" />
+  <meta property="article:tag" content="como lavar pano de prato" />
+  <meta property="article:tag" content="cuidados com panos de prato" />
+  <meta property="article:tag" content="algodão egípcio" />
+
+  <!--
+    ════════════════════════════════════════════════════════════════════
+    SCHEMA 1: BreadcrumbList
+    ════════════════════════════════════════════════════════════════════
+    FIELD:cluster-name    Nome do cluster (categoria). Ex.: "Cuidados"
+    FIELD:cluster-url     URL da categoria. Ex.: https://tramatto.com/blog/?cat=cuidados
+    FIELD:article-title   Título do artigo (mesmo do <h1>)
+    FIELD:article-url     URL canônica do artigo
+  -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Início",
+        "item": "https://tramatto.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Blog",
+        "item": "https://tramatto.com/blog/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Cuidados",
+        "item": "https://tramatto.com/blog/?cat=cuidados"
+      },
+      {
+        "@type": "ListItem",
+        "position": 4,
+        "name": "Como lavar pano de prato do jeito certo para durar anos",
+        "item": "https://tramatto.com/blog/como-lavar-pano-de-prato.html"
+      }
+    ]
+  }
+  </script>
+
+  <!--
+    ════════════════════════════════════════════════════════════════════
+    SCHEMA 2: Article + Author (Organization) + Organization ref
+    ════════════════════════════════════════════════════════════════════
+    FIELD:article-url     URL canônica
+    FIELD:headline        Mesmo do <title> sem "| Tramatto"
+    FIELD:description     Mesmo do meta-description
+    FIELD:image-url       URL da imagem OG do artigo (1200×630)
+    FIELD:date-published  ISO 8601. Ex.: 2026-06-16
+    FIELD:date-modified   ISO 8601. Atualizar ao revisar o artigo.
+    FIELD:keywords        Array de keywords primária + secundárias
+    FIELD:article-section Cluster/categoria. Ex.: "Cuidados"
+
+    AUTHOR NOTE: Author é a Organization enquanto não há Person definida.
+    Quando o fundador for nomeado publicamente, substituir por:
+    "author": {
+      "@type": "Person",
+      "@id": "https://tramatto.com/#founder",
+      "name": "[Nome do Fundador]",
+      "url": "https://tramatto.com/pages/about.html"
+    }
+  -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "@id": "https://tramatto.com/blog/como-lavar-pano-de-prato.html",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://tramatto.com/blog/como-lavar-pano-de-prato.html"
+    },
+    "headline": "Como lavar pano de prato do jeito certo para durar anos",
+    "description": "Aprenda como lavar pano de prato para durar anos: temperatura ideal, uso de amaciante (não use), secagem correta e cuidados especiais para algodão egípcio e jacquard.",
+    "image": {
+      "@type": "ImageObject",
+      "url": "https://tramatto.com/tramatto_og.jpg",
+      "width": 1200,
+      "height": 630
+    },
+    "datePublished": "2026-06-16",
+    "dateModified": "2026-06-16",
+    "author": {
+      "@type": "Organization",
+      "@id": "https://tramatto.com/#organization",
+      "name": "Tramatto",
+      "url": "https://tramatto.com"
+    },
+    "publisher": {
+      "@id": "https://tramatto.com/#organization"
+    },
+    "inLanguage": "pt-BR",
+    "url": "https://tramatto.com/blog/como-lavar-pano-de-prato.html",
+    "keywords": [
+      "como lavar pano de prato",
+      "lavar pano de prato na máquina",
+      "temperatura lavar pano de prato",
+      "cuidados com panos de prato",
+      "conservar pano de prato",
+      "algodão egípcio lavagem",
+      "pano jacquard cuidados"
+    ],
+    "articleSection": "Cuidados",
+    "about": {
+      "@id": "https://tramatto.com/#organization"
+    }
+  }
+  </script>
+
+  <!--
+    ════════════════════════════════════════════════════════════════════
+    SCHEMA 3: FAQPage
+    ════════════════════════════════════════════════════════════════════
+    Regras:
+    - Mínimo 3 perguntas, ideal 5.
+    - Perguntas devem aparecer TAMBÉM no HTML visível (seção .article-faq).
+    - Respostas devem ser texto puro (sem HTML no campo "text").
+    - Perguntas devem cobrir a keyword primária + long-tails relacionadas.
+  -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Qual a temperatura certa para lavar pano de prato?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A temperatura ideal para lavar panos de prato de algodão é entre 30°C e 40°C. Temperaturas acima de 60°C encurtam a vida útil da fibra e desbotam padrões coloridos. Para panos jacquard Tramatto, use sempre até 40°C."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Pode usar amaciante no pano de prato?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Não. Amaciante deposita uma camada de silicone na fibra de algodão que reduz a absorção com o tempo. Panos de algodão egípcio de qualidade ficam mais macios naturalmente a cada lavagem, sem precisar de amaciante."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Pode lavar pano de prato na máquina de lavar?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Sim. Use o ciclo delicado ou de algodão, temperatura até 40°C e centrifugação moderada (máximo 800 rpm). Evite misturar com roupas que soltem fiapos, como moletom."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Como secar pano de prato para conservar a cor?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Seque à sombra, pendurado aberto. A luz solar direta desbota padrões com o tempo, especialmente em tons terrosos e naturais. Se usar secadora, escolha temperatura baixa e retire ainda levemente úmido para evitar amassados."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Com que frequência devo lavar o pano de prato?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "O recomendado é trocar o pano de prato a cada 1 a 2 dias de uso. Para garantir higiene e ter sempre um pano limpo disponível, o ideal é ter 7 a 10 panos em rodízio semanal."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/tramatto-mark.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="./blog.css" />
+
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-W7NZMTL7');</script>
+  <!-- End Google Tag Manager -->
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W7NZMTL7"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <!-- Reading progress bar -->
+  <div class="reading-progress" id="readingProgress" aria-hidden="true"></div>
+
+  <a class="skip-link" href="#mainContent">Pular para o conteúdo</a>
+
+  <nav>
+    <a href="../index.html" class="nav-logo">Trama<span>tto</span></a>
+    <ul class="nav-links">
+      <li><a href="../collection.html">Coleção</a></li>
+      <li><a href="./index.html" class="blog-active">Blog</a></li>
+      <li><a href="../pages/about.html">Nossa marca</a></li>
+      <li><a href="../pages/shipping.html">Frete</a></li>
+      <li><a href="../pages/contact.html">Contato</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="../collection.html" class="nav-cart">Sacola <span data-cart-badge>0</span></a>
+    </div>
+    <button class="nav-hamburger" aria-label="Abrir menu" type="button">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+  <div class="nav-mobile-menu" id="mobileMenu">
+    <a href="../collection.html">Coleção</a>
+    <a href="./index.html">Blog</a>
+    <a href="../pages/about.html">Nossa marca</a>
+    <a href="../pages/shipping.html">Frete</a>
+    <a href="../pages/contact.html">Contato</a>
+  </div>
+
+  <main id="mainContent">
+
+    <!-- BREADCRUMB (visível) -->
+    <nav class="article-breadcrumb" aria-label="Breadcrumb">
+      <ol class="article-breadcrumb-list">
+        <li><a href="../index.html">Início</a></li>
+        <li><a href="./index.html">Blog</a></li>
+        <!--FIELD:cluster-name e URL-->
+        <li><a href="./index.html?cat=cuidados">Cuidados</a></li>
+        <li>Como lavar pano de prato</li>
+      </ol>
+    </nav>
+
+    <!-- ARTICLE ELEMENT — envolve tudo para o schema semântico -->
+    <article itemscope itemtype="https://schema.org/Article">
+
+      <!-- ARTICLE HEADER -->
+      <header class="article-header">
+        <!--FIELD:cluster-name-->
+        <div class="article-category">Cuidados</div>
+
+        <!--FIELD:article-title (h1 — deve conter keyword primária)-->
+        <h1 class="article-title" itemprop="headline">
+          Como lavar pano de prato do jeito certo<br>para <em>durar anos.</em>
+        </h1>
+
+        <!--FIELD:article-summary (resumo / lead — aparece em destaque)-->
+        <p class="article-summary" itemprop="description">
+          A maioria dos panos de prato não dura porque é lavada errado. Temperatura alta, amaciante e secagem ao sol são os três erros mais comuns — e todos encurtam a vida útil do tecido de forma irreversível. Este guia cobre o jeito certo para qualquer tipo de pano, com atenção especial ao algodão egípcio e ao jacquard.
+        </p>
+
+        <!-- ARTICLE META -->
+        <div class="article-meta">
+          <div class="article-meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            <span>8 min de leitura</span>
+          </div>
+          <div class="article-meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            <!--FIELD:date-published-->
+            <time itemprop="datePublished" datetime="2026-06-16">16 de junho de 2026</time>
+          </div>
+          <div class="article-meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <!--FIELD:author — substituir por link de autor quando houver Person-->
+            <span>Por <a href="../pages/about.html" class="article-author-link" itemprop="author" itemscope itemtype="https://schema.org/Organization"><span itemprop="name">Tramatto</span></a></span>
+          </div>
+        </div>
+      </header>
+
+      <!-- FEATURED IMAGE -->
+      <!--FIELD:article-image — substituir placeholder por <img> real quando foto existir-->
+      <div class="article-featured-img">
+        <div class="article-featured-img-placeholder">
+          Foto do artigo — panos de prato em bancada de cozinha
+        </div>
+        <!--
+        <img
+          src="./assets/como-lavar-pano-de-prato.jpg"
+          alt="Panos de prato Tramatto em algodão egípcio dobrados sobre bancada de cozinha em madeira clara"
+          width="1200"
+          height="480"
+          loading="eager"
+          decoding="async"
+          itemprop="image"
+        />
+        -->
+      </div>
+
+      <!-- ARTICLE LAYOUT: BODY + SIDEBAR -->
+      <div class="article-layout">
+
+        <!-- ── ARTICLE BODY ── -->
+        <div class="article-body">
+
+          <!--
+            ════════════════════════════════════════════════
+            CONTEÚDO DO ARTIGO
+            Estrutura recomendada:
+              <h2> para seções principais (3-7 por artigo)
+              <h3> para subseções (máximo 3 por h2)
+              <p> para parágrafos (ideal 2-4 por seção)
+              <ul>/<ol> para listas
+              .article-callout para informações em destaque
+              .article-product-cta para mencionar produto
+            ════════════════════════════════════════════════
+          -->
+
+          <h2>A temperatura certa muda tudo</h2>
+
+          <p>O algodão — especialmente o de fibra longa egípcia — é naturalmente resistente, mas a <strong>temperatura de lavagem é o fator que mais afeta a durabilidade</strong>. Acima de 60°C, as fibras começam a contrair de forma permanente, o tecido perde maciez e os padrões coloridos desbotam de forma irreversível.</p>
+
+          <p>A regra simples: <strong>até 40°C para uso cotidiano, até 30°C para panos com padrões coloridos ou bordas jacquard</strong>. Nunca acima de 60°C para nenhum pano de qualidade.</p>
+
+          <div class="article-callout">
+            <div class="article-callout-label">Regra prática</div>
+            <p>Se sua máquina tem ciclo "algodão" ou "têxteis delicados": use o de têxteis delicados a 40°C. Se tem só temperatura, escolha 30-40°C e ciclo normal. Nunca use "pré-lavagem a quente" em panos de prato de algodão egípcio.</p>
+          </div>
+
+          <h2>Máquina de lavar ou à mão?</h2>
+
+          <p>Ambas funcionam — com ressalvas. Na máquina de lavar, o atrito mecânico em ciclos agressivos desgasta as fibras ao longo do tempo. À mão, o risco é a temperatura da água não controlada e o esfregar com força para tirar manchas.</p>
+
+          <h3>Na máquina: configurações ideais</h3>
+
+          <ul>
+            <li><strong>Ciclo:</strong> delicado, algodão ou têxteis — nunca "intensivo" ou "pré-lavagem"</li>
+            <li><strong>Temperatura:</strong> 30-40°C</li>
+            <li><strong>Centrifugação:</strong> máximo 800 rpm — maior velocidade deforma as bordas dos panos</li>
+            <li><strong>Quantidade:</strong> não sobrecarregue — panos de prato precisam de espaço para circular</li>
+            <li><strong>Separação:</strong> separe panos brancos dos coloridos nas primeiras 5 lavagens</li>
+          </ul>
+
+          <h3>À mão: sem esfregar com força</h3>
+
+          <ul>
+            <li>Água morna (não quente ao toque — 30-40°C)</li>
+            <li>Sabão neutro ou detergente líquido para roupas finas</li>
+            <li>Movimentos suaves de afundar e espremer — nunca torcer ou esfregar com força</li>
+            <li>Enxágue completo — resíduo de sabão deixa o pano rígido</li>
+          </ul>
+
+          <h2>O mito do amaciante (não use)</h2>
+
+          <p>O amaciante é o inimigo do algodão de qualidade. O mecanismo é contraintuitivo: o amaciante deposita uma camada de <strong>silicone e compostos catiônicos</strong> na fibra, que inicialmente deixa o pano mais macio ao toque — mas progressivamente <strong>reduz a capacidade de absorção</strong> do tecido.</p>
+
+          <p>Panos de algodão egípcio de fibra longa ficam naturalmente mais macios a cada lavagem sem qualquer produto. A estrutura da fibra longa (38mm) se organiza com o uso e o calor da secagem. Usar amaciante é literalmente pagar para ter um resultado pior.</p>
+
+          <blockquote>
+            <p>Panos de prato não precisam de amaciante. Eles precisam de água, sabão e tempo. O algodão egípcio faz o resto sozinho.</p>
+          </blockquote>
+
+          <h2>Como secar para preservar cor e textura</h2>
+
+          <p>A secagem é responsável por cerca de <strong>30% do desgaste total</strong> de um pano de prato ao longo da vida útil. As principais decisões:</p>
+
+          <ol>
+            <li><strong>À sombra, sempre.</strong> A exposição direta ao sol desbota padrões — especialmente tons terrosos, naturais e jacquard colorido. A luz UV degrada os corantes têxteis de forma permanente.</li>
+            <li><strong>Aberto, não dobrado.</strong> Pendurar o pano dobrado cria marcas de umidade que viram manchas ao secar.</li>
+            <li><strong>Máquina de secar: temperatura baixa.</strong> Se usar, selecione temperatura baixa e retire o pano ainda ligeiramente úmido para evitar amassados e amarelar nas bordas.</li>
+          </ol>
+
+          <!-- INLINE PRODUCT CTA -->
+          <a href="../product.html?slug=linho-anatoliano" class="article-product-cta" aria-label="Ver produto Linho Anatoliano">
+            <div class="article-product-cta-img">
+              <img src="../assets/images/produto-linho-anatoliano.jpg" alt="Pano Linho Anatoliano Tramatto" width="60" height="60" loading="lazy" />
+            </div>
+            <div>
+              <div class="article-product-cta-name">Linho Anatoliano</div>
+              <div class="article-product-cta-desc">Algodão egípcio de fibra longa. Resiste a anos de lavagens diárias.</div>
+            </div>
+            <div class="article-product-cta-price">
+              R$ 120
+              <span class="article-product-cta-action">Ver produto →</span>
+            </div>
+          </a>
+
+          <h2>Cuidados especiais para panos com padrão jacquard</h2>
+
+          <p>O padrão jacquard é tecido diretamente na estrutura do fio — o que o torna muito mais durável que panos estampados. Mas há cuidados específicos para manter a riqueza visual do padrão:</p>
+
+          <ul>
+            <li><strong>Nunca use alvejante (água sanitária ou cloro).</strong> Mesmo diluído, o cloro destrói as fibras de cor do jacquard — e não há como reverter. Para branquear panos brancos jacquard, use água oxigenada a 10V diluída ou limão ao sol.</li>
+            <li><strong>Vire o pano do avesso nas primeiras lavagens.</strong> Reduz o contato do padrão com o atrito mecânico da máquina durante o período de "assentamento" do fio.</li>
+            <li><strong>Não use esponjas abrasivas.</strong> Para manchas em panos jacquard, trate com sabão neutro e água morna antes da lavagem — sem esfregar diretamente no padrão.</li>
+          </ul>
+
+          <h2>Sinais de que o pano precisa ser trocado</h2>
+
+          <p>Um pano de prato de algodão egípcio bem cuidado dura facilmente <strong>3 a 5 anos de uso diário</strong>. Os sinais de que chegou a hora de trocar:</p>
+
+          <ul>
+            <li>Fiapos em excesso que não somem após as primeiras lavagens</li>
+            <li>Odor que persiste mesmo após lavagem completa</li>
+            <li>Bordas com fio soltando ou desfazendo</li>
+            <li>Textura permanentemente áspera ao toque — sinal de fibra degradada</li>
+            <li>Cor cinza opaca que não era a original do pano</li>
+          </ul>
+
+          <div class="article-callout">
+            <div class="article-callout-label">Contraintuitivo</div>
+            <p>Panos de algodão egípcio ficam mais macios com o uso — não mais ásperos. Se o seu pano está ficando mais áspero a cada lavagem, o problema é temperatura muito alta ou excesso de detergente não enxaguado.</p>
+          </div>
+
+          <!-- ── FAQ (visível + correspondente ao FAQPage schema) ── -->
+          <section class="article-faq" aria-labelledby="faq-title">
+            <h2 class="article-faq-title" id="faq-title">Perguntas frequentes</h2>
+
+            <div class="faq-item open">
+              <button class="faq-question" aria-expanded="true" aria-controls="faq-a1">
+                Qual a temperatura certa para lavar pano de prato?
+              </button>
+              <div class="faq-answer" id="faq-a1" role="region">
+                A temperatura ideal é entre 30°C e 40°C. Acima de 60°C, as fibras contraem permanentemente e os padrões coloridos desbotam. Para panos jacquard Tramatto, use sempre até 40°C.
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question" aria-expanded="false" aria-controls="faq-a2">
+                Pode usar amaciante no pano de prato?
+              </button>
+              <div class="faq-answer" id="faq-a2" role="region">
+                Não. Amaciante deposita uma camada de silicone na fibra de algodão que reduz a absorção progressivamente. Panos de algodão egípcio de qualidade ficam mais macios naturalmente a cada lavagem — sem precisar de nenhum produto.
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question" aria-expanded="false" aria-controls="faq-a3">
+                Pode lavar pano de prato na máquina de lavar?
+              </button>
+              <div class="faq-answer" id="faq-a3" role="region">
+                Sim. Use o ciclo delicado ou de algodão, temperatura até 40°C e centrifugação moderada (máximo 800 rpm). Evite misturar com roupas que soltem fiapos, como moletom ou toalhas felpudas.
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question" aria-expanded="false" aria-controls="faq-a4">
+                Como secar pano de prato para conservar a cor?
+              </button>
+              <div class="faq-answer" id="faq-a4" role="region">
+                Seque à sombra, pendurado aberto. A luz solar direta desbota padrões com o tempo, especialmente tons terrosos e naturais. Se usar secadora, escolha temperatura baixa e retire ainda levemente úmido.
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question" aria-expanded="false" aria-controls="faq-a5">
+                Com que frequência devo lavar o pano de prato?
+              </button>
+              <div class="faq-answer" id="faq-a5" role="region">
+                O recomendado é trocar o pano a cada 1 a 2 dias de uso. Para sempre ter um pano limpo disponível, o ideal é ter 7 a 10 panos em rodízio semanal.
+              </div>
+            </div>
+
+          </section>
+
+          <!-- END CTA -->
+          <div class="article-end-cta">
+            <div class="article-end-cta-tag">Conheça a coleção</div>
+            <h3>Panos feitos para<br><em>durar décadas.</em></h3>
+            <p>Algodão egípcio de fibra longa, tear jacquard artesanal e acabamento à mão — os panos Tramatto são projetados para melhorar com o uso, não o contrário.</p>
+            <a href="../collection.html" class="btn-primary">Ver coleção completa</a>
+          </div>
+
+        </div><!-- /article-body -->
+
+        <!-- ── SIDEBAR ── -->
+        <aside class="article-sidebar" aria-label="Conteúdo relacionado">
+
+          <!-- TABLE OF CONTENTS -->
+          <div class="sidebar-block sidebar-block--toc">
+            <div class="sidebar-block-title">Neste artigo</div>
+            <nav aria-label="Índice do artigo">
+              <ol class="toc-list">
+                <li class="toc-item"><a href="#a-temperatura-certa-muda-tudo">A temperatura certa muda tudo</a></li>
+                <li class="toc-item"><a href="#maquina-de-lavar-ou-a-mao">Máquina ou à mão?</a></li>
+                <li class="toc-item"><a href="#o-mito-do-amaciante">O mito do amaciante</a></li>
+                <li class="toc-item"><a href="#como-secar">Como secar</a></li>
+                <li class="toc-item"><a href="#cuidados-jacquard">Cuidados jacquard</a></li>
+                <li class="toc-item"><a href="#quando-trocar">Quando trocar</a></li>
+                <li class="toc-item"><a href="#faq-title">Perguntas frequentes</a></li>
+              </ol>
+            </nav>
+          </div>
+
+          <!-- PRODUCT CARD -->
+          <div class="sidebar-block">
+            <div class="sidebar-block-title">Mencionado neste artigo</div>
+            <a href="../product.html?slug=linho-anatoliano" class="sidebar-product" aria-label="Ver produto Linho Anatoliano">
+              <div class="sidebar-product-img">
+                <img src="../assets/images/produto-linho-anatoliano.jpg" alt="Pano Linho Anatoliano Tramatto" width="280" height="210" loading="lazy" />
+              </div>
+              <div class="sidebar-product-body">
+                <div class="sidebar-product-name">Linho Anatoliano</div>
+                <div class="sidebar-product-price">R$ 120</div>
+                <div class="sidebar-product-action">Ver produto</div>
+              </div>
+            </a>
+          </div>
+
+          <!-- RELATED ARTICLES -->
+          <div class="sidebar-block">
+            <div class="sidebar-block-title">Leia também</div>
+            <div class="sidebar-articles">
+              <a href="./como-tirar-manchas-pano-de-prato.html" class="sidebar-article-item">
+                <div class="sidebar-article-img">
+                  <div class="blog-card-img-placeholder" style="width:60px;height:44px;font-size:0.6rem;">foto</div>
+                </div>
+                <div>
+                  <div class="sidebar-article-title">Como tirar manchas de pano de prato</div>
+                  <div class="sidebar-article-category">Cuidados</div>
+                </div>
+              </a>
+              <a href="./algodao-egipcio-fibra-longa.html" class="sidebar-article-item">
+                <div class="sidebar-article-img">
+                  <div class="blog-card-img-placeholder" style="width:60px;height:44px;font-size:0.6rem;">foto</div>
+                </div>
+                <div>
+                  <div class="sidebar-article-title">O que é algodão egípcio de fibra longa</div>
+                  <div class="sidebar-article-category">Materiais</div>
+                </div>
+              </a>
+              <a href="./pano-de-prato-algodao-linho-ou-microfibra.html" class="sidebar-article-item">
+                <div class="sidebar-article-img">
+                  <div class="blog-card-img-placeholder" style="width:60px;height:44px;font-size:0.6rem;">foto</div>
+                </div>
+                <div>
+                  <div class="sidebar-article-title">Algodão, linho ou microfibra: qual escolher</div>
+                  <div class="sidebar-article-category">Materiais</div>
+                </div>
+              </a>
+            </div>
+          </div>
+
+        </aside><!-- /sidebar -->
+
+      </div><!-- /article-layout -->
+
+      <!-- SHARE -->
+      <div class="article-share">
+        <span class="article-share-label">Compartilhar</span>
+        <div class="article-share-links">
+          <a
+            href="https://wa.me/?text=Aprenda%20como%20lavar%20pano%20de%20prato%20do%20jeito%20certo%3A%20https%3A%2F%2Ftramatto.com%2Fblog%2Fcomo-lavar-pano-de-prato.html"
+            class="article-share-link"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Compartilhar no WhatsApp"
+          >WhatsApp</a>
+          <a
+            href="https://www.instagram.com/tramatto"
+            class="article-share-link"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Seguir no Instagram"
+          >Instagram</a>
+        </div>
+      </div>
+
+    </article><!-- /article -->
+
+    <!-- RELATED ARTICLES (bottom, full-width) -->
+    <section class="related-articles" aria-labelledby="related-title">
+      <h2 class="related-articles-title" id="related-title">Continue lendo</h2>
+      <div class="related-articles-grid">
+
+        <article class="blog-card">
+          <a href="./como-tirar-manchas-pano-de-prato.html" class="blog-card-img-link">
+            <div class="blog-card-img">
+              <div class="blog-card-img-placeholder">foto</div>
+              <span class="blog-card-category">Cuidados</span>
+            </div>
+          </a>
+          <div class="blog-card-body">
+            <div class="blog-card-meta">
+              <time datetime="2026-06-16">16 jun 2026</time>
+              <span>·</span>
+              <span>6 min</span>
+            </div>
+            <h3 class="blog-card-title">
+              <a href="./como-tirar-manchas-pano-de-prato.html">Como tirar manchas de pano de prato sem estragar o tecido</a>
+            </h3>
+            <a href="./como-tirar-manchas-pano-de-prato.html" class="blog-card-cta">Ler artigo</a>
+          </div>
+        </article>
+
+        <article class="blog-card">
+          <a href="./algodao-egipcio-fibra-longa.html" class="blog-card-img-link">
+            <div class="blog-card-img">
+              <div class="blog-card-img-placeholder">foto</div>
+              <span class="blog-card-category">Materiais</span>
+            </div>
+          </a>
+          <div class="blog-card-body">
+            <div class="blog-card-meta">
+              <time datetime="2026-06-16">16 jun 2026</time>
+              <span>·</span>
+              <span>7 min</span>
+            </div>
+            <h3 class="blog-card-title">
+              <a href="./algodao-egipcio-fibra-longa.html">O que é algodão egípcio de fibra longa: guia completo</a>
+            </h3>
+            <a href="./algodao-egipcio-fibra-longa.html" class="blog-card-cta">Ler artigo</a>
+          </div>
+        </article>
+
+        <article class="blog-card">
+          <a href="./como-escolher-pano-de-prato.html" class="blog-card-img-link">
+            <div class="blog-card-img">
+              <div class="blog-card-img-placeholder">foto</div>
+              <span class="blog-card-category">Como escolher</span>
+            </div>
+          </a>
+          <div class="blog-card-body">
+            <div class="blog-card-meta">
+              <time datetime="2026-06-16">16 jun 2026</time>
+              <span>·</span>
+              <span>9 min</span>
+            </div>
+            <h3 class="blog-card-title">
+              <a href="./como-escolher-pano-de-prato.html">Como escolher pano de prato: guia definitivo</a>
+            </h3>
+            <a href="./como-escolher-pano-de-prato.html" class="blog-card-cta">Ler artigo</a>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand-name">Trama<em>tto</em></div>
+        <p class="footer-tagline">Peças premium para cozinhas que valorizam textura, presença e cuidado.</p>
+      </div>
+      <div>
+        <div class="footer-col-title">Loja</div>
+        <ul class="footer-links">
+          <li><a href="../collection.html">Coleção</a></li>
+          <li><a href="../pages/shipping.html">Frete</a></li>
+          <li><a href="../pages/contact.html">Contato</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Conteúdo</div>
+        <ul class="footer-links">
+          <li><a href="./index.html">Blog</a></li>
+          <li><a href="../pages/about.html">Sobre a marca</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Institucional</div>
+        <ul class="footer-links">
+          <li><a href="../pages/privacy.html">Privacidade</a></li>
+          <li><a href="../pages/terms.html">Termos</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 Tramatto. Todos os direitos reservados.</div>
+      <div class="footer-origin">Da Anatólia com cuidado</div>
+    </div>
+  </footer>
+
+  <a
+    href="https://wa.me/5547991176648?text=Ol%C3%A1!%20Li%20o%20artigo%20sobre%20como%20lavar%20pano%20de%20prato%20e%20gostaria%20de%20saber%20mais%20sobre%20os%20panos%20Tramatto."
+    class="whatsapp-float"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Falar com a Tramatto pelo WhatsApp"
+    title="Falar com a Tramatto pelo WhatsApp"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.79.47 3.49 1.36 5.01L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2zm0 18.13h-.01a8.2 8.2 0 0 1-4.18-1.14l-.3-.18-3.12.82.83-3.04-.2-.31a8.18 8.18 0 0 1-1.26-4.37c0-4.54 3.7-8.24 8.25-8.24 2.2 0 4.27.86 5.83 2.42a8.18 8.18 0 0 1 2.41 5.83c0 4.55-3.7 8.21-8.25 8.21zm4.52-6.16c-.25-.12-1.47-.72-1.7-.81-.23-.08-.39-.12-.56.13-.17.25-.64.81-.78.97-.14.17-.29.18-.54.06-.25-.12-1.06-.39-2.02-1.24-.75-.67-1.25-1.49-1.4-1.74-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.12-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.23.25-.86.84-.86 2.05 0 1.21.88 2.38 1 2.55.12.17 1.74 2.66 4.22 3.73.59.25 1.05.41 1.41.52.59.19 1.13.16 1.55.1.47-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.14-1.18-.06-.11-.23-.17-.48-.29z"/></svg>
+  </a>
+
+  <script defer src="../js/config.js"></script>
+  <script defer src="../js/domain-model.js"></script>
+  <script defer src="../js/services.js"></script>
+  <script defer src="../js/adapters.js"></script>
+  <script defer src="../integrations/nuvemshop/client.js"></script>
+  <script defer src="../integrations/nuvemshop/mapper.js"></script>
+  <script defer src="../integrations/nuvemshop/catalog.js"></script>
+  <script defer src="../integrations/nuvemshop/products.js"></script>
+  <script defer src="../integrations/nuvemshop/cart.js"></script>
+  <script defer src="../nuvemshop-mirror-data.js"></script>
+  <script defer src="../catalog-data.js"></script>
+  <script defer src="../script.js"></script>
+  <script defer src="../js/analytics.js"></script>
+
+  <!-- Blog UI: reading progress + FAQ accordion + TOC highlight -->
+  <script>
+    (function () {
+
+      // ── Reading progress bar ──
+      var bar = document.getElementById('readingProgress');
+      if (bar) {
+        window.addEventListener('scroll', function () {
+          var scrollTop = window.scrollY || document.documentElement.scrollTop;
+          var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+          bar.style.width = (docHeight > 0 ? (scrollTop / docHeight) * 100 : 0) + '%';
+        }, { passive: true });
+      }
+
+      // ── FAQ accordion ──
+      document.querySelectorAll('.faq-question').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var item = btn.closest('.faq-item');
+          var isOpen = item.classList.contains('open');
+          document.querySelectorAll('.faq-item.open').forEach(function (o) {
+            o.classList.remove('open');
+            o.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+          });
+          if (!isOpen) {
+            item.classList.add('open');
+            btn.setAttribute('aria-expanded', 'true');
+          }
+        });
+      });
+
+      // ── TOC active link highlight on scroll ──
+      var tocLinks = document.querySelectorAll('.toc-list a');
+      if (tocLinks.length) {
+        var headings = document.querySelectorAll('.article-body h2, .article-body h3, .article-faq-title');
+        headings.forEach(function (h, i) {
+          if (!h.id) h.id = h.textContent.trim().toLowerCase()
+            .replace(/\s+/g, '-').replace(/[^\w-]/g, '').replace(/--+/g, '-');
+        });
+        window.addEventListener('scroll', function () {
+          var current = '';
+          headings.forEach(function (h) {
+            if (window.scrollY >= h.offsetTop - 120) current = h.id;
+          });
+          tocLinks.forEach(function (a) {
+            var item = a.closest('.toc-item');
+            item.classList.toggle('active', a.getAttribute('href') === '#' + current);
+          });
+        }, { passive: true });
+      }
+
+    })();
+  </script>
+
+</body>
+</html>

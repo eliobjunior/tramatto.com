@@ -1,6 +1,16 @@
 let appState = null;
 let currentProductSelection = null;
 
+const SITE_URL = 'https://tramatto.com';
+const DEFAULT_OG_IMAGE = `${SITE_URL}/tramatto_og.jpg`;
+
+// Converte um caminho relativo (ex.: "assets/images/foo.jpg") em URL absoluta do site.
+function toAbsoluteUrl(path) {
+  if (!path) return null;
+  if (/^(https?:)?\/\//i.test(path) || path.startsWith('data:')) return path;
+  return `${SITE_URL}/${path.replace(/^\//, '')}`;
+}
+
 function escapeHTML(value = '') {
   return String(value)
     .replace(/&/g, '&amp;')
@@ -22,6 +32,18 @@ function formatPrice(value) {
 function buildPlaceholderImage(label) {
   const markup = encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1000"><rect width="100%" height="100%" fill="#F5F0E8"/><text x="50%" y="50%" text-anchor="middle" font-family="Arial" font-size="34" fill="#9B6B4B">${label}</text></svg>`);
   return `data:image/svg+xml;charset=UTF-8,${markup}`;
+}
+
+// Monta o link de "comprar" da Nuvemshop (js/purchase.js) a partir do
+// produto/variante selecionados na PDP. Retorna null quando o ambiente não
+// tem storeUrl configurada (MockAdapter/desenvolvimento) — nesse caso o
+// botão "Comprar" fica desabilitado em vez de redirecionar para um link
+// inválido (ver Fase D do plano de integração Nuvemshop).
+function getBuyUrl(product, variant, quantity = 1) {
+  const environment = window.TramattoConfig?.resolveEnvironment?.(window.TramattoConfig.environment);
+  const storeUrl = environment?.storeUrl;
+  const variantId = variant?.id ?? product?.variants?.[0]?.id;
+  return window.TramattoPurchase?.buildBuyUrl?.({ storeUrl, variantId, quantity }) || null;
 }
 
 function getAppState() {
@@ -48,6 +70,7 @@ async function initializeStorefront() {
   renderKits();
   renderProductDetail();
   renderCollections();
+  initCollectionSearch();
 }
 
 function updateCartBadge() {
@@ -87,11 +110,12 @@ function showToast(message) {
 async function addToCart(product, variant = null) {
   const app = getAppState();
   await app.services.cartService.addToCart(product, variant, 1);
+  dispatchAddToCart(product, variant, 1);
   updateCartBadge();
   showToast(`${product.title} adicionado à sacola`);
 }
 
-function renderProducts(container, items = appState?.products || []) {
+function renderProducts(container, items = appState?.products || [], listName = 'Coleção Premium') {
   if (!container) return;
 
   container.innerHTML = items.map((product) => `
@@ -116,6 +140,14 @@ function renderProducts(container, items = appState?.products || []) {
     </article>
   `).join('');
 
+  container.querySelectorAll('.product-card-link').forEach((link, index) => {
+    link.addEventListener('click', () => {
+      const slug = new URL(link.href, window.location.origin).searchParams.get('slug');
+      const product = (appState?.products || []).find((p) => p.slug === slug);
+      if (product) dispatchSelectItem(product, index, listName);
+    });
+  });
+
   container.querySelectorAll('[data-add-to-cart]').forEach((button) => {
     button.addEventListener('click', async (event) => {
       event.preventDefault();
@@ -131,15 +163,104 @@ function renderProducts(container, items = appState?.products || []) {
 function renderHomeProducts() {
   const container = document.getElementById('productsGrid');
   if (container) {
-    renderProducts(container, (appState?.products || []).slice(0, 4));
+    renderProducts(container, (appState?.products || []).slice(0, 4), 'Home — Destaques');
   }
 }
 
 function renderCollectionPage() {
   const container = document.getElementById('collectionProducts');
   if (container) {
-    renderProducts(container, appState?.products || []);
+    const products = appState?.products || [];
+    renderProducts(container, products, 'Coleção Premium');
+    dispatchViewCollection(products, 'Coleção Premium', 'colecao-premium');
   }
+}
+
+// Envia ao analytics.js a lista de produtos exibidos na coleção (evento view_collection)
+function dispatchViewCollection(products, listName = 'Coleção Premium', listId = 'colecao-premium') {
+  document.dispatchEvent(new CustomEvent('tramatto:view_collection', {
+    detail: {
+      currency: 'BRL',
+      list_name: listName,
+      list_id: listId,
+      items: products.map((product, index) => ({
+        item_id: product.slug,
+        item_name: product.title,
+        item_brand: product.brand,
+        item_category: product.googleProductCategory || product.productType || '',
+        price: product.getPrimaryPrice?.() || product.price || 0,
+        quantity: 1,
+        index
+      }))
+    }
+  }));
+}
+
+// Envia ao analytics.js o produto clicado na grade (evento select_item)
+function dispatchSelectItem(product, index, listName = 'Coleção Premium') {
+  const listId = listName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  document.dispatchEvent(new CustomEvent('tramatto:select_item', {
+    detail: {
+      list_name: listName,
+      list_id: listId,
+      item: {
+        item_id: product.slug,
+        item_name: product.title,
+        item_brand: product.brand,
+        item_category: product.googleProductCategory || product.productType || '',
+        price: product.getPrimaryPrice?.() || product.price || 0,
+        quantity: 1,
+        index
+      }
+    }
+  }));
+}
+
+// Envia ao analytics.js o produto adicionado à sacola (evento add_to_cart)
+function dispatchAddToCart(product, variant, quantity = 1) {
+  const price = Number(
+    variant?.getPrimaryPrice?.() || variant?.price ||
+    product.getPrimaryPrice?.() || product.price || 0
+  );
+  document.dispatchEvent(new CustomEvent('tramatto:add_to_cart', {
+    detail: {
+      currency: 'BRL',
+      value: price * quantity,
+      item: {
+        item_id: product.slug,
+        item_name: product.title,
+        item_brand: product.brand,
+        item_category: product.googleProductCategory || product.productType || '',
+        item_variant: variant?.name || null,
+        price,
+        quantity
+      }
+    }
+  }));
+}
+
+// Filtra a coleção pelo termo digitado e notifica o analytics.js (evento search)
+function initCollectionSearch() {
+  const input = document.getElementById('collectionSearch');
+  const container = document.getElementById('collectionProducts');
+  if (!input || !container) return;
+
+  input.addEventListener('input', () => {
+    const term = input.value.trim();
+    const allProducts = appState?.products || [];
+    const filtered = term
+      ? allProducts.filter((product) => product.title.toLowerCase().includes(term.toLowerCase()))
+      : allProducts;
+
+    const listName = term ? 'Busca — Coleção' : 'Coleção Premium';
+    renderProducts(container, filtered, listName);
+
+    if (term) {
+      document.dispatchEvent(new CustomEvent('tramatto:search', {
+        detail: { search_term: term, results_count: filtered.length }
+      }));
+    }
+  });
 }
 
 function renderKits() {
@@ -233,7 +354,8 @@ function renderProductDetail() {
           <div class="stock-pill secondary">${product.colors?.length ? `Cores: ${product.colors.join(', ')}` : 'Disponível em edição premium'}</div>
         </div>
         <div class="product-actions">
-          <button type="button" class="btn-primary" data-add-to-cart="${escapeHTML(product.slug)}">Adicionar à sacola</button>
+          <button type="button" class="btn-primary" data-buy-now="true">Comprar</button>
+          <button type="button" class="btn-secondary" data-add-to-cart="${escapeHTML(product.slug)}">Adicionar à sacola</button>
           <a href="collection.html" class="btn-secondary">Ver mais peças</a>
         </div>
       </div>
@@ -256,25 +378,124 @@ function renderProductDetail() {
     });
   }
 
-  injectProductSchema(product);
+  // "Comprar" leva direto para o carrinho/checkout hospedado da Nuvemshop
+  // (link nativo /comprar/{variant_id}-{quantity}/, validado manualmente
+  // contra a loja real). A Tramatto não implementa carrinho, checkout,
+  // frete, retirada, pagamento ou criação de pedido — só monta a URL.
+  const buyButton = container.querySelector('[data-buy-now]');
+  if (buyButton) {
+    const buyUrl = getBuyUrl(product, selectedVariant);
+    if (buyUrl) {
+      buyButton.addEventListener('click', () => {
+        window.location.href = buyUrl;
+      });
+    } else {
+      buyButton.disabled = true;
+      buyButton.title = 'Compra direta disponível apenas quando o catálogo real da Nuvemshop estiver ativo.';
+    }
+  }
+
+  updateCanonicalUrl(product.slug);
+  updateProductMetaTags(product, selectedVariant);
+  injectProductSchema(product, selectedVariant);
+  dispatchViewProduct(product, selectedVariant);
 }
 
-function injectProductSchema(product) {
+// Corrige o <link rel="canonical"> para apontar para a PDP do produto exibido
+// (cada slug passa a ter sua própria URL canônica, em vez de product.html genérico).
+function updateCanonicalUrl(slug) {
+  const canonical = document.getElementById('canonicalLink');
+  if (canonical) {
+    canonical.href = `${SITE_URL}/product.html?slug=${slug}`;
+  }
+}
+
+// Atualiza as meta tags Open Graph / Twitter Card com os dados do produto exibido.
+function setMetaContent(id, value) {
+  const el = document.getElementById(id);
+  if (el && value !== undefined && value !== null) {
+    el.setAttribute('content', String(value));
+  }
+}
+
+// Atualiza, de forma sincronizada, todos os pontos de SEO/compartilhamento da PDP:
+// <title>, <meta name="description">, Open Graph e Twitter Card.
+// Title/description ficam idênticos em todos esses lugares para evitar o
+// conflito de "canonical pré-JS" identificado em docs/search-console.md (§4.2).
+function updateProductMetaTags(product, variant) {
+  const price = Number(variant?.getPrimaryPrice?.() || variant?.price || product.getPrimaryPrice?.() || product.price || 0);
+  const image = toAbsoluteUrl(product.gallery?.[0]) || DEFAULT_OG_IMAGE;
+  const url = `${SITE_URL}/product.html?slug=${product.slug}`;
+  const title = `${product.title} | Panos de Prato Premium | Tramatto`;
+  const description = product.description;
+
+  document.title = title;
+  setMetaContent('pageDescription', description);
+
+  setMetaContent('ogUrl', url);
+  setMetaContent('ogTitle', title);
+  setMetaContent('ogDescription', description);
+  setMetaContent('ogImage', image);
+  setMetaContent('ogBrand', product.brand);
+  setMetaContent('ogAvailability', product.inStock ? 'in stock' : 'out of stock');
+  setMetaContent('ogCondition', product.condition);
+  setMetaContent('ogPriceAmount', price.toFixed(2));
+  setMetaContent('twitterTitle', title);
+  setMetaContent('twitterDescription', description);
+  setMetaContent('twitterImage', image);
+}
+
+// Envia ao analytics.js os dados do produto exibido na PDP (evento view_product)
+function dispatchViewProduct(product, variant) {
+  document.dispatchEvent(new CustomEvent('tramatto:view_product', {
+    detail: {
+      item: {
+        item_id: product.slug,
+        item_name: product.title,
+        item_brand: product.brand,
+        item_category: product.googleProductCategory || product.productType || '',
+        item_variant: variant?.name,
+        price: variant?.getPrimaryPrice?.() || variant?.price || product.getPrimaryPrice?.() || product.price || 0,
+        quantity: 1
+      }
+    }
+  }));
+}
+
+// Mapeia o "condition" do feed (Merchant Center) para o vocabulário schema.org
+const SCHEMA_CONDITION_MAP = {
+  new: 'https://schema.org/NewCondition',
+  refurbished: 'https://schema.org/RefurbishedCondition',
+  used: 'https://schema.org/UsedCondition'
+};
+
+function injectProductSchema(product, variant) {
   const existingSchema = document.querySelector('script[data-schema="product"]');
   if (existingSchema) {
     existingSchema.remove();
   }
+
+  const price = Number(variant?.getPrimaryPrice?.() || variant?.price || product.getPrimaryPrice?.() || product.price || 0);
+  const images = (product.gallery?.length ? product.gallery : [product.image]).map(toAbsoluteUrl).filter(Boolean);
+  const itemCondition = SCHEMA_CONDITION_MAP[product.condition] || SCHEMA_CONDITION_MAP.new;
 
   const productSchema = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.title,
     description: product.description,
-    image: product.gallery || [product.image],
+    image: images.length ? images : [DEFAULT_OG_IMAGE],
+    sku: product.slug,
+    mpn: product.slug.toUpperCase(),
+    brand: { '@type': 'Brand', name: product.brand },
+    category: product.googleProductCategory || product.productType || undefined,
+    itemCondition,
     offers: {
       '@type': 'Offer',
-      priceCurrency: 'BRL',
-      price: product.getPrimaryPrice?.() || product.price || 0,
+      url: `${SITE_URL}/product.html?slug=${product.slug}`,
+      priceCurrency: product.currency || 'BRL',
+      price,
+      itemCondition,
       availability: product.inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'
     }
   };

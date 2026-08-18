@@ -21,6 +21,12 @@
       this.label = data.label || 'Peça premium';
       this.small = data.small || 'Disponível em catalogo';
       this.metadata = data.metadata || {};
+
+      // Atributos para Google Merchant Center / GA4 ecommerce (ver docs/merchant-center.md)
+      this.brand = data.brand || 'Tramatto';
+      this.condition = data.condition || 'new';
+      this.productType = data.productType || '';
+      this.googleProductCategory = data.googleProductCategory || '';
     }
 
     getPrimaryPrice() {
