@@ -46,6 +46,31 @@ function getBuyUrl(product, variant, quantity = 1) {
   return window.TramattoPurchase?.buildBuyUrl?.({ storeUrl, variantId, quantity }) || null;
 }
 
+// Liga as setas (se existirem) à troca de imagem ativa na galeria da PDP.
+// Navegação circular: passar do último volta ao primeiro e vice-versa —
+// evita ter que desabilitar seta nas pontas e nunca produz índice inválido.
+function initGalleryNavigation(container) {
+  const gallery = container.querySelector('[data-gallery]');
+  if (!gallery) return;
+
+  const images = Array.from(gallery.querySelectorAll('.product-gallery-image'));
+  const prevButton = gallery.querySelector('[data-gallery-prev]');
+  const nextButton = gallery.querySelector('[data-gallery-next]');
+  if (images.length <= 1 || (!prevButton && !nextButton)) return;
+
+  let currentIndex = Math.max(0, images.findIndex((image) => image.classList.contains('active')));
+
+  function showImage(index) {
+    const safeIndex = ((index % images.length) + images.length) % images.length;
+    images[currentIndex]?.classList.remove('active');
+    images[safeIndex].classList.add('active');
+    currentIndex = safeIndex;
+  }
+
+  prevButton?.addEventListener('click', () => showImage(currentIndex - 1));
+  nextButton?.addEventListener('click', () => showImage(currentIndex + 1));
+}
+
 function getAppState() {
   if (!appState) {
     const services = window.TramattoConfig?.createServices?.(window.TramattoConfig.environment || 'development');
@@ -321,9 +346,16 @@ function renderProductDetail() {
   }
 
   const selectedVariant = currentProductSelection || product.variants?.[0] || null;
-  const galleryMarkup = (product.gallery || []).map((image, index) => `
+  const galleryImages = product.gallery?.length ? product.gallery : [buildPlaceholderImage(product.title)];
+  const galleryMarkup = galleryImages.map((image, index) => `
     <img class="product-gallery-image ${index === 0 ? 'active' : ''}" src="${image || buildPlaceholderImage(product.title)}" alt="${escapeHTML(product.title)} ${index + 1}" />
   `).join('');
+  // Setas só aparecem quando há mais de uma imagem — produto com 1 imagem
+  // (real ou placeholder) não mostra navegação nenhuma.
+  const galleryArrowsMarkup = galleryImages.length > 1 ? `
+    <button type="button" class="gallery-arrow gallery-arrow-prev" data-gallery-prev aria-label="Imagem anterior">‹</button>
+    <button type="button" class="gallery-arrow gallery-arrow-next" data-gallery-next aria-label="Próxima imagem">›</button>
+  ` : '';
   const variantMarkup = (product.variants || []).map((variant) => `
     <button type="button" class="variant-option ${selectedVariant?.id === variant.id ? 'selected' : ''}" data-select-variant="${escapeHTML(variant.id)}">
       <span>${escapeHTML(variant.name)}</span>
@@ -334,7 +366,7 @@ function renderProductDetail() {
   container.innerHTML = `
     <div class="product-shell">
       <div class="product-media">
-        <div class="product-gallery">${galleryMarkup}</div>
+        <div class="product-gallery" data-gallery>${galleryMarkup}${galleryArrowsMarkup}</div>
       </div>
       <div class="product-info">
         <a href="collection.html" class="back-link">← Voltar à coleção</a>
@@ -361,6 +393,8 @@ function renderProductDetail() {
       </div>
     </div>
   `;
+
+  initGalleryNavigation(container);
 
   container.querySelectorAll('[data-select-variant]').forEach((button) => {
     button.addEventListener('click', () => {
