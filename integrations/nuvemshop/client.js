@@ -5,6 +5,8 @@
   // Nunca fala com api.nuvemshop.com.br diretamente e nunca envia (nem
   // recebe) access_token, client_secret ou header Authorization — isso
   // fica inteiramente do lado do proxy.
+  const REQUEST_TIMEOUT_MS = 8000;
+
   function createClient(options = {}) {
     const config = {
       proxyBaseUrl: options.apiBaseUrl || options.proxyBaseUrl || ''
@@ -22,11 +24,29 @@
         }
       });
 
-      const response = await fetch(url.toString());
+      const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      const timer = controller ? setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS) : null;
+
+      let response;
+      try {
+        response = await fetch(url.toString(), controller ? { signal: controller.signal } : undefined);
+      } catch (error) {
+        // Rede fora do ar, timeout (AbortError) ou proxy inacessível — nunca
+        // vaza detalhes internos, só sinaliza que essa página falhou.
+        throw new Error(`Tramatto: falha ao contatar o proxy Nuvemshop para ${path} (${error.name || 'network_error'})`);
+      } finally {
+        if (timer) clearTimeout(timer);
+      }
+
       if (!response.ok) {
         throw new Error(`Tramatto: proxy Nuvemshop respondeu ${response.status} para ${path}`);
       }
-      return response.json();
+
+      try {
+        return await response.json();
+      } catch (error) {
+        throw new Error(`Tramatto: resposta inválida do proxy Nuvemshop para ${path}`);
+      }
     }
 
     return {

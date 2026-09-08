@@ -109,16 +109,37 @@
       this.client = client;
     }
 
+    // Fase 4 (robustez): API/proxy indisponível, timeout ou rate limit não
+    // podem derrubar o storefront inteiro. Cada método falha "para vazio"
+    // (lista vazia / null) em vez de propagar a exceção para a UI — quem
+    // chama (script.js) trata isso como "catálogo indisponível agora", não
+    // como "loja sem produtos". O erro é logado sem detalhes sensíveis
+    // (client.js nunca tem acesso a token, então não há o que vazar aqui).
     async getProducts() {
-      return Catalog.fetchCatalog?.(this.client) || [];
+      try {
+        return await Catalog.fetchCatalog?.(this.client) || [];
+      } catch (error) {
+        console.warn('[Nuvemshop] getProducts failed:', error.message || error);
+        return [];
+      }
     }
 
     async getProductBySlug(slug) {
-      return Products.fetchProductBySlug?.(this.client, slug) || null;
+      try {
+        return await Products.fetchProductBySlug?.(this.client, slug) || null;
+      } catch (error) {
+        console.warn('[Nuvemshop] getProductBySlug failed:', error.message || error);
+        return null;
+      }
     }
 
     async getCollections() {
-      return Catalog.fetchCollections?.(this.client) || [];
+      try {
+        return await Catalog.fetchCollections?.(this.client) || [];
+      } catch (error) {
+        console.warn('[Nuvemshop] getCollections failed:', error.message || error);
+        return [];
+      }
     }
 
     // Nota: fetchCatalog/fetchCollections já paginam internamente (ver
@@ -126,7 +147,12 @@
     // não muda, continua devolvendo a lista completa.
 
     async getCart() {
-      return CartUtil.fetchCart?.(this.client) || new Domain.Cart();
+      try {
+        return await CartUtil.fetchCart?.(this.client) || new Domain.Cart();
+      } catch (error) {
+        console.warn('[Nuvemshop] getCart failed:', error.message || error);
+        return new Domain.Cart();
+      }
     }
 
     async addToCart(cart, payload) {
