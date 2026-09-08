@@ -82,13 +82,26 @@ function getAppState() {
 async function initializeStorefront() {
   const app = getAppState();
   const { catalogService, collectionService, cartService } = app.services;
-  const [products, collections] = await Promise.all([
+
+  // allSettled (não Promise.all): se o catálogo real da Nuvemshop falhar
+  // (API fora do ar, timeout, rate limit), a página não pode travar em
+  // branco — cai para lista vazia e a UI mostra um estado vazio amigável
+  // em vez de propagar a exceção e nunca renderizar nada (nem o carrinho).
+  const [productsResult, collectionsResult] = await Promise.allSettled([
     catalogService.getProducts(),
     collectionService.getCollections()
   ]);
-  app.products = products;
-  app.collections = collections;
+
+  app.products = productsResult.status === 'fulfilled' ? productsResult.value : [];
+  app.collections = collectionsResult.status === 'fulfilled' ? collectionsResult.value : [];
+  app.catalogUnavailable = productsResult.status === 'rejected';
   app.cartService = cartService;
+  window.TramattoCartUI?.init(cartService);
+
+  if (productsResult.status === 'rejected') {
+    console.warn('Tramatto: catálogo indisponível no momento.', productsResult.reason);
+  }
+
   updateCartBadge();
   renderHomeProducts();
   renderCollectionPage();
@@ -113,6 +126,8 @@ function updateCartBadge() {
       ? `${itemCount} item${itemCount > 1 ? 's' : ''} na sacola`
       : 'Sua sacola está vazia';
   }
+
+  document.dispatchEvent(new CustomEvent('tramatto:cart-updated'));
 }
 
 function showToast(message) {
@@ -142,6 +157,13 @@ async function addToCart(product, variant = null) {
 
 function renderProducts(container, items = appState?.products || [], listName = 'Coleção Premium') {
   if (!container) return;
+
+  if (!items.length) {
+    container.innerHTML = appState?.catalogUnavailable
+      ? '<p class="catalog-empty-state">Não foi possível carregar o catálogo agora. Tente novamente em instantes.</p>'
+      : '<p class="catalog-empty-state">Nenhum produto disponível nesta coleção no momento.</p>';
+    return;
+  }
 
   container.innerHTML = items.map((product) => `
     <article class="product-card">

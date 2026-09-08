@@ -96,7 +96,11 @@
     }
 
     addItem(item) {
-      const existingItem = this.items.find((entry) => entry.lineId === item.lineId || entry.productId === item.productId);
+      // Só mescla por lineId (que já embute productId+variantId — ver
+      // CartService.addToCart). Mesclar também por productId juntaria
+      // variantes diferentes do mesmo produto na mesma linha, perdendo o
+      // variant_id real de uma delas — proibido pela arquitetura do carrinho.
+      const existingItem = this.items.find((entry) => entry.lineId === item.lineId);
       if (existingItem) {
         existingItem.quantity += item.quantity || 1;
         return existingItem;

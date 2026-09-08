@@ -70,6 +70,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <li><a href="blog/">Blog</a></li>
     </ul>
     <div class="nav-right">
+      <a href="#" class="nav-cart" data-open-cart>Sacola <span data-cart-badge>0</span></a>
     </div>
     <button class="nav-hamburger" aria-label="Menu" onclick="toggleMenu()">
       <span></span><span></span><span></span>
@@ -81,6 +82,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a href="collection.html" onclick="toggleMenu()">Coleções</a>
     <a href="index.html#origem" onclick="toggleMenu()">A Marca</a>
     <a href="blog/" onclick="toggleMenu()">Blog</a>
+    <a href="#" data-open-cart onclick="toggleMenu()">Sacola <span data-cart-badge>0</span></a>
   </div>
 
   <main class="collection-page">
@@ -137,6 +139,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </footer>
 
   <script src="js/config.js"></script>
+  <script src="js/purchase.js"></script>
   <script src="js/domain-model.js"></script>
   <script src="js/services.js"></script>
   <script src="js/adapters.js"></script>
@@ -147,6 +150,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <script src="integrations/nuvemshop/cart.js"></script>
   <script src="nuvemshop-mirror-data.js"></script>
   <script src="catalog-data.js"></script>
+  <script src="js/cart-ui.js"></script>
   <script src="script.js"></script>
   <script src="js/analytics.js"></script>
 
