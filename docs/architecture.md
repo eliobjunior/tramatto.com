@@ -10,7 +10,7 @@ O projeto atual usa uma estrutura estática simples, com separação entre conte
 - css/styles.css: camada visual compartilhada
 - script.js: renderização dinâmica do catálogo e interações básicas
 - catalog-data.js: dados locais de exemplo
-- integrations/nuvemshop.js: abstração para consumo futuro do catálogo via Nuvemshop
+- integrations/nuvemshop/: client, mapper e paginação da API oficial da Nuvemshop (ver docs/nuvemshop-integration.md)
 - pages/: páginas institucionais e de atendimento
 
 ## Estratégia de evolução

@@ -5,7 +5,7 @@ Preparar o storefront para integrar produtos, estoques e informações comerciai
 
 ## Modelo recomendado
 - O catálogo local continua ativo como fallback.
-- A camada em integrations/nuvemshop.js encapsula o carregamento e o mapeamento dos dados.
+- A camada em integrations/nuvemshop/ encapsula o carregamento e o mapeamento dos dados.
 - Em seguida, a interface usa esses dados para renderizar coleção e detalhes.
 
 ## Próximos passos

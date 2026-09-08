@@ -31,7 +31,7 @@
 | 8 | **Expor Kits na `collection.html`** (ou seção "Presentes" dedicada) | Conversão, SEO | Médio | Alto | ⭐⭐⭐⭐ | CP2 |
 | 9 | **Seletor de quantidade + cross-sell de Kits no `product.html`** | Conversão | Médio | Alto | ⭐⭐⭐⭐ | PP2, PP3 |
 | 10 | **Adicionar `defer` em todos os `<script>`** | Performance, Débito Técnico | Baixo | Médio | ⭐⭐⭐⭐ | P3 |
-| 11 | **Remover `integrations/nuvemshop.js` legado** + atualizar docs | Débito Técnico, Nuvemshop Integration | Baixo | Médio | ⭐⭐⭐ | A1, D2 |
+| 11 | ~~**Remover `integrations/nuvemshop.js` legado** + atualizar docs~~ ✅ **concluído** | Débito Técnico, Nuvemshop Integration | Baixo | Médio | ⭐⭐⭐ | A1, D2 |
 | 12 | **`aria-expanded`/`aria-controls` no menu mobile + `aria-live` no toast** | UX (Acessibilidade) | Baixo | Médio | ⭐⭐⭐ | AC2, AC5 |
 | 13 | **FAQ visível + `FAQPage` schema** (reaproveitar conteúdo de frete/trocas/origem) | SEO, GEO | Médio | Alto | ⭐⭐⭐⭐ | GEO1 |
 | 14 | **Conteúdo do catálogo no HTML inicial** (SSR/snapshot, não só pós-JS) | SEO, GEO | Alto | Alto | ⭐⭐⭐ | S2, GEO4 |
