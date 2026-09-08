@@ -10,7 +10,22 @@
  * Carrinho e checkout continuam fora deste proxy (ver docs da Fase 2).
  */
 
-const NUVEMSHOP_API_VERSION = '2025-03';
+// Versão confirmada na documentação oficial (dev.nuvemshop.com.br /
+// tiendanube.github.io/api-documentation): a API Nuvemshop usa "v1" no
+// path, não uma data. Não trocar sem reconfirmar contra a doc oficial.
+const NUVEMSHOP_API_VERSION = 'v1';
+
+// Nuvemshop: até 2 req/s com pico de 40 (Leaky Bucket), por loja+app.
+// Em 429 ela devolve x-rate-limit-reset (ms até esvaziar o bucket).
+const MAX_UPSTREAM_ATTEMPTS = 3;
+const DEFAULT_RETRY_DELAY_MS = 500;
+const UPSTREAM_TIMEOUT_MS = 8000;
+
+// Catálogo muda por ação humana no admin da Nuvemshop, não a cada segundo —
+// um cache curto no edge evita bater na API a cada carregamento de página
+// sem deixar o catálogo defasado por muito tempo. A Nuvemshop continua
+// sendo a fonte de verdade; isto é só para reduzir chamadas redundantes.
+const CACHE_TTL_SECONDS = 300;
 
 // Allowlist de query params repassados à Nuvemshop — evita que um cliente
 // injete parâmetros arbitrários na chamada upstream.
@@ -36,6 +51,10 @@ function buildCorsHeaders(request, env) {
   const headers = {
     'Access-Control-Allow-Methods': 'GET, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
+    // x-total-count/Link permitem que o frontend pagine seguindo a
+    // recomendação oficial (usar o header Link em vez de construir a URL
+    // da próxima página manualmente) em vez de adivinhar pelo tamanho da página.
+    'Access-Control-Expose-Headers': 'X-Total-Count, Link',
     Vary: 'Origin'
   };
 
@@ -66,36 +85,121 @@ function buildNuvemshopUrl(env, resource, searchParams, allowedParams) {
   return url;
 }
 
-async function callNuvemshop(env, url) {
-  return fetch(url.toString(), {
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// Faz um único fetch upstream com timeout — nunca deixa uma chamada presa
+// travar a resposta ao cliente indefinidamente.
+async function fetchWithTimeout(url, options, timeoutMs) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// Chama a Nuvemshop com retry em 429 (rate limit) e em falha de rede/timeout,
+// respeitando x-rate-limit-reset quando presente. Nunca loga o token.
+async function callNuvemshopWithRetry(env, url) {
+  const requestOptions = {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${env.NUVEMSHOP_ACCESS_TOKEN}`,
       'User-Agent': env.NUVEMSHOP_USER_AGENT || 'Tramatto Storefront Proxy (contato@tramatto.com)',
       'Content-Type': 'application/json; charset=utf-8'
     }
-  });
+  };
+
+  let lastError = null;
+
+  for (let attempt = 1; attempt <= MAX_UPSTREAM_ATTEMPTS; attempt += 1) {
+    try {
+      const response = await fetchWithTimeout(url, requestOptions, UPSTREAM_TIMEOUT_MS);
+
+      if (response.status === 429 && attempt < MAX_UPSTREAM_ATTEMPTS) {
+        const resetMs = Number(response.headers.get('x-rate-limit-reset'));
+        const delayMs = Number.isFinite(resetMs) && resetMs > 0 ? resetMs : DEFAULT_RETRY_DELAY_MS * attempt;
+        console.warn(`[Nuvemshop] rate limited (429), retrying in ${delayMs}ms (attempt ${attempt}/${MAX_UPSTREAM_ATTEMPTS})`);
+        await sleep(delayMs);
+        continue;
+      }
+
+      return response;
+    } catch (error) {
+      lastError = error;
+      console.warn(`[Nuvemshop] upstream request failed (attempt ${attempt}/${MAX_UPSTREAM_ATTEMPTS}): ${error.name || 'error'}`);
+      if (attempt < MAX_UPSTREAM_ATTEMPTS) {
+        await sleep(DEFAULT_RETRY_DELAY_MS * attempt);
+      }
+    }
+  }
+
+  throw lastError || new Error('upstream_request_failed');
+}
+
+// Cache Cloudflare Edge (Cache API) — só existe no runtime real do Worker.
+// Em ambientes sem `caches` (ex.: testes Node) o proxy funciona normalmente,
+// só sem cache.
+function getCacheStorage() {
+  return typeof caches !== 'undefined' && caches.default ? caches.default : null;
 }
 
 async function proxyResource(request, env, corsHeaders, resource, allowedParams) {
   const requestUrl = new URL(request.url);
   const upstreamUrl = buildNuvemshopUrl(env, resource, requestUrl.searchParams, allowedParams);
 
+  const cache = getCacheStorage();
+  // Chave de cache própria (não a URL do proxy, que pode ter params fora de
+  // ordem) — normaliza pela URL upstream final, já filtrada pela allowlist.
+  const cacheKey = new Request(upstreamUrl.toString(), { method: 'GET' });
+
+  if (cache) {
+    const cached = await cache.match(cacheKey);
+    if (cached) {
+      const cachedResponse = new Response(cached.body, cached);
+      Object.entries(corsHeaders).forEach(([key, value]) => cachedResponse.headers.set(key, value));
+      cachedResponse.headers.set('X-Tramatto-Cache', 'HIT');
+      return cachedResponse;
+    }
+  }
+
   let upstreamResponse;
   try {
-    upstreamResponse = await callNuvemshop(env, upstreamUrl);
+    upstreamResponse = await callNuvemshopWithRetry(env, upstreamUrl);
   } catch (error) {
+    console.error(`[Nuvemshop] ${resource} request failed: ${error.name || 'unknown_error'}`);
     return jsonResponse({ error: 'upstream_request_failed' }, 502, corsHeaders);
   }
 
   const body = await upstreamResponse.text();
-  return new Response(body, {
-    status: upstreamResponse.status,
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-      ...corsHeaders
-    }
-  });
+
+  if (!upstreamResponse.ok) {
+    console.warn(`[Nuvemshop] ${resource} request returned ${upstreamResponse.status}`);
+  }
+
+  const headers = {
+    'Content-Type': 'application/json; charset=utf-8',
+    ...corsHeaders
+  };
+
+  const totalCount = upstreamResponse.headers.get('x-total-count');
+  if (totalCount) headers['X-Total-Count'] = totalCount;
+  const linkHeader = upstreamResponse.headers.get('link');
+  if (linkHeader) headers.Link = linkHeader;
+
+  // Só cacheia respostas de sucesso — nunca guarda erro/rate-limit em cache.
+  if (cache && upstreamResponse.ok) {
+    headers['Cache-Control'] = `public, max-age=${CACHE_TTL_SECONDS}`;
+    const cacheableResponse = new Response(body, { status: upstreamResponse.status, headers });
+    await cache.put(cacheKey, cacheableResponse.clone());
+    cacheableResponse.headers.set('X-Tramatto-Cache', 'MISS');
+    return cacheableResponse;
+  }
+
+  return new Response(body, { status: upstreamResponse.status, headers });
 }
 
 export default {

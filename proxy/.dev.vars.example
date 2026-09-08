@@ -3,4 +3,4 @@
 # Nunca commite o arquivo ".dev.vars" real.
 
 NUVEMSHOP_ACCESS_TOKEN=coloque-o-access-token-aqui-apenas-localmente
-NUVEMSHOP_STORE_ID=coloque-o-store-id-aqui
+NUVEMSHOP_STORE_ID=5828361
