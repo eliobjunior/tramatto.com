@@ -29,8 +29,12 @@
       debug: true
     },
     production: {
-      adapter: 'mirror',
-      apiBaseUrl: 'https://tramatto-nuvemshop-proxy.example.workers.dev',
+      // NuvemshopAdapter (API real via proxy) é a fonte de verdade do
+      // catálogo em produção. MirrorAdapter permanece como fallback (ver
+      // createAdapter) apenas para falha de rede/API — não é mais a fonte
+      // primária (docs/nuvemshop-integration.md, seção "Migração").
+      adapter: 'nuvemshop',
+      apiBaseUrl: 'https://tramatto-nuvemshop-proxy.eliobj.workers.dev',
       storeUrl: NUVEMSHOP_STORE_URL,
       debug: false
     }
@@ -67,7 +71,11 @@
 
     if (environment.adapter === 'nuvemshop') {
       const client = root.TramattoNuvemshop?.createClient?.({ apiBaseUrl: environment.apiBaseUrl });
-      return new root.TramattoAdapters.NuvemshopAdapter(client);
+      // MirrorAdapter como fallback: só é usado se getProducts/getCollections/
+      // getProductBySlug/getCart do NuvemshopAdapter falharem por rede/API
+      // (ver js/adapters.js) — nunca substitui o catálogo real com sucesso.
+      const fallbackAdapter = new root.TramattoAdapters.MirrorAdapter();
+      return new root.TramattoAdapters.NuvemshopAdapter(client, { fallbackAdapter });
     }
 
     return new root.TramattoAdapters.MockAdapter();

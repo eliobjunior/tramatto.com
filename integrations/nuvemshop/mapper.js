@@ -47,7 +47,7 @@
     return { attributes, color, size, values };
   }
 
-  function mapVariant(raw, productAttributes) {
+  function mapVariant(raw, productAttributes, productId) {
     const { attributes, color, size, values } = mapVariantAttributes(productAttributes, raw.values);
     const price = parseDecimal(raw.price) || 0;
     const promotionalPrice = parseDecimal(raw.promotional_price);
@@ -55,6 +55,7 @@
 
     return new Domain.Variant({
       id: raw.id !== undefined ? String(raw.id) : (raw.sku || `variant-${Math.random().toString(36).slice(2)}`),
+      productId: raw.product_id !== undefined ? String(raw.product_id) : (productId !== undefined ? String(productId) : null),
       name,
       sku: raw.sku || null,
       price,
@@ -63,6 +64,8 @@
       // (documentação oficial). Preservamos o valor bruto; quem consome
       // (mapProduct.inStock) trata a semântica de "ilimitado".
       stock: raw.stock === '' ? '' : (raw.stock !== undefined && raw.stock !== null ? Number(raw.stock) : 0),
+      stockManagement: raw.stock_management !== undefined ? Boolean(raw.stock_management) : null,
+      visible: raw.visible !== undefined ? Boolean(raw.visible) : true,
       color,
       size,
       image: null,
@@ -74,12 +77,34 @@
     return variants.some((variant) => variant.stock === '' || Number(variant.stock) > 0);
   }
 
+  // raw.categories vem como lista de OBJETOS de categoria completos
+  // (id/name/handle/description multilíngues), confirmado contra a resposta
+  // real da API via proxy — nunca IDs soltos. Se algum vier sem nome/handle,
+  // preservamos null em vez de inventar um rótulo.
+  function mapProductCategory(raw) {
+    if (!raw || raw.id === undefined || raw.id === null) return null;
+    return {
+      id: String(raw.id),
+      name: localizedText(raw.name, '') || null,
+      slug: localizedText(raw.handle, '') || null
+    };
+  }
+
+  // raw.tags vem como string única separada por vírgula (confirmado contra
+  // a API real), não como array.
+  function parseTags(raw) {
+    if (Array.isArray(raw)) return raw.map((tag) => String(tag).trim()).filter(Boolean);
+    if (typeof raw === 'string') return raw.split(',').map((tag) => tag.trim()).filter(Boolean);
+    return [];
+  }
+
   function mapProduct(raw) {
     const attributes = raw.attributes || [];
-    const variants = Array.isArray(raw.variants) ? raw.variants.map((item) => mapVariant(item, attributes)) : [];
+    const variants = Array.isArray(raw.variants) ? raw.variants.map((item) => mapVariant(item, attributes, raw.id)) : [];
     const images = Array.isArray(raw.images)
       ? [...raw.images].sort((a, b) => (a.position || 0) - (b.position || 0)).map((image) => image.src).filter(Boolean)
       : [];
+    const categories = Array.isArray(raw.categories) ? raw.categories.map(mapProductCategory).filter(Boolean) : [];
 
     const firstVariant = variants[0] || null;
     const title = localizedText(raw.name, 'Produto Tramatto');
@@ -89,15 +114,22 @@
       id: raw.id !== undefined ? String(raw.id) : handle,
       title,
       slug: handle,
+      handle,
       description: localizedText(raw.description, 'Produto importado via Nuvemshop.'),
+      canonicalUrl: raw.canonical_url || null,
+      published: raw.published !== undefined ? Boolean(raw.published) : true,
+      visibility: raw.visibility || 'visible',
       price: firstVariant ? firstVariant.price : 0,
       promotionalPrice: firstVariant ? firstVariant.promotionalPrice : null,
       currency: 'BRL',
       inStock: variants.length ? hasAvailableStock(variants) : true,
-      // A Nuvemshop permite múltiplas categorias por produto
-      // (categories: [ids]); o domain model atual só suporta uma
-      // coleção primária, então usamos a primeira como collectionId.
-      collectionId: Array.isArray(raw.categories) && raw.categories.length ? String(raw.categories[0]) : null,
+      hasStock: raw.has_stock !== undefined ? Boolean(raw.has_stock) : undefined,
+      // A Nuvemshop permite múltiplas categorias por produto; o domain
+      // model atual só suporta uma coleção primária em `collectionId`, então
+      // usamos a primeira — a lista completa fica preservada em `categories`.
+      collectionId: categories.length ? categories[0].id : null,
+      categories,
+      tags: parseTags(raw.tags),
       image: images[0] || null,
       gallery: images,
       colors: [...new Set(variants.map((variant) => variant.color).filter(Boolean))],

@@ -6,12 +6,25 @@
       this.id = data.id || data.slug || data.handle || `product-${Math.random().toString(36).slice(2)}`;
       this.title = data.title || data.name || 'Produto Tramatto';
       this.slug = data.slug || data.handle || this.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      // handle: nome do campo bruto da API Nuvemshop, preservado à parte de
+      // `slug` (usado internamente pelo frontend) — ver docs/nuvemshop-integration.md.
+      this.handle = data.handle || this.slug;
       this.description = data.description || 'Produto premium da Tramatto.';
+      this.canonicalUrl = data.canonicalUrl || null;
+      this.published = data.published !== undefined ? data.published : true;
+      this.visibility = data.visibility || 'visible';
       this.price = data.price || 0;
       this.promotionalPrice = data.promotionalPrice || null;
       this.currency = data.currency || 'BRL';
       this.inStock = data.inStock !== undefined ? data.inStock : true;
+      // hasStock: flag bruta do produto na Nuvemshop (raw.has_stock). Some
+      // adapters (Mock/Mirror) não têm essa informação — cai para `inStock`.
+      this.hasStock = data.hasStock !== undefined ? data.hasStock : this.inStock;
       this.collectionId = data.collectionId || null;
+      // categories: lista completa de categorias reais retornadas pela API
+      // (id/name/slug), preservada além de collectionId (categoria primária).
+      this.categories = Array.isArray(data.categories) ? data.categories : [];
+      this.tags = Array.isArray(data.tags) ? data.tags : [];
       this.image = data.image || null;
       this.gallery = Array.isArray(data.gallery) && data.gallery.length ? data.gallery : [data.image].filter(Boolean);
       this.colors = Array.isArray(data.colors) ? data.colors : [];
@@ -41,11 +54,16 @@
   class Variant {
     constructor(data = {}) {
       this.id = data.id || `variant-${Math.random().toString(36).slice(2)}`;
+      // productId: variant.product_id real da API — não confundir com o
+      // product.id do produto pai (ver docs/nuvemshop-integration.md).
+      this.productId = data.productId || null;
       this.name = data.name || 'Padrão';
       this.sku = data.sku || this.id;
       this.price = data.price || 0;
       this.promotionalPrice = data.promotionalPrice || null;
       this.stock = data.stock !== undefined ? data.stock : 10;
+      this.stockManagement = data.stockManagement !== undefined ? data.stockManagement : null;
+      this.visible = data.visible !== undefined ? data.visible : true;
       this.color = data.color || null;
       this.size = data.size || null;
       this.image = data.image || null;

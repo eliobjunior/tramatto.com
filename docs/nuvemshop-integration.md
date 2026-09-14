@@ -35,20 +35,34 @@ Três adapters, selecionados por `js/config.js` conforme o hostname:
 | Adapter | Quando roda | Fonte dos dados |
 |---|---|---|
 | `MockAdapter` | dev/local | `catalog-data.js` (fixtures) |
-| `MirrorAdapter` | produção (`tramatto.com`) hoje | `nuvemshop-mirror-data.js`, gerado por scraping público (`scripts/sync-nuvemshop-mirror.js`) |
-| `NuvemshopAdapter` | produção, após validação | API real via `proxy/` |
+| `NuvemshopAdapter` | produção (`tramatto.com`), fonte de verdade | API real via `proxy/` |
+| `MirrorAdapter` | produção, só como fallback (rede de segurança) | `nuvemshop-mirror-data.js`, gerado por scraping público (`scripts/sync-nuvemshop-mirror.js`) |
 
-`NuvemshopAdapter` nunca propaga erro para a UI: qualquer falha (API fora
-do ar, timeout, rate limit) faz cada método cair para lista vazia / `null`
-/ `Cart` vazio, e o storefront mostra um estado vazio amigável em vez de
-travar em branco (ver `tests/nuvemshop-robustness.test.js`).
+`NuvemshopAdapter` nunca propaga erro para a UI. Em cada método (getProducts/
+getProductBySlug/getCollections/getCart), uma falha real de rede/API (proxy
+fora do ar, timeout, HTTP não-2xx) é logada (`console.warn`, nunca vaza
+detalhes sensíveis) e, se um `fallbackAdapter` foi passado no construtor,
+delega para ele — logando explicitamente que o fallback foi usado, nunca
+mascarando o erro em silêncio (ver `tests/nuvemshop-robustness.test.js`).
+Sem `fallbackAdapter`, cai para lista vazia / `null` / `Cart` vazio (mesmo
+comportamento de antes da Fase 4).
 
-**Migração para `NuvemshopAdapter` em produção**: trocar `adapter: 'mirror'`
-para `adapter: 'nuvemshop'` no bloco `production` de `js/config.js`, com
-`apiBaseUrl` apontando para o Worker já deployado. Só fazer isso depois de
-validar em `staging` que a saída do `NuvemshopAdapter` bate com o mirror
-atual. O `MirrorAdapter` continua no código como rede de segurança até essa
-validação — não remover antes disso.
+**Produção (`js/config.js`)**: `adapter: 'nuvemshop'`, `apiBaseUrl` apontando
+para o Worker deployado (`https://tramatto-nuvemshop-proxy.eliobj.workers.dev`).
+`createAdapter()` monta o `NuvemshopAdapter` com `fallbackAdapter: new
+MirrorAdapter()` — a Nuvemshop é a fonte de verdade; o mirror só entra em
+caso de falha de rede/API, nunca sobrescreve um catálogo carregado com
+sucesso. O `MirrorAdapter` e `nuvemshop-mirror-data.js` continuam no código
+como essa rede de segurança — não remover.
+
+**Atenção à ordem dos `<script>`**: `js/adapters.js` referencia
+`integrations/nuvemshop/{catalog,products,cart}.js` só dentro dos métodos
+(lookup feito em cada chamada, não capturado no topo do módulo) — de
+propósito, porque `js/adapters.js` é carregado antes desses arquivos nas
+páginas HTML. Capturar essas referências uma única vez no topo do módulo
+faria `NuvemshopAdapter` falhar silenciosamente (sem erro, sem log, sem
+fallback) mesmo com a API funcionando — esse foi um bug real encontrado e
+corrigido durante a migração para produção.
 
 ## Camada Nuvemshop (integrations/nuvemshop/)
 - `client.js`: fala exclusivamente com o proxy (nunca com `api.nuvemshop.com.br`
@@ -56,7 +70,11 @@ validação — não remover antes disso.
 - `mapper.js`: `NuvemshopProduct → TramattoProduct`, único lugar que
   transforma o schema real da API (campos multilíngues `name`/`description`/
   `handle`, variantes com `values[]` posicionais, `stock: ""` = ilimitado,
-  imagens ordenadas por `position`).
+  imagens ordenadas por `position`). Confirmado contra a resposta real da API
+  (via proxy em produção): `categories[]` vem como objetos completos
+  (id/name/handle), não IDs soltos; `tags` vem como string única separada
+  por vírgula, não array; `variant.product_id`/`stock_management`/`visible`
+  são preservados no domain model (nunca confundidos com `product.id`).
 - `catalog.js`: pagina `GET /products` e `GET /categories` (até 200
   itens/página, trava de segurança em 20 páginas).
 - `products.js`: busca produto por slug (via `handle`).

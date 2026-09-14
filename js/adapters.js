@@ -1,10 +1,16 @@
 (function (global) {
   const root = globalThis;
   const Domain = root.TramattoDomain || {};
-  const Mapper = root.TramattoNuvemshopMapper || {};
-  const Catalog = root.TramattoNuvemshopCatalog || {};
-  const Products = root.TramattoNuvemshopProducts || {};
-  const CartUtil = root.TramattoNuvemshopCart || {};
+
+  // Lidas em cada chamada (não capturadas uma vez no topo do módulo):
+  // js/adapters.js é carregado via <script> ANTES de integrations/nuvemshop/*.js
+  // (ver index.html/collection.html/product.html) — capturar
+  // `root.TramattoNuvemshopCatalog` etc. aqui em cima congelaria um objeto
+  // `{}` vazio para sempre, fazendo NuvemshopAdapter falhar silenciosamente
+  // (sem lançar erro, sem log, sem fallback) mesmo com a API funcionando.
+  function getCatalog() { return root.TramattoNuvemshopCatalog || {}; }
+  function getProductsApi() { return root.TramattoNuvemshopProducts || {}; }
+  function getCartUtil() { return root.TramattoNuvemshopCart || {}; }
 
   function parsePrice(value) {
     const normalized = String(value).replace(/[R$\s]/g, '').replace(/\./g, '').replace(',', '.');
@@ -105,39 +111,57 @@
   }
 
   class NuvemshopAdapter {
-    constructor(client) {
+    // options.fallbackAdapter (opcional): quando presente, uma falha real de
+    // rede/API (proxy fora do ar, timeout, HTTP não-2xx) usa esse adapter
+    // como rede de segurança em vez de cair para lista vazia — hoje é o
+    // MirrorAdapter em produção (ver js/config.js). Sem fallbackAdapter, o
+    // comportamento é o mesmo de antes (Fase 4: falha "para vazio").
+    constructor(client, options = {}) {
       this.client = client;
+      this.fallbackAdapter = options.fallbackAdapter || null;
     }
 
     // Fase 4 (robustez): API/proxy indisponível, timeout ou rate limit não
-    // podem derrubar o storefront inteiro. Cada método falha "para vazio"
-    // (lista vazia / null) em vez de propagar a exceção para a UI — quem
-    // chama (script.js) trata isso como "catálogo indisponível agora", não
-    // como "loja sem produtos". O erro é logado sem detalhes sensíveis
-    // (client.js nunca tem acesso a token, então não há o que vazar aqui).
+    // podem derrubar o storefront inteiro. Cada método nunca propaga a
+    // exceção para a UI — ou usa o fallbackAdapter (logando que o fallback
+    // foi acionado, nunca silenciosamente), ou falha "para vazio" (lista
+    // vazia / null). O erro é logado sem detalhes sensíveis (client.js nunca
+    // tem acesso a token, então não há o que vazar aqui).
     async getProducts() {
       try {
-        return await Catalog.fetchCatalog?.(this.client) || [];
+        return await getCatalog().fetchCatalog?.(this.client) || [];
       } catch (error) {
         console.warn('[Nuvemshop] getProducts failed:', error.message || error);
+        if (this.fallbackAdapter) {
+          console.warn('[Nuvemshop] Usando MirrorAdapter como fallback (getProducts) após falha de rede/API.');
+          return this.fallbackAdapter.getProducts();
+        }
         return [];
       }
     }
 
     async getProductBySlug(slug) {
       try {
-        return await Products.fetchProductBySlug?.(this.client, slug) || null;
+        return await getProductsApi().fetchProductBySlug?.(this.client, slug) || null;
       } catch (error) {
         console.warn('[Nuvemshop] getProductBySlug failed:', error.message || error);
+        if (this.fallbackAdapter) {
+          console.warn('[Nuvemshop] Usando MirrorAdapter como fallback (getProductBySlug) após falha de rede/API.');
+          return this.fallbackAdapter.getProductBySlug(slug);
+        }
         return null;
       }
     }
 
     async getCollections() {
       try {
-        return await Catalog.fetchCollections?.(this.client) || [];
+        return await getCatalog().fetchCollections?.(this.client) || [];
       } catch (error) {
         console.warn('[Nuvemshop] getCollections failed:', error.message || error);
+        if (this.fallbackAdapter) {
+          console.warn('[Nuvemshop] Usando MirrorAdapter como fallback (getCollections) após falha de rede/API.');
+          return this.fallbackAdapter.getCollections();
+        }
         return [];
       }
     }
@@ -148,23 +172,27 @@
 
     async getCart() {
       try {
-        return await CartUtil.fetchCart?.(this.client) || new Domain.Cart();
+        return await getCartUtil().fetchCart?.(this.client) || new Domain.Cart();
       } catch (error) {
         console.warn('[Nuvemshop] getCart failed:', error.message || error);
+        if (this.fallbackAdapter) {
+          console.warn('[Nuvemshop] Usando MirrorAdapter como fallback (getCart) após falha de rede/API.');
+          return this.fallbackAdapter.getCart();
+        }
         return new Domain.Cart();
       }
     }
 
     async addToCart(cart, payload) {
-      return CartUtil.addCartItem?.(this.client, payload) || cart;
+      return getCartUtil().addCartItem?.(this.client, payload) || cart;
     }
 
     async removeFromCart(cart, lineId) {
-      return CartUtil.removeCartItem?.(this.client, lineId) || cart;
+      return getCartUtil().removeCartItem?.(this.client, lineId) || cart;
     }
 
     async updateQuantity(cart, lineId, quantity) {
-      return CartUtil.updateCartItemQuantity?.(this.client, lineId, quantity) || cart;
+      return getCartUtil().updateCartItemQuantity?.(this.client, lineId, quantity) || cart;
     }
   }
 

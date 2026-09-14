@@ -7,6 +7,20 @@
   // fica inteiramente do lado do proxy.
   const REQUEST_TIMEOUT_MS = 8000;
 
+  // Extrai rel="next" do header Link (RFC 5988), como devolvido pelo proxy
+  // (ver Access-Control-Expose-Headers em proxy/src/index.js). Confirmado
+  // contra a resposta real: `<url>; rel="next", <url>; rel="last"`.
+  function linkHasNext(linkHeader) {
+    if (!linkHeader) return null;
+    return linkHeader.split(',').some((part) => /rel="next"/.test(part));
+  }
+
+  function parseTotalCount(headerValue) {
+    if (headerValue === null || headerValue === undefined) return null;
+    const number = Number(headerValue);
+    return Number.isFinite(number) ? number : null;
+  }
+
   function createClient(options = {}) {
     const config = {
       proxyBaseUrl: options.apiBaseUrl || options.proxyBaseUrl || ''
@@ -42,29 +56,46 @@
         throw new Error(`Tramatto: proxy Nuvemshop respondeu ${response.status} para ${path}`);
       }
 
+      let data;
       try {
-        return await response.json();
+        data = await response.json();
       } catch (error) {
         throw new Error(`Tramatto: resposta inválida do proxy Nuvemshop para ${path}`);
       }
+
+      return {
+        data,
+        totalCount: parseTotalCount(response.headers.get('x-total-count')),
+        // null = header Link ausente (proxy antigo/rota sem paginação) —
+        // quem chama decide o fallback; nunca presumimos "sem próxima página".
+        hasNextPage: linkHasNext(response.headers.get('link'))
+      };
     }
 
     return {
       config,
 
       async getProductsPage({ page = 1, perPage = 30 } = {}) {
-        const products = await proxyFetch('/products', { page, per_page: perPage });
-        return Array.isArray(products) ? products : [];
+        const { data, totalCount, hasNextPage } = await proxyFetch('/products', { page, per_page: perPage });
+        return {
+          items: Array.isArray(data) ? data : [],
+          totalCount,
+          hasNextPage
+        };
       },
 
       async getProductBySlug(slug) {
-        const products = await proxyFetch('/products', { handle: slug, per_page: 1 });
-        return Array.isArray(products) && products.length ? products[0] : null;
+        const { data } = await proxyFetch('/products', { handle: slug, per_page: 1 });
+        return Array.isArray(data) && data.length ? data[0] : null;
       },
 
       async getCategoriesPage({ page = 1, perPage = 30 } = {}) {
-        const categories = await proxyFetch('/categories', { page, per_page: perPage });
-        return Array.isArray(categories) ? categories : [];
+        const { data, totalCount, hasNextPage } = await proxyFetch('/categories', { page, per_page: perPage });
+        return {
+          items: Array.isArray(data) ? data : [],
+          totalCount,
+          hasNextPage
+        };
       },
 
       // Carrinho/checkout ficam fora do escopo da Fase 1 (ver docs de
