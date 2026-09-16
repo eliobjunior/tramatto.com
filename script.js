@@ -20,6 +20,17 @@ function escapeHTML(value = '') {
     .replace(/'/g, '&#39;');
 }
 
+// Compara dois variant.id normalizando para String — necessário porque
+// atributos HTML (data-select-variant) são sempre string, mas variant.id
+// pode vir como number (MirrorAdapter/nuvemshop-mirror-data.js) ou como
+// string (NuvemshopAdapter/mapper.js). Só usado para comparação de UI —
+// nunca altera o tipo/valor real armazenado no CartItem (ver
+// CartService.addToCart, que sempre chama String(targetVariant.id) só na
+// hora de montar o lineId, preservando variant.id original em variantId).
+function isSameVariantId(a, b) {
+  return a !== undefined && a !== null && b !== undefined && b !== null && String(a) === String(b);
+}
+
 function formatPrice(value) {
   const number = Number(value || 0);
   return new Intl.NumberFormat('pt-BR', {
@@ -100,6 +111,13 @@ async function initializeStorefront() {
 
   if (productsResult.status === 'rejected') {
     console.warn('Tramatto: catálogo indisponível no momento.', productsResult.reason);
+  } else {
+    // A Nuvemshop continua sendo a fonte de verdade (Fase 2A, regra 5): a
+    // cada catálogo real carregado com sucesso, atualiza nome/preço/imagem/
+    // estoque de cada linha já no carrinho (localStorage) por variant.id —
+    // nunca confia permanentemente no preço salvo. Só roda em sucesso: uma
+    // falha de rede não pode marcar o carrinho inteiro como indisponível.
+    cartService.syncWithCatalog(app.products);
   }
 
   updateCartBadge();
@@ -116,7 +134,9 @@ function updateCartBadge() {
   const cart = app?.services?.cartService?.getCart?.();
   const itemCount = cart?.getTotalItems?.() || 0;
 
-  document.querySelectorAll('.nav-cart').forEach((link) => {
+  // [data-open-cart] (não só .nav-cart): cobre também o link da sacola no
+  // menu mobile, que não tem a classe .nav-cart.
+  document.querySelectorAll('[data-open-cart]').forEach((link) => {
     link.innerHTML = `Sacola <span data-cart-badge>${itemCount}</span>`;
   });
 
@@ -149,9 +169,29 @@ function showToast(message) {
 
 async function addToCart(product, variant = null) {
   const app = getAppState();
-  await app.services.cartService.addToCart(product, variant, 1);
-  dispatchAddToCart(product, variant, 1);
+  const targetVariant = variant || product.variants?.[0] || null;
+  const lineId = targetVariant ? String(targetVariant.id) : null;
+  const beforeQty = lineId ? (app.services.cartService.getCart().items.find((item) => item.lineId === lineId)?.quantity || 0) : 0;
+
+  try {
+    await app.services.cartService.addToCart(product, targetVariant, 1);
+  } catch (error) {
+    // Fase 2A, regra 2/8: produto sem estoque (ou sem variante válida) não é
+    // adicionado — e o erro aparece pro usuário, nunca falha silenciosa.
+    showToast(error.message || 'Não foi possível adicionar este item à sacola.');
+    return;
+  }
+
   updateCartBadge();
+
+  const afterQty = lineId ? (app.services.cartService.getCart().items.find((item) => item.lineId === lineId)?.quantity || 0) : 0;
+  if (afterQty === beforeQty) {
+    // Estoque já estava no máximo permitido antes deste clique.
+    showToast('Quantidade máxima em estoque já está na sacola.');
+    return;
+  }
+
+  dispatchAddToCart(product, targetVariant, 1);
   showToast(`${product.title} adicionado à sacola`);
 }
 
@@ -379,7 +419,7 @@ function renderProductDetail() {
     <button type="button" class="gallery-arrow gallery-arrow-next" data-gallery-next aria-label="Próxima imagem">›</button>
   ` : '';
   const variantMarkup = (product.variants || []).map((variant) => `
-    <button type="button" class="variant-option ${selectedVariant?.id === variant.id ? 'selected' : ''}" data-select-variant="${escapeHTML(variant.id)}">
+    <button type="button" class="variant-option ${isSameVariantId(selectedVariant?.id, variant.id) ? 'selected' : ''}" data-select-variant="${escapeHTML(variant.id)}">
       <span>${escapeHTML(variant.name)}</span>
       <small>${escapeHTML(variant.color || '')} ${escapeHTML(variant.size || '')}</small>
     </button>
@@ -421,7 +461,7 @@ function renderProductDetail() {
   container.querySelectorAll('[data-select-variant]').forEach((button) => {
     button.addEventListener('click', () => {
       const variantId = button.getAttribute('data-select-variant');
-      currentProductSelection = product.variants.find((variant) => variant.id === variantId) || product.variants[0] || null;
+      currentProductSelection = product.variants.find((variant) => isSameVariantId(variant.id, variantId)) || product.variants[0] || null;
       renderProductDetail();
     });
   });
@@ -591,3 +631,10 @@ window.toggleMenu = toggleMenu;
 window.addEventListener('DOMContentLoaded', async () => {
   await initializeStorefront();
 });
+
+// Exposto só para teste automatizado (tests/script-variant-selection.test.js)
+// — no browser, `module` não existe, então este bloco nunca executa e o
+// comportamento da página não muda em nada.
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { isSameVariantId };
+}

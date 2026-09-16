@@ -7,11 +7,23 @@ compatibility_date = "2026-08-01"
 # Cloudflare (Worker > Settings > Variables) para não versionar o ID
 # real da loja no repositório público.
 [vars]
-NUVEMSHOP_STORE_ID = ""
+NUVEMSHOP_STORE_ID = "5828361"
 NUVEMSHOP_USER_AGENT = "Tramatto Storefront Proxy (contato@tramatto.com)"
-ALLOWED_ORIGINS = "https://tramatto.com,https://www.tramatto.com,http://localhost:8080,http://127.0.0.1:8080"
+# https://tramattotestenubesdk.lojavirtualnuvem.com.br: loja demo/teste onde
+# o app NubeSDK roda e chama GET /cart-transfer/:token (Fase 2B).
+ALLOWED_ORIGINS = "https://tramatto.com,https://www.tramatto.com,http://localhost:8080,http://127.0.0.1:8080,https://tramattotestenubesdk.lojavirtualnuvem.com.br"
 
 # NUVEMSHOP_ACCESS_TOKEN NÃO fica neste arquivo (nem em nenhum arquivo
 # versionado). Configure como secret:
 #   wrangler secret put NUVEMSHOP_ACCESS_TOKEN
 # Veja README.md nesta pasta para o passo a passo completo.
+
+# Fase 2B — KV dedicada ao hand-off one-time de carrinho (POST/GET
+# /cart-transfer). Só guarda {items, createdAt} com TTL curto — nunca
+# access_token, Client Secret, cookies, PII, preço ou nome. Namespaces
+# criadas via `wrangler kv namespace create CART_TRANSFER_KV` (e
+# `--preview`) na conta eliobj@gmail.com.
+[[kv_namespaces]]
+binding = "CART_TRANSFER_KV"
+id = "1b992d855e304d899ad443749632ed04"
+preview_id = "b8f1c91a92dd4dbbb830b11a05e73f11"

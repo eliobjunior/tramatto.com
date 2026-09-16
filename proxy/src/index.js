@@ -37,6 +37,21 @@ const PRODUCTS_ALLOWED_PARAMS = new Set([
 
 const CATEGORIES_ALLOWED_PARAMS = new Set(['page', 'per_page', 'parent_id', 'fields', 'language']);
 
+// Fase 2B — hand-off one-time de carrinho Tramatto → carrinho nativo
+// Nuvemshop via NubeSDK. cart:add roda no client-side do storefront, na
+// sessão do próprio visitante — este endpoint nunca fala com a API da
+// Nuvemshop, só grava/lê a KV própria do Worker. Por isso não depende de
+// NUVEMSHOP_ACCESS_TOKEN/STORE_ID.
+const CART_TRANSFER_TTL_SECONDS = 600; // ~10min: tempo de redirect + load.
+const CART_TRANSFER_MIN_ITEMS = 1;
+const CART_TRANSFER_MAX_ITEMS = 20;
+const CART_TRANSFER_MIN_QUANTITY = 1;
+const CART_TRANSFER_MAX_QUANTITY = 20;
+// Token é sempre um crypto.randomUUID() — valida o formato antes de
+// consultar a KV, tanto para rejeitar lixo cedo quanto para nunca deixar um
+// valor arbitrário do cliente virar chave de busca sem verificação.
+const CART_TRANSFER_TOKEN_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 function parseAllowedOrigins(env) {
   return (env.ALLOWED_ORIGINS || '')
     .split(',')
@@ -49,7 +64,7 @@ function buildCorsHeaders(request, env) {
   const origin = request.headers.get('Origin');
 
   const headers = {
-    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
     // x-total-count/Link permitem que o frontend pagine seguindo a
     // recomendação oficial (usar o header Link em vez de construir a URL
@@ -202,12 +217,142 @@ async function proxyResource(request, env, corsHeaders, resource, allowedParams)
   return new Response(body, { status: upstreamResponse.status, headers });
 }
 
+// Valida o payload de POST /cart-transfer. Só aceita exatamente os três
+// campos esperados por item — qualquer outro campo do body é ignorado, nunca
+// usado como fonte de dado (ex.: um "price"/"name" mandado pelo cliente
+// jamais entra na KV).
+function validateCartTransferItems(rawItems) {
+  if (!Array.isArray(rawItems)) {
+    return { error: 'items precisa ser um array' };
+  }
+  if (rawItems.length < CART_TRANSFER_MIN_ITEMS || rawItems.length > CART_TRANSFER_MAX_ITEMS) {
+    return { error: `items precisa ter entre ${CART_TRANSFER_MIN_ITEMS} e ${CART_TRANSFER_MAX_ITEMS} itens` };
+  }
+
+  const items = [];
+  for (const rawItem of rawItems) {
+    if (!rawItem || typeof rawItem !== 'object') {
+      return { error: 'cada item precisa ser um objeto' };
+    }
+
+    const { productId, variantId, quantity } = rawItem;
+
+    if (!Number.isInteger(productId) || productId <= 0) {
+      return { error: 'productId precisa ser um inteiro positivo' };
+    }
+    if (!Number.isInteger(variantId) || variantId <= 0) {
+      return { error: 'variantId precisa ser um inteiro positivo' };
+    }
+    if (!Number.isInteger(quantity) || quantity < CART_TRANSFER_MIN_QUANTITY || quantity > CART_TRANSFER_MAX_QUANTITY) {
+      return { error: `quantity precisa ser um inteiro entre ${CART_TRANSFER_MIN_QUANTITY} e ${CART_TRANSFER_MAX_QUANTITY}` };
+    }
+
+    items.push({ productId, variantId, quantity });
+  }
+
+  return { items };
+}
+
+function isValidCartTransferToken(token) {
+  return typeof token === 'string' && CART_TRANSFER_TOKEN_PATTERN.test(token);
+}
+
+function cartTransferKvKey(token) {
+  return `cart-transfer:${token}`;
+}
+
+async function handleCartTransferCreate(request, env, corsHeaders) {
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonResponse({ error: 'invalid_json' }, 400, corsHeaders);
+  }
+
+  const { items, error } = validateCartTransferItems(body?.items);
+  if (error) {
+    return jsonResponse({ error: 'invalid_items', message: error }, 400, corsHeaders);
+  }
+
+  // Token opaco, aleatório e não-previsível — nunca contém id/preço/nome,
+  // só identifica a entrada na KV.
+  const token = crypto.randomUUID();
+
+  await env.CART_TRANSFER_KV.put(
+    cartTransferKvKey(token),
+    JSON.stringify({ items, createdAt: Date.now() }),
+    { expirationTtl: CART_TRANSFER_TTL_SECONDS }
+  );
+
+  return jsonResponse({ token }, 201, corsHeaders);
+}
+
+async function handleCartTransferRead(token, env, corsHeaders) {
+  if (!isValidCartTransferToken(token)) {
+    return jsonResponse({ error: 'invalid_token' }, 400, corsHeaders);
+  }
+
+  const key = cartTransferKvKey(token);
+  const stored = await env.CART_TRANSFER_KV.get(key);
+  if (!stored) {
+    return jsonResponse({ error: 'not_found' }, 404, corsHeaders);
+  }
+
+  // Uso único: apaga antes de responder — uma segunda leitura do mesmo
+  // token (refresh, aba duplicada, replay) sempre recebe 404 a partir daqui.
+  await env.CART_TRANSFER_KV.delete(key);
+
+  let parsed;
+  try {
+    parsed = JSON.parse(stored);
+  } catch (error) {
+    console.error(`[cart-transfer] entrada corrompida na KV: ${error.name || 'parse_error'}`);
+    return jsonResponse({ error: 'corrupted_entry' }, 500, corsHeaders);
+  }
+
+  // Só devolve o que o NubeSDK precisa — nunca createdAt nem qualquer outro
+  // metadado interno.
+  return jsonResponse({ items: parsed.items }, 200, corsHeaders);
+}
+
+async function handleCartTransfer(request, env, corsHeaders, pathname) {
+  if (!env.CART_TRANSFER_KV) {
+    return jsonResponse({ error: 'cart_transfer_not_configured' }, 500, corsHeaders);
+  }
+
+  if (pathname === '/cart-transfer') {
+    if (request.method !== 'POST') {
+      return jsonResponse({ error: 'method_not_allowed' }, 405, corsHeaders);
+    }
+    return handleCartTransferCreate(request, env, corsHeaders);
+  }
+
+  // /cart-transfer/{token}
+  const token = pathname.slice('/cart-transfer/'.length);
+  if (!token) {
+    return jsonResponse({ error: 'not_found' }, 404, corsHeaders);
+  }
+  if (request.method !== 'GET') {
+    return jsonResponse({ error: 'method_not_allowed' }, 405, corsHeaders);
+  }
+  return handleCartTransferRead(token, env, corsHeaders);
+}
+
 export default {
   async fetch(request, env) {
     const corsHeaders = buildCorsHeaders(request, env);
 
     if (request.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: corsHeaders });
+    }
+
+    const { pathname } = new URL(request.url);
+
+    // /cart-transfer não depende do access_token da Nuvemshop (só de KV
+    // própria) — resolvido antes do gate de credenciais abaixo, que é
+    // específico dos endpoints de catálogo (/products, /categories).
+    if (pathname === '/cart-transfer' || pathname.startsWith('/cart-transfer/')) {
+      return handleCartTransfer(request, env, corsHeaders, pathname);
     }
 
     if (request.method !== 'GET') {
@@ -217,8 +362,6 @@ export default {
     if (!env.NUVEMSHOP_ACCESS_TOKEN || !env.NUVEMSHOP_STORE_ID) {
       return jsonResponse({ error: 'proxy_not_configured' }, 500, corsHeaders);
     }
-
-    const { pathname } = new URL(request.url);
 
     if (pathname === '/products') {
       return proxyResource(request, env, corsHeaders, 'products', PRODUCTS_ALLOWED_PARAMS);

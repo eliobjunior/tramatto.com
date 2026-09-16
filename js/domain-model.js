@@ -98,12 +98,36 @@
 
   class CartItem {
     constructor(data = {}) {
-      this.lineId = data.lineId || `${data.productId || 'item'}-${Math.random().toString(36).slice(2)}`;
       this.productId = data.productId || null;
+      this.variantId = data.variantId !== undefined && data.variantId !== null ? data.variantId : (data.variant?.id ?? null);
+      // lineId: identidade real do item no carrinho = variant.id real da
+      // Nuvemshop (nunca nome/slug/índice/preço — Fase 2A). Globalmente
+      // único por loja, então basta a própria variante para identificar a
+      // linha (ver docs/nuvemshop-integration.md).
+      this.lineId = data.lineId || (this.variantId !== null ? String(this.variantId) : `item-${Math.random().toString(36).slice(2)}`);
       this.product = data.product || null;
       this.variant = data.variant || null;
+
+      // Snapshot exibido mesmo antes do catálogo real recarregar (reload de
+      // página) ou se o produto deixar de existir — nunca a fonte de
+      // verdade definitiva; CartService.syncWithCatalog() atualiza estes
+      // campos a partir do catálogo real a cada carregamento.
+      this.name = data.name || data.product?.title || 'Produto Tramatto';
+      this.variantName = data.variantName || data.variant?.name || null;
+      this.sku = data.sku || data.variant?.sku || null;
+      this.image = data.image || data.product?.image || data.variant?.image || null;
+      this.stock = data.stock !== undefined ? data.stock : (data.variant?.stock ?? null);
+      this.stockManagement = data.stockManagement !== undefined ? data.stockManagement : (data.variant?.stockManagement ?? null);
+
       this.quantity = Number(data.quantity || 1);
       this.price = Number(data.price || 0);
+
+      // unavailable: variant.id não encontrado mais no catálogo real (produto
+      // removido/despublicado). outOfStock: variante existe mas stock
+      // chegou a 0 com stock_management ativo. Nunca inferidos aqui — só
+      // CartService.syncWithCatalog() os define, a partir do catálogo real.
+      this.unavailable = data.unavailable === true;
+      this.outOfStock = data.outOfStock === true;
     }
   }
 
@@ -149,7 +173,8 @@
 
     toJSON() {
       return {
-        items: this.items.map((item) => ({ ...item, product: item.product, variant: item.variant })),
+        version: 1,
+        items: this.items.map((item) => ({ ...item })),
         customer: this.customer
       };
     }

@@ -20,14 +20,23 @@ Nuvemshop → API oficial → proxy/ (Cloudflare Worker) → tramatto.com
 - `Product`: produto com preço, descrição, estoque, galeria, variantes e coleção.
 - `Variant`: variação (cor/tamanho/SKU), preserva `id` = variant_id real da Nuvemshop.
 - `Collection`: agrupamento editorial/navegação (mapeado de `categories`).
-- `Cart` / `CartItem`: carrinho local, `lineId` único por produto+variante
-  (nunca mescla variantes diferentes do mesmo produto na mesma linha).
+- `Cart` / `CartItem`: carrinho local. `lineId` = `String(variant.id)` real da
+  Nuvemshop (identidade única do item — nunca nome/slug/índice/preço; nunca
+  mescla variantes diferentes do mesmo produto na mesma linha).
 - `Customer`: reservado para checkout futuro (não usado hoje).
 
 ## Serviços (js/services.js)
 - `CatalogService` / `ProductService` / `CollectionService`: leitura de catálogo.
-- `CartService`: add/remove/update quantidade, persistência em `localStorage`
-  (chave `tramatto-cart`).
+- `CartService` (Fase 2A — carrinho visual): add/remove/update quantidade,
+  `syncWithCatalog()` (refaz preço/nome/imagem/estoque a partir do catálogo
+  real a cada carregamento, nunca confia no valor antigo salvo),
+  `getCheckoutItems()` (projeta `{productId, variantId, quantity}` — o shape
+  mínimo que a Fase 2B/NubeSDK vai consumir; não faz nenhuma chamada de rede).
+  Persistência em `localStorage` na chave versionada **`tramatto.cart.v1`**
+  (antes era `tramatto-cart`, sem versão). **Não existe migração** da chave
+  antiga — carrinhos salvos sob `tramatto-cart` antes da Fase 2A ficam
+  órfãos (nunca lidos, nunca apagados); decisão consciente, documentada
+  aqui para não ser reintroduzida por engano.
 
 ## Adapters (js/adapters.js)
 Três adapters, selecionados por `js/config.js` conforme o hostname:

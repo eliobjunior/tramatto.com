@@ -889,6 +889,16 @@ body.cart-drawer-locked { overflow: hidden; }
   cursor: pointer; color: var(--text-main); line-height: 1;
 }
 .cart-drawer-item-qty button:hover { border-color: var(--terra); color: var(--terra); }
+.cart-drawer-item-qty button:disabled {
+  opacity: 0.35; cursor: not-allowed; border-color: var(--sand); color: var(--text-light);
+}
+.cart-drawer-item-qty button:disabled:hover { border-color: var(--sand); color: var(--text-light); }
+.cart-drawer-item-notice {
+  font-size: 0.72rem; color: var(--terra); margin-top: 0.35rem;
+}
+.cart-drawer-item.is-unavailable .cart-drawer-item-image,
+.cart-drawer-item.is-out-of-stock .cart-drawer-item-image { opacity: 0.5; }
+.cart-drawer-item.is-unavailable .cart-drawer-item-name { color: var(--text-muted); }
 .cart-drawer-item-remove {
   background: none; border: none; font-size: 1.2rem; line-height: 1; color: var(--text-light);
   cursor: pointer; flex-shrink: 0;

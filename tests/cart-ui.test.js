@@ -8,7 +8,7 @@ class MemoryStorage {
   removeItem(key) { this.store.delete(key); }
 }
 
-// CartService persiste em localStorage por chave fixa ('tramatto-cart') —
+// CartService persiste em localStorage por chave fixa ('tramatto.cart.v1') —
 // sem resetar entre testes, cada `new CartService({})` carregaria o
 // carrinho deixado pelo teste anterior.
 test.beforeEach(() => {

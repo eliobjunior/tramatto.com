@@ -16,6 +16,21 @@
     return Number(item.price || item.variant?.getPrimaryPrice?.() || item.product?.getPrimaryPrice?.() || 0);
   }
 
+  // Mesmo padrão visual do placeholder usado em script.js (buildPlaceholderImage),
+  // duplicado aqui de propósito: cart-ui.js roda como script solto sem módulos
+  // (mesmo padrão já usado por formatPriceBRL/escapeHTML neste arquivo) e não
+  // deve depender de script.js já ter carregado.
+  function buildItemPlaceholder(label) {
+    const markup = encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="200" height="250"><rect width="100%" height="100%" fill="#F5F0E8"/><text x="50%" y="50%" text-anchor="middle" font-family="Arial" font-size="13" fill="#9B6B4B">${label}</text></svg>`);
+    return `data:image/svg+xml;charset=UTF-8,${markup}`;
+  }
+
+  function getItemAvailableStock(item) {
+    if (item.stockManagement !== true) return Infinity;
+    if (item.stock === '') return Infinity;
+    return Number(item.stock) || 0;
+  }
+
   function getSubtotal(cart) {
     return (cart?.items || []).reduce((sum, item) => sum + getItemPrice(item) * Number(item.quantity || 0), 0);
   }
@@ -36,8 +51,9 @@
     if (!items.length) return '';
 
     const lines = items.map((item) => {
-      const name = item.product?.title || 'Produto Tramatto';
-      const variantName = item.variant?.name && item.variant.name !== 'Padrão' ? ` (${item.variant.name})` : '';
+      const name = item.name || item.product?.title || 'Produto Tramatto';
+      const itemVariantName = item.variantName || item.variant?.name;
+      const variantName = itemVariantName && itemVariantName !== 'Padrão' ? ` (${itemVariantName})` : '';
       const lineTotal = formatPriceBRL(getItemPrice(item) * Number(item.quantity || 0));
       return `- ${item.quantity}x ${name}${variantName} — ${lineTotal}`;
     });
@@ -67,7 +83,8 @@
     if (items.length !== 1) return null;
 
     const [item] = items;
-    const variantId = item.variant?.id ?? item.product?.variants?.[0]?.id;
+    if (item.unavailable || item.outOfStock) return null;
+    const variantId = item.variantId ?? item.variant?.id ?? item.product?.variants?.[0]?.id;
     const environment = root.TramattoConfig?.resolveEnvironment?.(root.TramattoConfig.environment);
     const storeUrl = environment?.storeUrl;
 
@@ -112,7 +129,7 @@
             <span>Subtotal</span>
             <strong data-cart-subtotal>R$ 0,00</strong>
           </div>
-          <a class="btn-primary cart-drawer-buy" data-cart-native-buy hidden>Comprar agora</a>
+          <button type="button" class="btn-primary cart-drawer-buy" data-cart-checkout hidden>Finalizar compra</button>
           <a class="btn-secondary cart-drawer-whatsapp" data-cart-whatsapp-buy target="_blank" rel="noopener">Finalizar pelo WhatsApp</a>
           <button type="button" class="btn-secondary cart-drawer-continue">Continuar comprando</button>
         </div>
@@ -124,45 +141,70 @@
       overlay.addEventListener('click', close);
       drawer.querySelector('.cart-drawer-close').addEventListener('click', close);
       drawer.querySelector('.cart-drawer-continue').addEventListener('click', close);
+      drawer.querySelector('[data-cart-checkout]').addEventListener('click', handleCheckoutClick);
     }
 
     function render() {
       const cart = cartService.getCart();
       const itemsContainer = drawer.querySelector('.cart-drawer-items');
       const subtotalEl = drawer.querySelector('[data-cart-subtotal]');
-      const nativeBuyLink = drawer.querySelector('[data-cart-native-buy]');
+      const checkoutButton = drawer.querySelector('[data-cart-checkout]');
       const whatsappLink = drawer.querySelector('[data-cart-whatsapp-buy]');
 
       if (!cart.items.length) {
         itemsContainer.innerHTML = '<p class="cart-drawer-empty">Sua sacola está vazia.</p>';
       } else {
-        itemsContainer.innerHTML = cart.items.map((item) => `
-          <div class="cart-drawer-item" data-line-id="${escapeHTML(item.lineId)}">
-            <div class="cart-drawer-item-image" style="background-image:url('${escapeHTML(item.product?.image || item.variant?.image || '')}')"></div>
+        itemsContainer.innerHTML = cart.items.map((item) => {
+          const name = item.name || item.product?.title || 'Produto Tramatto';
+          const image = item.image || item.product?.image || item.variant?.image || buildItemPlaceholder(name);
+          const availableStock = getItemAvailableStock(item);
+          const atMaxStock = availableStock !== Infinity && item.quantity >= availableStock;
+          const increaseDisabled = item.unavailable || item.outOfStock || atMaxStock;
+          const rowClasses = ['cart-drawer-item'];
+          if (item.unavailable) rowClasses.push('is-unavailable');
+          else if (item.outOfStock) rowClasses.push('is-out-of-stock');
+
+          let noticeHTML = '';
+          if (item.unavailable) {
+            noticeHTML = '<div class="cart-drawer-item-notice">Este produto não está mais disponível.</div>';
+          } else if (item.outOfStock) {
+            noticeHTML = '<div class="cart-drawer-item-notice">Sem estoque no momento.</div>';
+          } else if (atMaxStock) {
+            noticeHTML = '<div class="cart-drawer-item-notice">Quantidade máxima em estoque.</div>';
+          }
+
+          return `
+          <div class="${rowClasses.join(' ')}" data-line-id="${escapeHTML(item.lineId)}">
+            <div class="cart-drawer-item-image" style="background-image:url('${escapeHTML(image)}')"></div>
             <div class="cart-drawer-item-info">
-              <div class="cart-drawer-item-name">${escapeHTML(item.product?.title || 'Produto Tramatto')}</div>
-              ${item.variant?.name && item.variant.name !== 'Padrão' ? `<div class="cart-drawer-item-variant">${escapeHTML(item.variant.name)}</div>` : ''}
+              <div class="cart-drawer-item-name">${escapeHTML(name)}</div>
+              ${item.variantName && item.variantName !== 'Padrão' ? `<div class="cart-drawer-item-variant">${escapeHTML(item.variantName)}</div>` : ''}
               <div class="cart-drawer-item-price">${formatPriceBRL(getItemPrice(item))}</div>
               <div class="cart-drawer-item-qty">
                 <button type="button" class="cart-qty-decrease" aria-label="Diminuir quantidade">-</button>
                 <span>${item.quantity}</span>
-                <button type="button" class="cart-qty-increase" aria-label="Aumentar quantidade">+</button>
+                <button type="button" class="cart-qty-increase" aria-label="Aumentar quantidade" ${increaseDisabled ? 'disabled aria-disabled="true"' : ''}>+</button>
               </div>
+              ${noticeHTML}
             </div>
             <button type="button" class="cart-drawer-item-remove" aria-label="Remover item">&times;</button>
           </div>
-        `).join('');
+        `;
+        }).join('');
       }
 
       subtotalEl.textContent = formatPriceBRL(getSubtotal(cart));
 
-      const nativeBuyUrl = buildNativeBuyUrlForSingleItemCart(cart);
-      if (nativeBuyUrl) {
-        nativeBuyLink.href = nativeBuyUrl;
-        nativeBuyLink.hidden = false;
-      } else {
-        nativeBuyLink.hidden = true;
-      }
+      // Botão "Finalizar compra" (Fase 2B — cart-transfer/NubeSDK): visível
+      // sempre que houver ao menos 1 item no carrinho, independente da
+      // quantidade de linhas — substitui o antigo link nativo /comprar/,
+      // que só funcionava para exatamente 1 linha (ver
+      // buildNativeBuyUrlForSingleItemCart, mantida só para os testes e uso
+      // futuro, não chamada mais aqui). A checagem real de itens
+      // transferíveis (unavailable/outOfStock/IDs inválidos) acontece no
+      // clique, em handleCheckoutClick — nunca aqui, para não duplicar a
+      // lógica de js/cart-transfer.js.
+      checkoutButton.hidden = cart.items.length === 0;
 
       const whatsappUrl = buildWhatsAppCheckoutUrl(cart);
       if (whatsappUrl) {
@@ -195,7 +237,9 @@
       const item = cart.items.find((entry) => entry.lineId === lineId);
       if (!item) return;
 
-      if (event.target.closest('.cart-qty-increase')) {
+      const increaseButton = event.target.closest('.cart-qty-increase');
+      if (increaseButton) {
+        if (increaseButton.disabled) return;
         await cartService.updateQuantity(lineId, item.quantity + 1);
       } else if (event.target.closest('.cart-qty-decrease')) {
         await cartService.updateQuantity(lineId, item.quantity - 1);
@@ -205,8 +249,45 @@
         return;
       }
 
-      document.dispatchEvent(new CustomEvent('tramatto:cart-updated'));
+      // updateCartBadge() (js/script.js) atualiza o contador do header E
+      // dispara 'tramatto:cart-updated' — usamos ela em vez de só disparar o
+      // evento para não deixar o badge do header dessincronizado quando o
+      // carrinho muda pelo drawer (ver regra 6 da Fase 2A). Lookup tardio
+      // (não capturado no topo do arquivo) porque script.js carrega depois
+      // de cart-ui.js — mesmo motivo da correção em js/adapters.js.
+      root.updateCartBadge?.();
       render();
+    }
+
+    // Fase 2B — clique em "Finalizar compra": pega os itens BRUTOS do
+    // carrinho (cart.items, com unavailable/outOfStock) e delega a
+    // filtragem/normalização/POST/redirect inteiras para
+    // js/cart-transfer.js (TramattoCartTransfer.transferCartToNuvemshop) —
+    // nunca duplica essa lógica aqui. Lookup tardio (não capturado no topo
+    // do arquivo) pelo mesmo motivo já documentado para TramattoConfig
+    // acima: cart-ui.js pode carregar antes de cart-transfer.js na página.
+    async function handleCheckoutClick() {
+      const checkoutButton = drawer.querySelector('[data-cart-checkout]');
+      if (checkoutButton.disabled) return;
+
+      checkoutButton.disabled = true;
+      const cart = cartService.getCart();
+
+      const result = (await root.TramattoCartTransfer?.transferCartToNuvemshop?.(cart.items))
+        || { ok: false, reason: 'cart_transfer_unavailable' };
+
+      if (result.ok) {
+        // Redirect real para a loja demo — a página é descartada em seguida,
+        // então não há necessidade de reabilitar o botão neste caminho.
+        root.location.href = result.redirectUrl;
+        return;
+      }
+
+      checkoutButton.disabled = false;
+      // Sem UI de erro dedicada ainda (fora do escopo desta etapa) — o
+      // resultado tipado ({reason, error}) já está pronto para uma futura
+      // mensagem visual; por enquanto só loga para não falhar em silêncio.
+      console.warn('[Tramatto] checkout (cart-transfer) não concluído:', result.reason, result.error || '');
     }
 
     drawer.querySelector('.cart-drawer-items').addEventListener('click', handleItemsClick);

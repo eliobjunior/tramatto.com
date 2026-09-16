@@ -43,10 +43,12 @@ test('cart service adds, updates and removes items with persistence', async () =
   const cart = await cartService.addToCart(product, variant, 2);
   assert.equal(cart.getTotalItems(), 2);
 
-  await cartService.updateQuantity(`${product.slug}-${variant.id}`, 3);
+  // lineId = variant.id (identidade real do item — Fase 2A), não mais
+  // `${product.slug}-${variant.id}`.
+  await cartService.updateQuantity(String(variant.id), 3);
   assert.equal(cartService.getCart().getTotalItems(), 3);
 
-  await cartService.removeFromCart(`${product.slug}-${variant.id}`);
+  await cartService.removeFromCart(String(variant.id));
   assert.equal(cartService.getCart().getTotalItems(), 0);
   assert.equal(global.localStorage.getItem(cartService.storageKey).includes('items'), true);
 });
