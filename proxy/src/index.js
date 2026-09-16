@@ -52,6 +52,16 @@ const CART_TRANSFER_MAX_QUANTITY = 20;
 // valor arbitrário do cliente virar chave de busca sem verificação.
 const CART_TRANSFER_TOKEN_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+// Webhooks LGPD obrigatórios (store/redact, customers/redact,
+// customers/data_request) — exigidos pela Nuvemshop para liberar o link de
+// instalação do app no Partner Portal (ver docs/nuvemshop-integration.md).
+// Semanticamente mínimos de propósito: este projeto nunca armazenou dado
+// pessoal de cliente em lugar nenhum (nem aqui, nem no NubeSDK/nube-app),
+// então não há o que "redact" nem que reportar — só confirmam recebimento.
+// Nunca persistem nem logam o corpo da requisição.
+const LGPD_HMAC_HEADER = 'x-linkedstore-hmac-sha256';
+const textEncoder = new TextEncoder();
+
 function parseAllowedOrigins(env) {
   return (env.ALLOWED_ORIGINS || '')
     .split(',')
@@ -338,6 +348,86 @@ async function handleCartTransfer(request, env, corsHeaders, pathname) {
   return handleCartTransferRead(token, env, corsHeaders);
 }
 
+function arrayBufferToBase64(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  for (let i = 0; i < bytes.length; i += 1) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+// HMAC-SHA256 do corpo CRU (nunca de um JSON reserializado — o whitespace/
+// ordem de chaves original importa para a assinatura bater) via Web Crypto,
+// nativo no runtime do Worker (sem node:crypto). Assinatura em base64,
+// mesmo padrão usado por outras plataformas (Shopify HMAC de webhook) —
+// ainda não validado contra um payload real da Nuvemshop; se a primeira
+// entrega real falhar a verificação, confirmar o encoding exato com a
+// Nuvemshop antes de mudar isto.
+async function computeHmacSha256Base64(secret, rawBody) {
+  const key = await crypto.subtle.importKey(
+    'raw',
+    textEncoder.encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+  const signature = await crypto.subtle.sign('HMAC', key, textEncoder.encode(rawBody));
+  return arrayBufferToBase64(signature);
+}
+
+// Comparação em tempo constante — nunca usa "===" direto numa assinatura
+// (evita vazar por timing quanto da string está correta). Tamanhos
+// diferentes retornam false imediatamente: o tamanho de um HMAC-SHA256 em
+// base64 é sempre fixo e público, não há segredo nisso (mesmo
+// comportamento de crypto.timingSafeEqual do Node).
+function timingSafeEqual(a, b) {
+  if (a.length !== b.length) return false;
+  let mismatch = 0;
+  for (let i = 0; i < a.length; i += 1) {
+    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return mismatch === 0;
+}
+
+// Handler único para os 3 webhooks LGPD — todos com a mesma validação
+// (POST + HMAC do App Secret) e a mesma resposta mínima (nunca persistem
+// nem logam o corpo, nunca logam email/telefone/identificação).
+async function handleLgpdWebhook(request, env, corsHeaders) {
+  if (request.method !== 'POST') {
+    return jsonResponse({ error: 'method_not_allowed' }, 405, corsHeaders);
+  }
+
+  if (!env.NUVEMSHOP_CLIENT_SECRET) {
+    console.error('[LGPD webhook] NUVEMSHOP_CLIENT_SECRET não configurado.');
+    return jsonResponse({ error: 'webhook_not_configured' }, 500, corsHeaders);
+  }
+
+  const signature = request.headers.get(LGPD_HMAC_HEADER);
+  if (!signature) {
+    return jsonResponse({ error: 'missing_signature' }, 401, corsHeaders);
+  }
+
+  // Corpo cru primeiro — o HMAC é calculado sobre exatamente esses bytes,
+  // nunca sobre um JSON.parse/JSON.stringify de volta (mudaria a string).
+  const rawBody = await request.text();
+
+  const expectedSignature = await computeHmacSha256Base64(env.NUVEMSHOP_CLIENT_SECRET, rawBody);
+  if (!timingSafeEqual(signature.trim(), expectedSignature)) {
+    return jsonResponse({ error: 'invalid_signature' }, 403, corsHeaders);
+  }
+
+  try {
+    JSON.parse(rawBody);
+  } catch {
+    return jsonResponse({ error: 'invalid_json' }, 400, corsHeaders);
+  }
+
+  // Nunca persistido, nunca logado — só confirma recebimento (ver
+  // comentário no topo do arquivo sobre por que os handlers são mínimos).
+  return jsonResponse({ ok: true }, 200, corsHeaders);
+}
+
 export default {
   async fetch(request, env) {
     const corsHeaders = buildCorsHeaders(request, env);
@@ -353,6 +443,17 @@ export default {
     // específico dos endpoints de catálogo (/products, /categories).
     if (pathname === '/cart-transfer' || pathname.startsWith('/cart-transfer/')) {
       return handleCartTransfer(request, env, corsHeaders, pathname);
+    }
+
+    // Webhooks LGPD (store/redact, customers/redact, customers/data_request)
+    // — resolvidos antes do gate de GET abaixo (são sempre POST) e antes do
+    // gate de credenciais da Nuvemshop (dependem só do NUVEMSHOP_CLIENT_SECRET,
+    // uma credencial diferente do NUVEMSHOP_ACCESS_TOKEN usado por /products
+    // e /categories).
+    if (pathname === '/webhooks/store-redact'
+      || pathname === '/webhooks/customers-redact'
+      || pathname === '/webhooks/customers-data-request') {
+      return handleLgpdWebhook(request, env, corsHeaders);
     }
 
     if (request.method !== 'GET') {

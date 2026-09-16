@@ -4,3 +4,8 @@
 
 NUVEMSHOP_ACCESS_TOKEN=coloque-o-access-token-aqui-apenas-localmente
 NUVEMSHOP_STORE_ID=5828361
+
+# Client Secret do app no Partner Portal — usado só para validar a
+# assinatura HMAC dos webhooks LGPD (/webhooks/store-redact,
+# /webhooks/customers-redact, /webhooks/customers-data-request).
+NUVEMSHOP_CLIENT_SECRET=coloque-o-client-secret-aqui-apenas-localmente

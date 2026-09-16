@@ -10,6 +10,18 @@ Endpoints expostos (somente leitura, Fase 1):
 - `GET /products` — repassa para `GET /v1/{store_id}/products` da Nuvemshop
 - `GET /categories` — repassa para `GET /v1/{store_id}/categories` da Nuvemshop
 
+Webhooks LGPD (exigidos pela Nuvemshop para liberar o link de instalação do
+app no Partner Portal — ver docs/nuvemshop-integration.md):
+
+- `POST /webhooks/store-redact`
+- `POST /webhooks/customers-redact`
+- `POST /webhooks/customers-data-request`
+
+Cada um valida a assinatura HMAC-SHA256 (header `x-linkedstore-hmac-sha256`,
+calculada sobre o corpo cru com `NUVEMSHOP_CLIENT_SECRET`) e responde `200`
+sem persistir nem logar o corpo — este projeto nunca armazenou dado pessoal
+de cliente, então não há o que "redact" nem que reportar.
+
 Query params são filtrados por allowlist (ver `src/index.js`) antes de
 serem repassados — o proxy nunca encaminha parâmetros arbitrários.
 
@@ -72,6 +84,7 @@ curl "http://localhost:8787/products?page=1&per_page=5"
 cd proxy
 wrangler login
 wrangler secret put NUVEMSHOP_ACCESS_TOKEN
+wrangler secret put NUVEMSHOP_CLIENT_SECRET
 # defina NUVEMSHOP_STORE_ID: edite [vars] em wrangler.toml OU configure
 # pelo painel Cloudflare (Worker > Settings > Variables) para não
 # versionar o ID real da loja
@@ -85,9 +98,13 @@ ser substituído pela URL real antes de ir para produção).
 
 ## Segurança
 
-- `NUVEMSHOP_ACCESS_TOKEN` só existe como secret do Worker — nunca em
-  arquivo versionado, nunca na resposta HTTP.
+- `NUVEMSHOP_ACCESS_TOKEN` e `NUVEMSHOP_CLIENT_SECRET` só existem como
+  secret do Worker — nunca em arquivo versionado, nunca na resposta HTTP,
+  nunca em log.
 - CORS restrito às origens em `ALLOWED_ORIGINS` (`wrangler.toml`).
-- Apenas `GET` é aceito; qualquer outro método retorna `405`.
-- Fase 1 não implementa nenhuma operação de escrita (carrinho/checkout
-  continuam fora deste proxy — ver auditoria da Fase 2).
+- `/products` e `/categories` só aceitam `GET`; os webhooks LGPD só aceitam
+  `POST`; qualquer outro método retorna `405`.
+- Fase 1 não implementa nenhuma operação de escrita no catálogo
+  (carrinho/checkout continuam fora deste proxy — ver auditoria da Fase 2).
+  Os webhooks LGPD são a única exceção de escrita, e mesmo assim não
+  persistem nada — ver seção de Endpoints acima.
