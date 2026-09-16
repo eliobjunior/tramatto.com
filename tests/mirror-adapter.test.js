@@ -15,7 +15,7 @@ global.nuvemshopMirrorData = {
   products: [
     {
       nuvemshopProductId: 356837564,
-      title: 'Kit 2 Panos de Prato Viva Vermelho',
+      title: 'Kit 2 Panos de Louça Viva Vermelho',
       slug: 'viva--vermelho-kit-2-pecas',
       description: 'Panos de louça premium importados da Turquia.',
       price: 74.9,
@@ -93,7 +93,7 @@ test('MirrorAdapter.getProducts() retorna produto real com dados corretos', asyn
   const product = products.find((item) => item.slug === 'viva--vermelho-kit-2-pecas');
 
   assert.ok(product, 'produto real deveria estar presente');
-  assert.equal(product.title, 'Kit 2 Panos de Prato Viva Vermelho');
+  assert.equal(product.title, 'Kit 2 Panos de Louça Viva Vermelho');
   assert.equal(product.price, 74.9);
   assert.equal(product.inStock, true);
   assert.equal(product.collectionId, 'kits');

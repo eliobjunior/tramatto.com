@@ -7,7 +7,7 @@ const { buildBuyUrl } = require('../js/purchase');
 // (ver auditoria): o item entrou no carrinho, a quantidade foi respeitada
 // e o cliente caiu direto no checkout nativo da Nuvemshop.
 const REAL_STORE_URL = 'https://tramatto.lojavirtualnuvem.com.br';
-const REAL_VARIANT_ID = 1562965536; // Kit 2 Panos de Prato Viva Vermelho
+const REAL_VARIANT_ID = 1562965536; // Kit 2 Panos de Louça Viva Vermelho
 
 test('1. variante correta gera exatamente a URL validada manualmente na loja real', () => {
   const url = buildBuyUrl({ storeUrl: REAL_STORE_URL, variantId: REAL_VARIANT_ID, quantity: 1 });

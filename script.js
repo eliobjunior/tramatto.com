@@ -522,7 +522,7 @@ function updateProductMetaTags(product, variant) {
   const price = Number(variant?.getPrimaryPrice?.() || variant?.price || product.getPrimaryPrice?.() || product.price || 0);
   const image = toAbsoluteUrl(product.gallery?.[0]) || DEFAULT_OG_IMAGE;
   const url = `${SITE_URL}/product.html?slug=${product.slug}`;
-  const title = `${product.title} | Panos de Prato Premium | Tramatto`;
+  const title = `${product.title} | Panos de Louça Premium | Tramatto`;
   const description = product.description;
 
   document.title = title;
