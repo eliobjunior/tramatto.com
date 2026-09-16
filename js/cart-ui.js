@@ -273,12 +273,17 @@
       checkoutButton.disabled = true;
       const cart = cartService.getCart();
 
-      const result = (await root.TramattoCartTransfer?.transferCartToNuvemshop?.(cart.items))
+      // cartTransferStoreUrl vem do ambiente atual (ver js/config.js) — nunca
+      // hardcoded aqui, para que produção nunca resolva para a loja demo
+      // (mesmo padrão de resolveEnvironment já usado em getBuyUrl/script.js).
+      const environment = root.TramattoConfig?.resolveEnvironment?.(root.TramattoConfig.environment);
+      const result = (await root.TramattoCartTransfer?.transferCartToNuvemshop?.(cart.items, { storeUrl: environment?.cartTransferStoreUrl }))
         || { ok: false, reason: 'cart_transfer_unavailable' };
 
       if (result.ok) {
-        // Redirect real para a loja demo — a página é descartada em seguida,
-        // então não há necessidade de reabilitar o botão neste caminho.
+        // Redirect real para a loja do ambiente atual — a página é
+        // descartada em seguida, então não há necessidade de reabilitar o
+        // botão neste caminho.
         root.location.href = result.redirectUrl;
         return;
       }

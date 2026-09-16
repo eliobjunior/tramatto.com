@@ -14,6 +14,11 @@
       // na loja real — js/purchase.js trata storeUrl vazio como "compra
       // indisponível neste ambiente" (ver Fase D do plano de integração).
       storeUrl: '',
+      // cartTransferStoreUrl: loja demo/teste do fluxo NubeSDK (Fase 2B —
+      // ver js/cart-ui.js/handleCheckoutClick e js/cart-transfer.js). Campo
+      // isolado de `storeUrl` acima (fluxo antigo de 1 item) de propósito —
+      // dev/teste continuam contra a loja demo mesmo com storeUrl vazio.
+      cartTransferStoreUrl: 'https://tramattotestenubesdk.lojavirtualnuvem.com.br',
       debug: true
     },
     staging: {
@@ -26,6 +31,9 @@
       // precisarmos reativar o NuvemshopAdapter.
       apiBaseUrl: 'https://tramatto-nuvemshop-proxy-staging.example.workers.dev',
       storeUrl: NUVEMSHOP_STORE_URL,
+      // Ainda pré-produção: mantém o fluxo NubeSDK contra a loja demo/teste,
+      // nunca a loja real (mesma lógica do development, ver comentário acima).
+      cartTransferStoreUrl: 'https://tramattotestenubesdk.lojavirtualnuvem.com.br',
       debug: true
     },
     production: {
@@ -36,6 +44,10 @@
       adapter: 'nuvemshop',
       apiBaseUrl: 'https://tramatto-nuvemshop-proxy.eliobj.workers.dev',
       storeUrl: NUVEMSHOP_STORE_URL,
+      // Nunca a loja demo em produção — clientes reais só podem ser
+      // redirecionados para a loja real da Nuvemshop (ver auditoria do
+      // fluxo NubeSDK em docs/nuvemshop-integration.md).
+      cartTransferStoreUrl: NUVEMSHOP_STORE_URL,
       debug: false
     }
   };
