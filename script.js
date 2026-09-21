@@ -57,17 +57,40 @@ function getBuyUrl(product, variant, quantity = 1) {
   return window.TramattoPurchase?.buildBuyUrl?.({ storeUrl, variantId, quantity }) || null;
 }
 
-// A Nuvemshop é a fonte de verdade da categoria de cada produto
-// (collectionId, ver integrations/nuvemshop/mapper.js). "panos-de-louca" e
-// "kits" são os ids reais das duas coleções da loja — nunca inferir kit x
+// A Nuvemshop é a fonte de verdade da categoria de cada produto. "panos-de-louca"
+// e "kits" são os slugs reais das duas coleções da loja — nunca inferir kit x
 // avulso por posição no array, nome do produto, preço ou SKU.
+//
+// IMPORTANTE: product.collectionId NÃO serve para essa comparação — no
+// NuvemshopAdapter real (integrations/nuvemshop/mapper.js) ele é o ID
+// NUMÉRICO da categoria (ex.: "39773033"), nunca o slug. O slug amigável só
+// existe em product.categories[].slug (confirmado ao vivo em produção após
+// o deploy anterior: a comparação com collectionId nunca casava com nenhum
+// produto real, esvaziando "Panos avulsos"). Verificado em
+// integrations/nuvemshop/mapper.js:84-91 (mapProductCategory).
 const PANOS_AVULSOS_COLLECTION_ID = 'panos-de-louca';
 const KITS_COLLECTION_ID = 'kits';
 
-// MockAdapter (catalog-data.js, usado em dev/demo — ver js/config.js)
-// nunca usa esse esquema real de collectionId (usa 'essentials'/'signature',
-// só para o mock). Sem isso, filtrar direto por 'panos-de-louca'/'kits'
-// esvaziaria as seções no ambiente de demonstração.
+// Único ponto que decide se um produto pertence a uma categoria (por slug).
+// Lê product.categories com segurança (ausente/null/vazio nunca lança erro).
+//
+// MirrorAdapter (nuvemshop-mirror-data.js) é a exceção: ele não tem
+// categories[] nenhum, e expõe collectionId já como o slug amigável direto
+// (confirmado no arquivo — nunca o ID numérico da Nuvemshop real). Sem esse
+// fallback, uma falha de rede no NuvemshopAdapter (que recua para
+// MirrorAdapter, ver js/config.js) reproduziria a mesma seção vazia.
+function hasCategorySlug(product, slug) {
+  if (!product) return false;
+  if (Array.isArray(product.categories) && product.categories.length) {
+    return product.categories.some((category) => category?.slug === slug);
+  }
+  return product.collectionId === slug;
+}
+
+// MockAdapter (catalog-data.js, usado em dev/demo — ver js/config.js) nunca
+// usa esse esquema de categoria (usa collectionId 'essentials'/'signature',
+// só para o mock, sem categories[]). Sem isso, filtrar direto por
+// 'panos-de-louca'/'kits' esvaziaria as seções no ambiente de demonstração.
 function isRealCatalogEnvironment() {
   const environment = window.TramattoConfig?.resolveEnvironment?.(window.TramattoConfig.environment);
   return environment?.adapter === 'mirror' || environment?.adapter === 'nuvemshop';
@@ -75,12 +98,12 @@ function isRealCatalogEnvironment() {
 
 function getAvulsoProducts(products = []) {
   if (!isRealCatalogEnvironment()) return products;
-  return products.filter((product) => product?.collectionId === PANOS_AVULSOS_COLLECTION_ID);
+  return products.filter((product) => hasCategorySlug(product, PANOS_AVULSOS_COLLECTION_ID));
 }
 
 function getKitProducts(products = []) {
   if (!isRealCatalogEnvironment()) return [];
-  return products.filter((product) => product?.collectionId === KITS_COLLECTION_ID);
+  return products.filter((product) => hasCategorySlug(product, KITS_COLLECTION_ID));
 }
 
 // Liga as setas (se existirem) à troca de imagem ativa na galeria da PDP.
@@ -678,5 +701,5 @@ window.addEventListener('DOMContentLoaded', async () => {
 // tests/catalog-classification.test.js) — no navegador, `module` não existe,
 // então este bloco nunca executa e o comportamento da página não muda em nada.
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { isSameVariantId, getAvulsoProducts, getKitProducts };
+  module.exports = { isSameVariantId, getAvulsoProducts, getKitProducts, hasCategorySlug };
 }
