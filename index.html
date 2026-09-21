@@ -103,16 +103,18 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
+    color-scheme: light;
     --cream: #F5F0E8;
     --cream-dark: #EDE6D6;
     --sand: #D4C5A9;
     --terra: #9B6B4B;
     --terra-light: #C4896A;
     --terra-dark: #6B3F25;
+    --terra-text: #8A5230;
     --charcoal: #2C2420;
     --warm-white: #FAF8F4;
     --text-main: #2C2420;
-    --text-muted: #7A6A5E;
+    --text-muted: #6E5D50;
     --text-light: #A89880;
     --serif: 'Cormorant Garamond', Georgia, serif;
     --sans: 'Jost', sans-serif;
@@ -379,7 +381,7 @@
     letter-spacing: 0.05em; margin-bottom: 0.5rem;
   }
   .product-price {
-    font-size: 0.85rem; color: var(--terra);
+    font-size: 0.85rem; color: var(--terra-text);
     font-weight: 400; letter-spacing: 0.05em;
   }
 
@@ -416,7 +418,7 @@
     line-height: 1.7; margin-bottom: 1.25rem;
   }
   .kit-price {
-    font-size: 0.9rem; color: var(--terra); margin-bottom: 1rem;
+    font-size: 0.9rem; color: var(--terra-text); margin-bottom: 1rem;
   }
   .btn-outline {
     display: inline-block;
@@ -529,7 +531,7 @@
     background: var(--warm-white); font-family: var(--sans);
     font-size: 0.85rem; color: var(--text-main); outline: none;
   }
-  .newsletter-form input::placeholder { color: var(--text-light); }
+  .newsletter-form input::placeholder { color: var(--text-muted); }
   .newsletter-form input:focus { border-color: var(--terra); }
   .newsletter-form button {
     background: var(--terra); color: var(--warm-white);
@@ -766,7 +768,7 @@
     .footer-top { grid-template-columns: 1fr; }
   }
 </style> -->
-<link rel="stylesheet" href="styles.css?v=20260611c">
+<link rel="stylesheet" href="styles.css?v=20260921-contrast">
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
