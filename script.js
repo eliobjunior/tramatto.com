@@ -57,6 +57,32 @@ function getBuyUrl(product, variant, quantity = 1) {
   return window.TramattoPurchase?.buildBuyUrl?.({ storeUrl, variantId, quantity }) || null;
 }
 
+// A Nuvemshop é a fonte de verdade da categoria de cada produto
+// (collectionId, ver integrations/nuvemshop/mapper.js). "panos-de-louca" e
+// "kits" são os ids reais das duas coleções da loja — nunca inferir kit x
+// avulso por posição no array, nome do produto, preço ou SKU.
+const PANOS_AVULSOS_COLLECTION_ID = 'panos-de-louca';
+const KITS_COLLECTION_ID = 'kits';
+
+// MockAdapter (catalog-data.js, usado em dev/demo — ver js/config.js)
+// nunca usa esse esquema real de collectionId (usa 'essentials'/'signature',
+// só para o mock). Sem isso, filtrar direto por 'panos-de-louca'/'kits'
+// esvaziaria as seções no ambiente de demonstração.
+function isRealCatalogEnvironment() {
+  const environment = window.TramattoConfig?.resolveEnvironment?.(window.TramattoConfig.environment);
+  return environment?.adapter === 'mirror' || environment?.adapter === 'nuvemshop';
+}
+
+function getAvulsoProducts(products = []) {
+  if (!isRealCatalogEnvironment()) return products;
+  return products.filter((product) => product?.collectionId === PANOS_AVULSOS_COLLECTION_ID);
+}
+
+function getKitProducts(products = []) {
+  if (!isRealCatalogEnvironment()) return [];
+  return products.filter((product) => product?.collectionId === KITS_COLLECTION_ID);
+}
+
 // Liga as setas (se existirem) à troca de imagem ativa na galeria da PDP.
 // Navegação circular: passar do último volta ao primeiro e vice-versa —
 // evita ter que desabilitar seta nas pontas e nunca produz índice inválido.
@@ -250,7 +276,10 @@ function renderProducts(container, items = appState?.products || [], listName = 
 function renderHomeProducts() {
   const container = document.getElementById('productsGrid');
   if (container) {
-    renderProducts(container, (appState?.products || []).slice(0, 4), 'Home — Destaques');
+    // Filtra por collectionId ANTES de cortar para os 4 primeiros — nunca o
+    // contrário, senão um kit que caia entre os primeiros itens do catálogo
+    // aparece na seção "Panos avulsos" (ver auditoria de classificação).
+    renderProducts(container, getAvulsoProducts(appState?.products).slice(0, 4), 'Home — Destaques');
   }
 }
 
@@ -354,7 +383,20 @@ function renderKits() {
   const container = document.getElementById('kitsGrid');
   if (!container) return;
 
-  const kits = window.catalogData?.kits || [];
+  // Kits reais da Nuvemshop (collectionId === 'kits') têm prioridade sobre
+  // os 4 kits fictícios de catalog-data.js — o mock só entra quando não há
+  // nenhum kit real disponível (ambiente de demo/dev, ver isRealCatalogEnvironment).
+  const realKits = getKitProducts(appState?.products);
+  const kits = realKits.length
+    ? realKits.map((product) => ({
+        tag: 'Kit',
+        title: product.title,
+        image: product.gallery?.[0] || null,
+        description: product.description,
+        price: formatPrice(product.getPrimaryPrice?.() || product.price || 0)
+      }))
+    : (window.catalogData?.kits || []);
+
   container.innerHTML = kits.map((kit) => `
     <div class="kit-card">
       <div class="kit-photo">
@@ -363,7 +405,7 @@ function renderKits() {
       <div class="kit-content">
         <div class="kit-tag">${escapeHTML(kit.tag)}</div>
         <div class="kit-name">${escapeHTML(kit.title)}</div>
-        <p class="kit-desc">${escapeHTML(kit.description)}</p>
+        <div class="kit-desc">${window.TramattoSanitize.sanitizeDescriptionHtml(kit.description)}</div>
         <div class="kit-price">${escapeHTML(kit.price)}</div>
         <button type="button" class="btn-outline" data-add-to-cart-kit="${escapeHTML(kit.title)}">Adicionar à sacola</button>
       </div>
@@ -389,7 +431,7 @@ function renderCollections() {
   collectionContainer.innerHTML = collections.map((collection) => `
     <article class="collection-card">
       <h3>${escapeHTML(collection.name)}</h3>
-      <p>${escapeHTML(collection.description)}</p>
+      <p>${window.TramattoSanitize.sanitizeDescriptionHtml(collection.description)}</p>
     </article>
   `).join('');
 }
@@ -435,7 +477,7 @@ function renderProductDetail() {
         <div class="section-tag">Peça selecionada</div>
         <h1 class="product-detail-title">${escapeHTML(product.title)}</h1>
         <p class="product-detail-price">${formatPrice(selectedVariant?.getPrimaryPrice?.() || selectedVariant?.price || product.getPrimaryPrice?.() || product.price || 0)}</p>
-        <p class="product-detail-description">${escapeHTML(product.description)}</p>
+        <div class="product-detail-description">${window.TramattoSanitize.sanitizeDescriptionHtml(product.description)}</div>
         <div class="product-variant-group">
           <div class="variant-label">Variações</div>
           <div class="variant-list">${variantMarkup}</div>
@@ -632,9 +674,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   await initializeStorefront();
 });
 
-// Exposto só para teste automatizado (tests/script-variant-selection.test.js)
-// — no browser, `module` não existe, então este bloco nunca executa e o
-// comportamento da página não muda em nada.
+// Exposto só para teste automatizado (tests/script-variant-selection.test.js,
+// tests/catalog-classification.test.js) — no navegador, `module` não existe,
+// então este bloco nunca executa e o comportamento da página não muda em nada.
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { isSameVariantId };
+  module.exports = { isSameVariantId, getAvulsoProducts, getKitProducts };
 }
