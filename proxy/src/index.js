@@ -52,6 +52,16 @@ const CART_TRANSFER_MAX_QUANTITY = 20;
 // valor arbitrário do cliente virar chave de busca sem verificação.
 const CART_TRANSFER_TOKEN_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+// OAuth callback do app Partner "Tramatto Storefront" (ID 42251) — troca o
+// authorization code pelo access_token para a instalação do script #10189
+// (NubeSDK, auto instalado pela própria Nuvemshop) realmente "pegar" na
+// loja. O Redirect URL padrão do Partner Portal
+// (partners.nuvemshop.com.br/applications/authentication/{app_id}) não
+// completa esse passo — ver plano técnico em docs/nuvemshop-integration.md.
+// client_id é sempre fixo aqui no servidor (nunca aceito do navegador).
+const NUVEMSHOP_OAUTH_TOKEN_URL = 'https://www.tiendanube.com/apps/authorize/token';
+const NUVEMSHOP_APP_CLIENT_ID = '42251';
+
 // Webhooks LGPD obrigatórios (store/redact, customers/redact,
 // customers/data_request) — exigidos pela Nuvemshop para liberar o link de
 // instalação do app no Partner Portal (ver docs/nuvemshop-integration.md).
@@ -428,6 +438,96 @@ async function handleLgpdWebhook(request, env, corsHeaders) {
   return jsonResponse({ ok: true }, 200, corsHeaders);
 }
 
+function htmlResponse(html, status, corsHeaders) {
+  return new Response(html, {
+    status,
+    headers: {
+      'Content-Type': 'text/html; charset=utf-8',
+      ...corsHeaders
+    }
+  });
+}
+
+// Páginas fixas, sem interpolação nenhuma — nunca há dado dinâmico (muito
+// menos code/access_token/client_secret) nestas respostas.
+function oauthInstallSuccessHtml() {
+  return '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Tramatto Storefront</title></head><body><p>Tramatto Storefront instalado com sucesso.</p></body></html>';
+}
+
+function oauthInstallErrorHtml() {
+  return '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Tramatto Storefront</title></head><body><p>Não foi possível concluir a instalação do Tramatto Storefront. Tente novamente ou contate o suporte.</p></body></html>';
+}
+
+// POST server-to-server (nunca do navegador) — troca o authorization code
+// por um access_token. Content-Type application/json conforme a
+// documentação oficial (nuvemshop.dev/api/authentication).
+async function exchangeOAuthCode(env, code) {
+  return fetchWithTimeout(NUVEMSHOP_OAUTH_TOKEN_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      client_id: NUVEMSHOP_APP_CLIENT_ID,
+      client_secret: env.NUVEMSHOP_CLIENT_SECRET,
+      grant_type: 'authorization_code',
+      code
+    })
+  }, UPSTREAM_TIMEOUT_MS);
+}
+
+async function handleOAuthCallback(request, env, corsHeaders) {
+  if (request.method !== 'GET') {
+    return jsonResponse({ error: 'method_not_allowed' }, 405, corsHeaders);
+  }
+
+  if (!env.NUVEMSHOP_CLIENT_SECRET) {
+    console.error('[oauth/callback] NUVEMSHOP_CLIENT_SECRET não configurado.');
+    return htmlResponse(oauthInstallErrorHtml(), 500, corsHeaders);
+  }
+
+  // Só lê `code` da URL. Nunca lê/aceita client_id, client_secret ou token
+  // vindos de query string — client_id é sempre o valor fixo do servidor.
+  const code = new URL(request.url).searchParams.get('code');
+  if (!code) {
+    return htmlResponse(oauthInstallErrorHtml(), 400, corsHeaders);
+  }
+
+  let upstreamResponse;
+  try {
+    upstreamResponse = await exchangeOAuthCode(env, code);
+  } catch (error) {
+    // Nunca loga `code` — só o tipo do erro de rede/timeout.
+    console.error(`[oauth/callback] troca de code falhou: ${error.name || 'unknown_error'}`);
+    return htmlResponse(oauthInstallErrorHtml(), 502, corsHeaders);
+  }
+
+  let payload;
+  try {
+    payload = await upstreamResponse.json();
+  } catch {
+    console.error(`[oauth/callback] resposta da Nuvemshop não é JSON válido (status ${upstreamResponse.status}).`);
+    return htmlResponse(oauthInstallErrorHtml(), 502, corsHeaders);
+  }
+
+  if (!upstreamResponse.ok || typeof payload?.access_token !== 'string' || !payload.access_token) {
+    // Nunca loga `payload` inteiro (conteria o access_token em sucesso
+    // parcial) — só o status HTTP, que não é sensível.
+    console.error(`[oauth/callback] troca de code retornou ${upstreamResponse.status} sem access_token válido.`);
+    return htmlResponse(oauthInstallErrorHtml(), 502, corsHeaders);
+  }
+
+  // Evidência mínima para diagnóstico — nunca token/code/secret. Não valida
+  // user_id contra uma loja fixa de propósito: este endpoint precisa
+  // continuar funcionando se o app for autorizado por outra loja no futuro
+  // (ver plano técnico). scope também só é registrado, nunca exigido como
+  // exatamente "write_scripts" (a Nuvemshop pode incluir escopo implícito).
+  console.log(`[oauth/callback] instalação concluída: app_id=${NUVEMSHOP_APP_CLIENT_ID} user_id=${payload.user_id ?? 'desconhecido'} scope=${payload.scope ?? 'desconhecido'} timestamp=${new Date().toISOString()}`);
+
+  // access_token nunca é persistido nem repassado adiante — o script #10189
+  // é auto instalado pela própria Nuvemshop; este app não precisa reusar o
+  // token depois da instalação (ver docs/nuvemshop-integration.md).
+  return htmlResponse(oauthInstallSuccessHtml(), 200, corsHeaders);
+}
+
 export default {
   async fetch(request, env) {
     const corsHeaders = buildCorsHeaders(request, env);
@@ -454,6 +554,13 @@ export default {
       || pathname === '/webhooks/customers-redact'
       || pathname === '/webhooks/customers-data-request') {
       return handleLgpdWebhook(request, env, corsHeaders);
+    }
+
+    // /oauth/callback (app 42251) depende só de NUVEMSHOP_CLIENT_SECRET —
+    // resolvido antes do gate de GET/credenciais de catálogo abaixo, mesmo
+    // padrão de /cart-transfer e dos webhooks LGPD acima.
+    if (pathname === '/oauth/callback') {
+      return handleOAuthCallback(request, env, corsHeaders);
     }
 
     if (request.method !== 'GET') {
