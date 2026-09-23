@@ -306,12 +306,35 @@ function renderHomeProducts() {
   }
 }
 
+// collection.html é compartilhada por três links de navegação diferentes
+// ("Panos Avulsos", "Kits", "Coleções") que sempre apontaram para a MESMA
+// URL sem nenhum parâmetro — por isso a página nunca filtrava por categoria,
+// e "Panos Avulsos" acabava listando o catálogo inteiro (kits inclusive).
+// ?categoria=avulsos|kits reaproveita getAvulsoProducts/getKitProducts (já
+// validados contra os slugs reais da Nuvemshop) só para esta página; sem o
+// parâmetro (link "Coleções"), o comportamento continua o mesmo de sempre:
+// lista o catálogo completo.
+function getCollectionFilterProducts(products = [], search = window.location.search) {
+  const categoria = new URLSearchParams(search).get('categoria');
+  if (categoria === 'avulsos') return getAvulsoProducts(products);
+  if (categoria === 'kits') return getKitProducts(products);
+  return products;
+}
+
+function getCollectionListMeta(search = window.location.search) {
+  const categoria = new URLSearchParams(search).get('categoria');
+  if (categoria === 'avulsos') return { name: 'Panos Avulsos', id: 'panos-avulsos' };
+  if (categoria === 'kits') return { name: 'Kits Curados', id: 'kits-curados' };
+  return { name: 'Coleção Premium', id: 'colecao-premium' };
+}
+
 function renderCollectionPage() {
   const container = document.getElementById('collectionProducts');
   if (container) {
-    const products = appState?.products || [];
-    renderProducts(container, products, 'Coleção Premium');
-    dispatchViewCollection(products, 'Coleção Premium', 'colecao-premium');
+    const products = getCollectionFilterProducts(appState?.products || []);
+    const { name, id } = getCollectionListMeta();
+    renderProducts(container, products, name);
+    dispatchViewCollection(products, name, id);
   }
 }
 
@@ -386,12 +409,12 @@ function initCollectionSearch() {
 
   input.addEventListener('input', () => {
     const term = input.value.trim();
-    const allProducts = appState?.products || [];
+    const baseProducts = getCollectionFilterProducts(appState?.products || []);
     const filtered = term
-      ? allProducts.filter((product) => product.title.toLowerCase().includes(term.toLowerCase()))
-      : allProducts;
+      ? baseProducts.filter((product) => product.title.toLowerCase().includes(term.toLowerCase()))
+      : baseProducts;
 
-    const listName = term ? 'Busca — Coleção' : 'Coleção Premium';
+    const listName = term ? 'Busca — Coleção' : getCollectionListMeta().name;
     renderProducts(container, filtered, listName);
 
     if (term) {
@@ -701,5 +724,5 @@ window.addEventListener('DOMContentLoaded', async () => {
 // tests/catalog-classification.test.js) — no navegador, `module` não existe,
 // então este bloco nunca executa e o comportamento da página não muda em nada.
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { isSameVariantId, getAvulsoProducts, getKitProducts, hasCategorySlug };
+  module.exports = { isSameVariantId, getAvulsoProducts, getKitProducts, hasCategorySlug, getCollectionFilterProducts };
 }

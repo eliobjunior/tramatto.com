@@ -19,7 +19,7 @@ function setEnvironment(adapterName) {
   };
 }
 
-const { getAvulsoProducts, getKitProducts, hasCategorySlug } = require('../script.js');
+const { getAvulsoProducts, getKitProducts, hasCategorySlug, getCollectionFilterProducts } = require('../script.js');
 
 // Formato real do NuvemshopAdapter (integrations/nuvemshop/mapper.js:84-91):
 // collectionId é o ID NUMÉRICO da categoria; o slug amigável só existe em
@@ -133,4 +133,45 @@ test('ambiente mock/demo: getKitProducts retorna vazio (renderKits() cai para ca
   setEnvironment('mock');
   const products = [{ title: 'Linho Anatoliano', collectionId: 'essentials', categories: [] }];
   assert.deepEqual(getKitProducts(products), []);
+});
+
+// Bug real reproduzido aqui: collection.html é compartilhada pelos links
+// "Panos Avulsos", "Kits" e "Coleções", que sempre apontaram para a mesma
+// URL sem nenhum parâmetro — renderCollectionPage() nunca chamava
+// getAvulsoProducts/getKitProducts, então a seção "Panos Avulsos" listava o
+// catálogo inteiro (kits inclusive). getCollectionFilterProducts() é o que
+// corrige isso, lendo ?categoria= da URL.
+test('getCollectionFilterProducts: ?categoria=avulsos nunca retorna nenhum kit (mesmo com kit primeiro no array)', () => {
+  setEnvironment('nuvemshop');
+  const kit1 = realProduct({ title: 'Kit 2 Panos de Louça Mika – Verde', categorySlug: 'kits', categoryId: '39773033' });
+  const avulso1 = realProduct({ title: 'Pano de Louça Golgeli Cinza | Unitário', categorySlug: 'panos-de-louca', categoryId: '39773031' });
+  const kit2 = realProduct({ title: 'Kit 2 Panos de Louça Nuovo – Amarelo', categorySlug: 'kits', categoryId: '39773033' });
+  const avulso2 = realProduct({ title: 'Pano de Louça Zehra | Unitário', categorySlug: 'panos-de-louca', categoryId: '39773031' });
+  const products = [kit1, avulso1, kit2, avulso2];
+
+  const result = getCollectionFilterProducts(products, '?categoria=avulsos');
+  assert.deepEqual(result, [avulso1, avulso2]);
+  assert.ok(result.every((p) => !p.title.startsWith('Kit')), 'nenhum kit pode vazar para avulsos');
+});
+
+test('getCollectionFilterProducts: ?categoria=kits nunca retorna nenhum avulso', () => {
+  setEnvironment('nuvemshop');
+  const kit1 = realProduct({ title: 'Kit 2 Panos de Louça Kita – Branco', categorySlug: 'kits', categoryId: '39773033' });
+  const avulso1 = realProduct({ title: 'Pano de Louça Golgeli Cinza | Unitário', categorySlug: 'panos-de-louca', categoryId: '39773031' });
+  const kit2 = realProduct({ title: 'Kit 2 Panos de Louça Kita – Azul', categorySlug: 'kits', categoryId: '39773033' });
+  const products = [avulso1, kit1, kit2];
+
+  const result = getCollectionFilterProducts(products, '?categoria=kits');
+  assert.deepEqual(result, [kit1, kit2]);
+  assert.ok(!result.includes(avulso1), 'nenhum avulso pode vazar para kits');
+});
+
+test('getCollectionFilterProducts: sem ?categoria= (link "Coleções") preserva o comportamento antigo — lista tudo', () => {
+  setEnvironment('nuvemshop');
+  const kit1 = realProduct({ title: 'Kit 2 Panos de Louça', categorySlug: 'kits', categoryId: '39773033' });
+  const avulso1 = realProduct({ title: 'Pano de Louça Zehra | Unitário', categorySlug: 'panos-de-louca', categoryId: '39773031' });
+  const products = [kit1, avulso1];
+
+  assert.deepEqual(getCollectionFilterProducts(products, ''), products);
+  assert.deepEqual(getCollectionFilterProducts(products, '?q=busca'), products);
 });
