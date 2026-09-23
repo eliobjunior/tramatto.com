@@ -280,7 +280,7 @@ nav {
   font-size: 0.58rem;
 }
 .product-img {
-  aspect-ratio: 3/4;
+  aspect-ratio: 4/5;
   background: var(--cream-dark);
   position: relative; overflow: hidden;
   margin-bottom: 1rem;
@@ -314,14 +314,15 @@ nav {
 }
 .kit-card {
   display: grid; grid-template-columns: 1fr 1fr;
+  align-items: start;
   background: var(--warm-white);
   overflow: hidden;
   cursor: pointer;
   transition: transform 0.3s;
 }
 .kit-card:hover { transform: translateY(-3px); }
-.kit-photo { background: var(--cream-dark); }
-.kit-photo .photo-placeholder { min-height: 280px; }
+.kit-photo { background: var(--cream-dark); aspect-ratio: 4/5; overflow: hidden; }
+.kit-photo .photo-placeholder { min-height: 100%; }
 .kit-content {
   padding: 2rem 1.75rem;
   display: flex; flex-direction: column; justify-content: center;
@@ -337,6 +338,10 @@ nav {
 .kit-desc {
   font-size: 0.8rem; color: var(--text-muted);
   line-height: 1.7; margin-bottom: 1.25rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .kit-price {
   font-size: 0.9rem; color: var(--terra-text); margin-bottom: 1rem;
@@ -637,7 +642,7 @@ footer {
   .kit-card {
     grid-template-columns: 1fr;
   }
-  .kit-photo .photo-placeholder { min-height: 220px; }
+  .kit-photo .photo-placeholder { min-height: 100%; }
   .kit-content { padding: 1.5rem; }
 
   .material { padding: 4rem 1.5rem; }
